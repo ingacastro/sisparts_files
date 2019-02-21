@@ -14,13 +14,13 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        $role = Role::create(['guard_name' => 'web', 'name' => 'superadmin']);
-
         $user = User::create([
         	'name' => 'Admin',
         	'email' => 'admin@admin.com',
         	'password' => bcrypt('123456789')
         ]);
+
+        $role = Role::findByName('superadmin');
 
         $user->assignRole($role);
     }

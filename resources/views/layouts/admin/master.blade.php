@@ -387,9 +387,8 @@ License: You must have a valid license purchased only from themeforest(the above
             <!-- BEGIN CONTAINER -->
             <div class="page-container">
                 <!-- BEGIN SIDEBAR -->
-
+                @include('layouts.admin.includes.sidebar')
                 <!-- END SIDEBAR -->
-                </div>
                 <!-- END SIDEBAR -->
                 <!-- BEGIN CONTENT -->
                 @include('layouts.admin.includes.content')

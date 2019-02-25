@@ -27,5 +27,8 @@
     <link href="/metronic-assets/layouts/layout/css/themes/darkblue.min.css" rel="stylesheet" type="text/css" id="style_color" />
     <link href="/metronic-assets/layouts/layout/css/custom.min.css" rel="stylesheet" type="text/css" />
     <!-- END THEME LAYOUT STYLES -->
-    <link rel="shortcut icon" href="favicon.ico" /> 
+    <link rel="shortcut icon" href="favicon.ico" />
+    <style>
+        .page-sidebar-menu { padding-top: 44px !important; }
+    </style>
 </head>

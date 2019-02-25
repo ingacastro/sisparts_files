@@ -18,3 +18,6 @@ Route::get('/', function () {
 Auth::routes(['register' => false]);
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+//New logout route, since link is a get request
+Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout');

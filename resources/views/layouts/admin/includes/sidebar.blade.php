@@ -47,8 +47,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="javascript:;" class="nav-link nav-toggle">
-                <i class=""></i>
+            <a href="{{ route('supplier.index') }}" class="nav-link nav-toggle">
+                <i class="icon-basket"></i>
                 <span class="title">Proveedores</span>
                 <span class="selected"></span>
             </a>

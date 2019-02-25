@@ -1,73 +1,73 @@
-@extends('layouts.app')
-
+@extends('layouts.auth.master')
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Login') }}</div>
-
-                <div class="card-body">
-                    <form method="POST" action="{{ route('login') }}">
-                        @csrf
-
-                        <div class="form-group row">
-                            <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required autofocus>
-
-                                @if ($errors->has('email'))
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $errors->first('email') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
-
-                                @if ($errors->has('password'))
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $errors->first('password') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-md-6 offset-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-
-                                    <label class="form-check-label" for="remember">
-                                        {{ __('Remember Me') }}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Login') }}
-                                </button>
-
-                                @if (Route::has('password.request'))
-                                    <a class="btn btn-link" href="{{ route('password.request') }}">
-                                        {{ __('Forgot Your Password?') }}
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+<!-- BEGIN LOGO -->
+<div class="logo">
+    <a href="index.html">
+        <img src="/metronic-assets/pages/img/logo-big.png" alt="" /></a>
 </div>
+<!-- END LOGO -->
+<!-- BEGIN LOGIN -->
+<div class="content">
+    <!-- BEGIN LOGIN FORM -->
+    <form class="login-form" action="{{ route('login') }}" method="post">
+        @csrf
+        <h3 class="form-title font-green">Login</h3>
+        <div class="alert alert-danger display-hide">
+            <button class="close" data-close="alert"></button>
+            <span> Ingresa usuario y contraseña. </span>
+        </div>
+        <div class="form-group">
+            <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
+            <label class="control-label visible-ie8 visible-ie9">Email</label>
+            <input class="form-control-solid placeholder-no-fix form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" 
+            type="email" placeholder="Correo elctrónico" name="email" value="{{ old('email') }}" required autofocus /> 
+            @if ($errors->has('email'))
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $errors->first('email') }}</strong>
+                </span>
+            @endif
+        </div>
+        <div class="form-group">
+            <label class="control-label visible-ie8 visible-ie9">Contraseña</label>
+            <input class="form-control-solid placeholder-no-fix form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" 
+            type="password" autocomplete="off" placeholder="Contraseña" name="password" required /> 
+            @if ($errors->has('password'))
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $errors->first('password') }}</strong>
+                </span>
+            @endif
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn green uppercase">Entrar</button>
+            <label class="rememberme check mt-checkbox mt-checkbox-outline">
+                <input class="form-check-input" type="checkbox" name="remember" id="remember" value="1" 
+                {{ old('remember') ? 'checked' : '' }}/>Recordar
+                <span></span>
+            </label>
+            <a href="{{ route('password.request') }}" id="forget-password" class="forget-password">¿Olvidaste tu contraseña?</a>
+        </div>
+    </form>
+    <!-- END LOGIN FORM -->
+    <!-- BEGIN FORGOT PASSWORD FORM -->
+    <form class="forget-form" action="{{ route('password.email') }}" method="post">
+        @csrf
+        <h3 class="font-green">Recuperar contraseña</h3>
+        <p> Ingresa to correo electrónico para restablecer tu contraseña. </p>
+        <div class="form-group">
+            <input type="email" autocomplete="off" placeholder="Correo electrónico" 
+            name="email" id="email" class="placeholder-no-fix form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" required/> 
+            @if ($errors->has('email'))
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $errors->first('email') }}</strong>
+                </span>
+            @endif
+        </div>
+        <div class="form-actions">
+            <button type="button" id="back-btn" class="btn green btn-outline">Regresar</button>
+            <button type="submit" class="btn btn-success uppercase pull-right btn-primary">Enviar</button>
+        </div>
+    </form>
+    <!-- END FORGOT PASSWORD FORM -->
+</div>
+<!-- END LOGIN -->
 @endsection

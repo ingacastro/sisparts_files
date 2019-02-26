@@ -3,7 +3,7 @@
 @section('breadcumb')
 <ul class="page-breadcrumb">
     <li>
-        <a href="index.html">Home</a>
+        <a>Home</a>
         <i class="fa fa-circle"></i>
     </li>
     <li>
@@ -13,7 +13,7 @@
 @endsection
 @section('page-title')
 <h1 class="page-title"> Dashboard
-    <small>statistics, charts, recent events and reports</small>
+    <small></small>
 </h1>
 @endsection
 @section('page-content')

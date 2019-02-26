@@ -20,7 +20,6 @@ License: You must have a valid license purchased only from themeforest(the above
     <!-- BEGIN HEAD -->
     @include('layouts.admin.includes.meta')
     <!-- END HEAD -->
-
     <body class="page-header-fixed page-sidebar-closed-hide-logo page-container-bg-solid page-content-white">
         <div class="page-wrapper">
             <!-- BEGIN HEADER -->
@@ -458,5 +457,4 @@ License: You must have a valid license purchased only from themeforest(the above
         <!-- END THEME LAYOUT SCRIPTS -->
         @stack('scripts')
     </body>
-
 </html>

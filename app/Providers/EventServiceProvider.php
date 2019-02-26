@@ -1,6 +1,6 @@
 <?php
 
-namespace InternationalParts\Providers;
+namespace IParts\Providers;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;

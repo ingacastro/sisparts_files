@@ -1,6 +1,6 @@
 <?php
 
-namespace InternationalParts\Providers;
+namespace IParts\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Broadcast;

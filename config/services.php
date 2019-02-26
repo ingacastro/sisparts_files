@@ -30,7 +30,7 @@ return [
     ],
 
     'stripe' => [
-        'model' => InternationalParts\User::class,
+        'model' => IParts\User::class,
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
     ],

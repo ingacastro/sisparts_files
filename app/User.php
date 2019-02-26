@@ -1,6 +1,6 @@
 <?php
 
-namespace InternationalParts;
+namespace IParts;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;

@@ -39,14 +39,14 @@
             </form>
             <!-- END RESPONSIVE QUICK SEARCH FORM -->
         </li> --}}
-        <li class="nav-item start active">
-            <a href="javascript:;" class="nav-link nav-toggle">
+        <li id="sidebar_dashboard" class="nav-item start">
+            <a href="{{ route('home') }}" class="nav-link nav-toggle">
                 <i class="icon-bar-chart"></i>
                 <span class="title">Tablero</span>
                 <span class="selected"></span>
             </a>
         </li>
-        <li class="nav-item">
+        <li id="sidebar_supplier" class="nav-item ">
             <a href="{{ route('supplier.index') }}" class="nav-link nav-toggle">
                 <i class="icon-basket"></i>
                 <span class="title">Proveedores</span>

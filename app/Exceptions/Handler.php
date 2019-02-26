@@ -1,6 +1,6 @@
 <?php
 
-namespace InternationalParts\Exceptions;
+namespace IParts\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;

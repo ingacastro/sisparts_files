@@ -1,6 +1,6 @@
 <?php
 
-namespace InternationalParts\Http\Middleware;
+namespace IParts\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 

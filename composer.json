@@ -25,7 +25,7 @@
             "database/factories"
         ],
         "psr-4": {
-            "InternationalParts\\": "app/"
+            "IParts\\": "app/"
         }
     },
     "autoload-dev": {

@@ -1,6 +1,6 @@
 <?php
 
-namespace InternationalParts\Http\Controllers\Auth;
+namespace IParts\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;

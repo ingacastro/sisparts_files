@@ -66,7 +66,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => InternationalParts\User::class,
+            'model' => IParts\User::class,
         ],
 
         // 'users' => [

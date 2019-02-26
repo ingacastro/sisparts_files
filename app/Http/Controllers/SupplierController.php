@@ -1,8 +1,10 @@
 <?php
 
-namespace InternationalParts\Http\Controllers;
+namespace IParts\Http\Controllers;
 
 use Illuminate\Http\Request;
+use IParts\Supplier;
+use  Illuminate\Support\Facades\Log;
 
 class SupplierController extends Controller
 {
@@ -13,7 +15,9 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        //
+        $suppliers = Supplier::all();
+        Log::notice($suppliers);
+        return view('supplier.index', compact('suppliers'));
     }
 
     /**

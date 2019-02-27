@@ -16,7 +16,6 @@ class SupplierController extends Controller
     public function index()
     {
         $suppliers = Supplier::all();
-        Log::notice($suppliers);
         return view('supplier.index', compact('suppliers'));
     }
 

@@ -1,5 +1,5 @@
 @extends('layouts.admin.master')
-@section('meta-css')}
+@section('meta-css')
 @endsection
 @section('content')
 @section('breadcumb')
@@ -29,28 +29,67 @@
                 <li>
                     <a href="#tab_1" data-toggle="tab"> Datos Fiscales </a>
                 </li>
+                @if(isset($model->id))
                 <li>
                     <a href="#tab_2" data-toggle="tab"> Marcas </a>
                 </li>
+                @endif
             </ul>
 			<div class="tab-content">
                 <div class="tab-pane active" id="tab_0">
                   <div class="portlet box blue">
                         <div class="portlet-title">
                             <div class="caption">
-                                <i class=""></i>Datos Básicos </div>
+                                <i class=""></i>Datos Básicos</div>
                         </div>
                         <div class="portlet-body form">
                             <!-- BEGIN FORM-->
-                            @include('supplier.tabs.basic_data')
+                            {!! Form::open(['route' => 'supplier.store', 'class' => 'horizontal-form']) !!}
+                                @include('supplier.tabs.basic_data')
+                            {!! Form::close() !!}
                             <!-- END FORM-->
                         </div>
                     </div>
                 </div>
+                <div class="tab-pane" id="tab_1">
+                  <div class="portlet box blue">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class=""></i>Datos Fiscales</div>
+                        </div>
+                        <div class="portlet-body form">
+                            <!-- BEGIN FORM-->
+                            {!! Form::open(['route' => 'supplier.store', 'class' => 'horizontal-form']) !!}
+                                @include('supplier.tabs.fiscal_data')
+                            {!! Form::close() !!}
+                            <!-- END FORM-->
+                        </div>
+                    </div>
+                </div>
+                @if(isset($model->id))
+                <div class="tab-pane" id="tab_2">
+                  <div class="portlet box blue">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class=""></i>Marcas</div>
+                        </div>
+                        <div class="portlet-body form">
+                            <!-- BEGIN FORM-->
+                            {!! Form::open(['route' => 'supplier.store', 'class' => 'horizontal-form']) !!}
+                                @include('supplier.tabs.brands')
+                            {!! Form::close() !!}
+                            <!-- END FORM-->
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     </div>
 </div>
 @endsection
 @push('scripts')
+<script type="text/javascript">
+    $('#sidebar_supplier').addClass('active');
+</script>
 @endpush

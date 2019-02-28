@@ -42,7 +42,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="landline">Teléfono móvil</label>
-                {!! Form::text('landline', $model->landline, ['class' => 'form-control', 'id' => 'landline']) !!}
+                {!! Form::text('mobile', $model->landline, ['class' => 'form-control', 'id' => 'landline']) !!}
             </div>
         </div>
         <div class="col-md-6">

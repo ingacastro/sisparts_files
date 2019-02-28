@@ -4,10 +4,15 @@ namespace IParts\Http\Controllers;
 
 use Illuminate\Http\Request;
 use IParts\Supplier;
-use  Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Log;
+use IParts\Http\Requests\SupplierRequest;
 
 class SupplierController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth', ['except' => ['index','show']]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -27,7 +32,7 @@ class SupplierController extends Controller
     public function create()
     {
         $model = new Supplier();
-        return view('supplier.create', compact('model'));
+        return view('supplier.create_update', compact('model'));
     }
 
     /**
@@ -36,9 +41,9 @@ class SupplierController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(SupplierRequest $request)
     {
-        //
+        
     }
 
     /**

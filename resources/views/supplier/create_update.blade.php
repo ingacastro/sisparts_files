@@ -17,6 +17,7 @@
 <h1 class="page-title"> Nuevo Proveedor
     <small></small>
 </h1>
+@include('layouts.admin.includes.error_messages')
 @endsection
 @section('page-content')
 <div class="row">
@@ -44,14 +45,16 @@
                         </div>
                         <div class="portlet-body form">
                             <!-- BEGIN FORM-->
-                            {!! Form::open(['route' => 'supplier.store', 'class' => 'horizontal-form']) !!}
+                            {{-- {!! Form::open(['route' => 'supplier.store', 'class' => 'horizontal-form', 'id' => 'basic_form']) !!} --}}
+                            <form action="" id="basic_form" class="horizontal-form">
                                 @include('supplier.tabs.basic_data')
-                            {!! Form::close() !!}
+                            </form>
+                            {{-- {!! Form::close() !!} --}}
                             <!-- END FORM-->
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane" id="tab_1">
+                <div class="tab-pane " id="tab_1">
                   <div class="portlet box blue">
                         <div class="portlet-title">
                             <div class="caption">
@@ -59,7 +62,7 @@
                         </div>
                         <div class="portlet-body form">
                             <!-- BEGIN FORM-->
-                            {!! Form::open(['route' => 'supplier.store', 'class' => 'horizontal-form']) !!}
+                            {!! Form::open(['route' => ['supplier.store', $model], 'class' => 'horizontal-form', 'id' => 'fiscal_form']) !!}
                                 @include('supplier.tabs.fiscal_data')
                             {!! Form::close() !!}
                             <!-- END FORM-->
@@ -67,7 +70,7 @@
                     </div>
                 </div>
                 @if(isset($model->id))
-                <div class="tab-pane" id="tab_2">
+                <div class="tab-pane " id="tab_2">
                   <div class="portlet box blue">
                         <div class="portlet-title">
                             <div class="caption">
@@ -75,7 +78,8 @@
                         </div>
                         <div class="portlet-body form">
                             <!-- BEGIN FORM-->
-                            {!! Form::open(['route' => 'supplier.store', 'class' => 'horizontal-form']) !!}
+                            {!! Form::open(['route' => 'supplier.store', 'method' => 'post', 'class' => 'horizontal-form', 
+                            'id' => 'brands_form']) !!}
                                 @include('supplier.tabs.brands')
                             {!! Form::close() !!}
                             <!-- END FORM-->
@@ -90,6 +94,16 @@
 @endsection
 @push('scripts')
 <script type="text/javascript">
-    $('#sidebar_supplier').addClass('active');
+    $(document).ready(function(){
+        $('#sidebar_supplier').addClass('active');
+    });
+
+    //We merge basic and fiscal forms every time one of them is submitted
+    $('#fiscal_form').submit(function(e){
+        $('#basic_form :input').not(':submit').clone().hide().prependTo('#fiscal_form');
+    });
+    $('#basic_form').submit(function(e){
+        $('#fiscal_form :input').not(':submit').clone().hide().appendTo('#basic_form');
+    });
 </script>
 @endpush

@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\User;
+use IParts\User;
 use Spatie\Permission\Models\Role;
 
 class UsersTableSeeder extends Seeder

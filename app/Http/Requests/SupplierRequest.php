@@ -26,24 +26,59 @@ class SupplierRequest extends FormRequest
         return [
               'trade_name' => 'required',
               'countries_id' => 'required',
-              'email' => 'required',
+              'email' => 'required|email',
               'languages_id' => 'required',
-              'landline' => 'required',
+              'landline' => 'required|max:15',
               'currencies_id' => 'required',
-              'mobile' => 'required',
+              'mobile' => 'required|max:15',
+              'marketplace' => 'required',
               'business_name' => 'required',
               'type' => 'required',
               'states_id' => 'required',
-              'rfc' => 'required',
+              'rfc' => ['required', 'regex:/^[a-zA-Z]{3,4}(\d{6})((\D|\d){2,3})?$/'],
               'city' => 'required',
               'post_code' => 'required',
               'street' => 'required',
               'contact_name' => 'required',
               'street_number' => 'required',
               'unit_number' => 'required',
-              'credit_days' => 'required',
+              'credit_days' => 'required|numeric',
               'suburb' => 'required',
-              'credit_amount' => 'required'
+              'credit_amount' => 'required|numeric'
         ];
+    }
+
+    public function messages()
+    {
+      return [
+        'trade_name.required' => 'El nombre comercial es requerido.',
+        'countries_id.required' => 'El país es requerido.',
+        'email.required' => 'El correo electrónico es requerido.',
+        'email.email' => 'El formato del correo electrónico es incorrecto.',
+        'languages_id.required' => 'El idioma es requerido.',
+        'landline.required' => 'El teléfono fijo es requerido.',
+        'landline.max' => 'El formato de teléfono debe ser de máximo 15 caracteres.',
+        'currencies_id.required' => 'La moneda es requerida.',
+        'mobile.required' => 'El teléfono móvil es requerido.',
+        'mobile.max' => 'El formato de teléfono debe ser de máximo 15 caracteres.',
+        'marketplace.required' => 'El marketplace es requerido.',
+        'business_name.required' => 'La razón social es requerido.',
+        'type.required' => 'El tipo de proveedor es requerido.',
+        'states_id.required' => 'El estado es requerido.',
+        'rfc.required' => 'El RFC requerido.',
+        'rfc.regex' => 'El formato de RFC es incorrecto.',
+        'city.required' => 'La ciudad es requerido.',
+        'post_code.required' => 'El código postal es requerido.',
+        'post_code.size' => 'El código postal debe ser de 5 dígitos.',
+        'street.required' => 'La calle es requerida.',
+        'contact_name.required' => 'El contacto es requerido.',
+        'street_number.required' => 'El número exterior es requerido.',
+        'unit_number.required' => 'El número interior es requerido.',
+        'credit_days.required' => 'Los días de crédito es requerido.',
+        'credit_days.required' => 'Los días de crédito debe ser númerico.',
+        'suburb.required' => 'La colonia es requerida.',
+        'credit_amount.required' => 'El monto de crédito es requerido.',
+        'credit_amount.required' => 'El monto de crédito debe ser númerico.'
+      ];
     }
 }

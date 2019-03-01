@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use IParts\Supplier;
 use Illuminate\Support\Facades\Log;
 use IParts\Http\Requests\SupplierRequest;
+use DB;
 
 class SupplierController extends Controller
 {
@@ -32,7 +33,11 @@ class SupplierController extends Controller
     public function create()
     {
         $model = new Supplier();
-        return view('supplier.create_update', compact('model'));
+        $countries = DB::table('countries')->pluck('name', 'id');
+        $languages = DB::table('languages')->pluck('name', 'id');
+        $currencies = DB::table('currencies')->pluck('name', 'id');
+        return view('supplier.create_update', compact(
+            'model', 'countries', 'languages', 'currencies'));
     }
 
     /**
@@ -41,9 +46,16 @@ class SupplierController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(SupplierRequest $request)
+    public function store(Request $request)
     {
-        
+        Log::notice($request);
+        try {
+            Supplier::create($request->all());
+            $request->session()->flash('message', 'Proveedor guardado correctamente, sección de marcas habilitada.');
+        } catch(\Exception $e) {
+            return redirect()->back()->withErrors($e->getMessage());
+        }
+        return redirect('supplier.edit');
     }
 
     /**
@@ -65,7 +77,8 @@ class SupplierController extends Controller
      */
     public function edit($id)
     {
-        //
+        $model = Supplier::find($id);
+        return view('supplier.create_update', compact('model'));
     }
 
     /**

@@ -2,51 +2,53 @@
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="business_name">Razón social</label>
+                <label class="control-label" for="business_name"><span class="required">* </span>Razón social</label>
                 {!! Form::text('business_name', $model->business_name, ['class' => 'form-control', 'id' => 'business_name']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="">Tipo de proveedor</label>
+                <label class="control-label" for=""><span class="required">* </span>Tipo de proveedor</label>
                 {!! Form::select('type', [1 => 'Persona física', 2 => 'Persona moral', 3 => 'Extranjero'], $model->type, 
-                ['placeholder' => 'Seleccionar...', 'class' => 'form-control', 'id' => 'countries_id']) !!}
+                ['placeholder' => 'Seleccionar...', 'class' => 'form-control', 'id' => 'type']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="states_id">Estado</label>
-                {!! Form::select('states_id', [1, 2], $model->states_id, 
-                ['placeholder' => 'Seleccionar...', 'class' => 'form-control', 'id' => 'states_id']) !!}
+                <label class="control-label" for="states_id"><span class="required">* </span>Estado</label>
+                {!! Form::select('states_id', [], $model->states_id, ['class' => 'form-control', 'id' => 'states_id',
+                'placeholder' => 'Seleccionar...', 'disabled']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="rfc">RFC</label>
-                {!! Form::text('rfc', $model->rfc, ['class' => 'form-control', 'id' => 'rfc']) !!}
+                <label class="control-label" for="rfc"><span class="required">* </span>RFC</label>
+                {!! Form::text('rfc', $model->rfc, ['class' => 'form-control', 'id' => 'rfc',
+                'maxlength' => '13', 'style' => 'text-transform: uppercase']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="city">Ciudad</label>
+                <label class="control-label" for="city"><span class="required">* </span>Ciudad</label>
                 {!! Form::text('city', $model->city, ['class' => 'form-control', 'id' => 'city']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="post_code">Código postal</label>
-                {!! Form::text('post_code', $model->post_code, ['class' => 'form-control', 'id' => 'post_code']) !!}
+                <label class="control-label" for="post_code"><span class="required">* </span>Código postal</label>
+                {!! Form::text('post_code', $model->post_code, ['class' => 'form-control integer-mask', 'id' => 'post_code',
+                'maxlength' => '5']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="street">Calle</label>
+                <label class="control-label" for="street"><span class="required">* </span>Calle</label>
                 {!! Form::text('street', $model->street, ['class' => 'form-control', 'id' => 'street']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="contact_name">Contacto</label>
+                <label class="control-label" for="contact_name"><span class="required">* </span>Contacto</label>
                 {!! Form::text('contact_name', $model->contact_name, ['class' => 'form-control', 'id' => 'contact_name']) !!}
             </div>
         </div>
@@ -54,13 +56,13 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label" for="street_number">Número exterior</label>
+                        <label class="control-label" for="street_number"><span class="required">* </span>Número exterior</label>
                         {!! Form::text('street_number', $model->street_number, ['class' => 'form-control', 'id' => 'street_number']) !!}
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label" for="unit_number">Número interior</label>
+                        <label class="control-label" for="unit_number"><span class="required">* </span>Número interior</label>
                         {!! Form::text('unit_number', $model->unit_number, ['class' => 'form-control', 'id' => 'unit_number']) !!}
                     </div>
                 </div>
@@ -68,26 +70,27 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="credit_days">Días de crédito</label>
-                {!! Form::text('credit_days', $model->credit_days, ['class' => 'form-control', 'id' => 'credit_days']) !!}
+                <label class="control-label" for="credit_days"><span class="required">* </span>Días de crédito</label>
+                {!! Form::text('credit_days', $model->credit_days, ['class' => 'form-control integer-mask', 'id' => 'credit_days']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="suburb">Colonia</label>
+                <label class="control-label" for="suburb"><span class="required">* </span>Colonia</label>
                 {!! Form::text('suburb', $model->suburb, ['class' => 'form-control', 'id' => 'suburb']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="credit_amount">Monto de credito</label>
-                {!! Form::text('credit_amount', $model->credit_amount, ['class' => 'form-control', 'id' => 'credit_amount']) !!}
+                <label class="control-label" for="credit_amount"><span class="required">* </span>Monto de credito</label>
+                {!! Form::text('credit_amount', $model->credit_amount, ['class' => 'form-control currency-mask', 
+                'id' => 'credit_amount']) !!}
             </div>
         </div>
     </div>
 </div>
 <div class="form-actions right">
-    <button type="button" class="btn default">Cancelar</button>
+    <a href="{{ route('supplier.index') }}" class="btn default">Cancelar</a>
     <button type="submit" class="btn blue">
         <i class="fa fa-check"></i> Guardar</button>
 </div>

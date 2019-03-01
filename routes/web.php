@@ -22,5 +22,9 @@ Route::get('home', 'HomeController@index')->name('home');
 //New logout route, since link is a get request and default logout route is post
 Route::get('logout', 'Auth\LoginController@logout');
 
+//Util routes
+Route::get('country-states', 'UtilController@getCountryStates');
+
 //Supplier routes
 Route::resource('supplier', 'SupplierController');
+

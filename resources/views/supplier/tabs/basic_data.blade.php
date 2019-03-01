@@ -11,7 +11,7 @@
                 <label class="control-label" for="country"><span class="required">* </span>Country</label>
                 {!! Form::select(null, $countries, $model->countries_id, 
                 ['placeholder' => 'Seleccionar...', 'class' => 'form-control drop-down', 'id' => 'country']) !!}
-                <input type="hidden" name="countries_id" value="" id="country_hidden">
+                <input type="hidden" name="countries_id" value="{{ $model->countries_id }}" id="country_hidden">
             </div>
         </div>
         <div class="col-md-6">
@@ -23,8 +23,9 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="language"><span class="required">* </span>Idioma</label>
-                {!! Form::select('languages_id', $languages, $model->languages_id, 
-                ['placeholder' => 'Seleccionar...', 'class' => 'form-control', 'id' => 'languages_id']) !!}
+                {!! Form::select(null, $languages, $model->languages_id, 
+                ['placeholder' => 'Seleccionar...', 'class' => 'form-control drop-down', 'id' => 'language']) !!}
+                <input type="hidden" name="languages_id" value="{{ $model->languages_id }}" id="language_hidden">
             </div>
         </div>
         <div class="col-md-6">
@@ -35,9 +36,10 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="currencies_id"><span class="required">* </span>Moneda</label>
-                {!! Form::select('currencies_id', $currencies, $model->currencies_id, 
-                ['placeholder' => 'Seleccionar...', 'class' => 'form-control', 'id' => 'currencies_id']) !!}
+                <label class="control-label" for="currency"><span class="required">* </span>Moneda</label>
+                {!! Form::select(null, $currencies, $model->currencies_id, 
+                ['placeholder' => 'Seleccionar...', 'class' => 'form-control drop-down', 'id' => 'currency']) !!}
+                <input type="hidden" name="currencies_id" value="{{ $model->currencies_id }}" id="currency_hidden">
             </div>
         </div>
         <div class="col-md-6">

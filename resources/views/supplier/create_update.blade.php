@@ -103,34 +103,23 @@
         if($.isNumeric(model_id)) $('#states_id').removeAttr("disabled");
     });
 
-    //Laravel collective by default is not changing selected option
+    //We copy every select selected option value into a hidden input
     $('.drop-down').change(function(){
         let select_val = $(this).val();
-        console.log(select_val);
         $('#' + $(this).attr('id') + '_hidden').val(select_val);
+        //console.log($('#' + $(this).attr('id') + '_hidden').val());
     });
 
     //We merge basic and fiscal forms every time one of them is submitted
     $('#fiscal_form').submit(function(e){
-        let basic_form = $('#basic_form :input');
-        let basic_form_clone = basic_form.clone();
-        basic_form_clone.hide().prependTo('#fiscal_form');
-
-        //Especial case for selects
-        //get original selects into a jq object
-/*        var originalSelects = basic_form.find('select');
-        basic_form_clone.find('select').each(function(index, item) {
-             //set new select to value of old select
-             $(item).val(originalSelects.eq(index).val());
-             console.log(item);
-        });*/
+        $('#basic_form :input').not(':submit').clone().hide().prependTo('#fiscal_form');
     });
 
     $('#basic_form').submit(function(e){
         $('#fiscal_form :input').not(':submit').clone().hide().appendTo('#basic_form');
     });
 
-    $('#countries_id').change(function(){
+    $('#country').change(function(){
         loadStates();
     });
 

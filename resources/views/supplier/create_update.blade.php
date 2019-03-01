@@ -18,6 +18,7 @@
     <small></small>
 </h1>
 @include('layouts.admin.includes.error_messages')
+@include('layouts.admin.includes.success_messages')
 @endsection
 @section('page-content')
 <div class="row">
@@ -45,11 +46,17 @@
                         </div>
                         <div class="portlet-body form">
                             <!-- BEGIN FORM-->
-                            {{-- {!! Form::open(['route' => 'supplier.store', 'class' => 'horizontal-form', 'id' => 'basic_form']) !!} --}}
+                            @if(!isset($model->id))
+                            <!-- Create -->
                             <form action="" id="basic_form" class="horizontal-form">
                                 @include('supplier.tabs.basic_data')
                             </form>
-                            {{-- {!! Form::close() !!} --}}
+                            @else
+                            <!-- Update -->
+                            {!! Form::model(['route' => ['supplier.update', $model], 'class' => 'horizontal-form', 'id' => 'basic_form']) !!}
+                                @include('supplier.tabs.basic_data')
+                            {!! Form::close() !!}
+                            @endif
                             <!-- END FORM-->
                         </div>
                     </div>
@@ -62,7 +69,8 @@
                         </div>
                         <div class="portlet-body form">
                             <!-- BEGIN FORM-->
-                            {!! Form::open(['route' => ['supplier.store', $model], 'class' => 'horizontal-form', 'id' => 'fiscal_form']) !!}
+                            {!! Form::open(['route' => 'supplier.store', 'class' => 'horizontal-form', 'id' => 'fiscal_form']) !!}
+                                <input type="hidden" name="tabs_config" value="">
                                 @include('supplier.tabs.fiscal_data')
                             {!! Form::close() !!}
                             <!-- END FORM-->

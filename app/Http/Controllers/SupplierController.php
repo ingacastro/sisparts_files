@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use IParts\Supplier;
 use Illuminate\Support\Facades\Log;
 use IParts\Http\Requests\SupplierRequest;
+use Illuminate\Support\Facades\Session;
 use DB;
 
 class SupplierController extends Controller
@@ -66,7 +67,7 @@ class SupplierController extends Controller
         } catch(\Exception $e) {
             return redirect()->back()->withErrors($e->getMessage());
         }
-        return redirect()->route('supplier.edit', compact('model'));
+        return redirect()->route('supplier.edit', $model->id);
     }
 
     /**

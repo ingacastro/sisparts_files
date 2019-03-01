@@ -23,29 +23,35 @@ class SupplierRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        $rules = [
               'trade_name' => 'required',
               'countries_id' => 'required',
-              'email' => 'required|email',
               'languages_id' => 'required',
-              'landline' => 'required|max:15',
-              'currencies_id' => 'required',
-              'mobile' => 'required|max:15',
-              'marketplace' => 'required',
-              'business_name' => 'required',
+              //'currencies_id' => 'required',
+              'mobile' => 'nullable|max:15',
+              //'marketplace' => 'required',
+              //'business_name' => 'required',
               'type' => 'required',
-              'states_id' => 'required',
-              'rfc' => ['required', 'regex:/^[a-zA-Z]{3,4}(\d{6})((\D|\d){2,3})?$/'],
-              'city' => 'required',
+              //'states_id' => 'required',
+              'rfc' => ['nullable', 'regex:/^[a-zA-Z]{3,4}(\d{6})((\D|\d){2,3})?$/', 'unique'],
+              //'city' => 'required',
               'post_code' => 'required',
-              'street' => 'required',
-              'contact_name' => 'required',
-              'street_number' => 'required',
-              'unit_number' => 'required',
-              'credit_days' => 'required|numeric',
-              'suburb' => 'required',
-              'credit_amount' => 'required|numeric'
+              //'street' => 'required',
+              //'contact_name' => 'required',
+              //'street_number' => 'required',
+              //'unit_number' => 'required',
+              'credit_days' => 'nullable|numeric',
+              //'suburb' => 'required',
+              'credit_amount' => 'nullable|numeric'
         ];
+
+        //only for no marketplace suppliers
+        if(!$this->has('marketplace')){
+          $rules['email'] = 'required|email';
+          $rules['landline'] = 'required|max:15';
+        }
+
+        return $rules;
     }
 
     public function messages()
@@ -61,11 +67,12 @@ class SupplierRequest extends FormRequest
         'currencies_id.required' => 'La moneda es requerida.',
         'mobile.required' => 'El teléfono móvil es requerido.',
         'mobile.max' => 'El formato de teléfono debe ser de máximo 15 caracteres.',
-        'marketplace.required' => 'El marketplace es requerido.',
+        //'marketplace.required' => 'El marketplace es requerido.',
         'business_name.required' => 'La razón social es requerido.',
         'type.required' => 'El tipo de proveedor es requerido.',
         'states_id.required' => 'El estado es requerido.',
         'rfc.required' => 'El RFC requerido.',
+        'rfc.unique' => 'El RFC indicado ya existe.',
         'rfc.regex' => 'El formato de RFC es incorrecto.',
         'city.required' => 'La ciudad es requerido.',
         'post_code.required' => 'El código postal es requerido.',

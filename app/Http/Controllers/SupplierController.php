@@ -56,6 +56,9 @@ class SupplierController extends Controller
     public function store(SupplierRequest $request)
     {
         $model = null;
+        $supp_data = $request->all();
+
+        if(!$request->has('marketplace')) $supp_data['marketplace'] = 0;
 
         try {
             $model = Supplier::create($request->all());

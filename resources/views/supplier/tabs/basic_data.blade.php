@@ -17,7 +17,7 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="email"><span class="required">* </span>Correo electrónico</label>
+                <label class="control-label" for="email">Correo electrónico</label>
                 {!! Form::text('email', $model->email, ['class' => 'form-control', 'id' => 'email',
                 'autocomplete' => 'off']) !!}
             </div>
@@ -32,14 +32,14 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="landline"><span class="required">* </span>Teléfono fijo</label>
+                <label class="control-label" for="landline">Teléfono fijo</label>
                 {!! Form::text('landline', $model->landline, ['class' => 'form-control phone-mask', 'id' => 'landline',
                 'autocomplete' => 'off']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="currency"><span class="required">* </span>Moneda</label>
+                <label class="control-label" for="currency">Moneda</label>
                 {!! Form::select(null, $selects_options['currencies'], $model->currencies_id, 
                 ['placeholder' => 'Seleccionar...', 'class' => 'form-control drop-down', 'id' => 'currency']) !!}
                 <input type="hidden" name="currencies_id" value="{{ $model->currencies_id }}" id="currency_hidden">
@@ -47,7 +47,7 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="landline"><span class="required">* </span>Teléfono móvil</label>
+                <label class="control-label" for="landline">Teléfono móvil</label>
                 {!! Form::text('mobile', $model->landline, ['class' => 'form-control phone-mask', 'id' => 'landline',
                 'autocomplete' => 'off']) !!}
             </div>

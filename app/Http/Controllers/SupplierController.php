@@ -33,11 +33,18 @@ class SupplierController extends Controller
     public function create()
     {
         $model = new Supplier();
-        $countries = DB::table('countries')->pluck('name', 'id');
-        $languages = DB::table('languages')->pluck('name', 'id');
-        $currencies = DB::table('currencies')->pluck('name', 'id');
+        $selects_options = $this->formSelectsOptions();
         return view('supplier.create_update', compact(
-            'model', 'countries', 'languages', 'currencies'));
+            'model', 'selects_options'));
+    }
+
+    private function formSelectsOptions()
+    {
+        return [
+            'countries' => DB::table('countries')->pluck('name', 'id'),
+            'languages' => DB::table('languages')->pluck('name', 'id'),
+            'currencies' => DB::table('currencies')->pluck('name', 'id')
+        ];
     }
 
     /**
@@ -46,16 +53,17 @@ class SupplierController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(SupplierRequest $request)
     {
-        Log::notice($request);
+        $model = null;
+
         try {
-            Supplier::create($request->all());
+            $model = Supplier::create($request->all());
             $request->session()->flash('message', 'Proveedor guardado correctamente, sección de marcas habilitada.');
         } catch(\Exception $e) {
             return redirect()->back()->withErrors($e->getMessage());
         }
-        return redirect('supplier.edit');
+        return redirect()->route('supplier.edit', compact('model'));
     }
 
     /**
@@ -78,7 +86,9 @@ class SupplierController extends Controller
     public function edit($id)
     {
         $model = Supplier::find($id);
-        return view('supplier.create_update', compact('model'));
+        $selects_options = $this->formSelectsOptions();
+        return view('supplier.create_update', compact(
+            'model', 'selects_options'));
     }
 
     /**

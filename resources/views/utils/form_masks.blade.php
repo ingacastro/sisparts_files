@@ -5,15 +5,12 @@ $(document).ready(function(){
 	$('.phone-mask').inputmask("mask", {
 		mask:"(99) 9999-9999"
 	});
-/*	$('.rfc-mask').inputmask("mask", {
-		mask:"(99) 9999-9999"
-	});*/
-	$('.integer-mask').inputmask({ "mask": "9", "repeat": "13"});
-/*	$('.integer-mask').inputmask("integer", {
+	//$('.post-code-mask').inputmask({ "mask": "9", "repeat": "5"});
+	$('.integer-mask').inputmask("integer", {
 	    rightAlign: false,
 	    allowMinus: false,
 	    oncleared: function () { self.Value(''); }
-	});*/
+	});
 	$('.currency-mask').inputmask("numeric", {
 	    radixPoint: ".",
 	    groupSeparator: ",",

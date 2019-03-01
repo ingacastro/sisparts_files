@@ -3,13 +3,14 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="trade_name"><span class="required">* </span>Nombre comercial</label>
-                {!! Form::text('trade_name', $model->trade_name, ['class' => 'form-control', 'id' => 'trade_name']) !!}
+                {!! Form::text('trade_name', $model->trade_name, ['class' => 'form-control', 'id' => 'trade_name',
+                'autocomplete' => 'off']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="country"><span class="required">* </span>Country</label>
-                {!! Form::select(null, $countries, $model->countries_id, 
+                {!! Form::select(null, $selects_options['countries'], $model->countries_id, 
                 ['placeholder' => 'Seleccionar...', 'class' => 'form-control drop-down', 'id' => 'country']) !!}
                 <input type="hidden" name="countries_id" value="{{ $model->countries_id }}" id="country_hidden">
             </div>
@@ -17,13 +18,14 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="email"><span class="required">* </span>Correo electrónico</label>
-                {!! Form::text('email', $model->email, ['class' => 'form-control', 'id' => 'email']) !!}
+                {!! Form::text('email', $model->email, ['class' => 'form-control', 'id' => 'email',
+                'autocomplete' => 'off']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="language"><span class="required">* </span>Idioma</label>
-                {!! Form::select(null, $languages, $model->languages_id, 
+                {!! Form::select(null, $selects_options['languages'], $model->languages_id, 
                 ['placeholder' => 'Seleccionar...', 'class' => 'form-control drop-down', 'id' => 'language']) !!}
                 <input type="hidden" name="languages_id" value="{{ $model->languages_id }}" id="language_hidden">
             </div>
@@ -31,13 +33,14 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="landline"><span class="required">* </span>Teléfono fijo</label>
-                {!! Form::text('landline', $model->landline, ['class' => 'form-control phone-mask', 'id' => 'landline']) !!}
+                {!! Form::text('landline', $model->landline, ['class' => 'form-control phone-mask', 'id' => 'landline',
+                'autocomplete' => 'off']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="currency"><span class="required">* </span>Moneda</label>
-                {!! Form::select(null, $currencies, $model->currencies_id, 
+                {!! Form::select(null, $selects_options['currencies'], $model->currencies_id, 
                 ['placeholder' => 'Seleccionar...', 'class' => 'form-control drop-down', 'id' => 'currency']) !!}
                 <input type="hidden" name="currencies_id" value="{{ $model->currencies_id }}" id="currency_hidden">
             </div>
@@ -45,7 +48,8 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="landline"><span class="required">* </span>Teléfono móvil</label>
-                {!! Form::text('mobile', $model->landline, ['class' => 'form-control phone-mask', 'id' => 'landline']) !!}
+                {!! Form::text('mobile', $model->landline, ['class' => 'form-control phone-mask', 'id' => 'landline',
+                'autocomplete' => 'off']) !!}
             </div>
         </div>
         <div class="col-md-6">

@@ -3,7 +3,8 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="business_name"><span class="required">* </span>Razón social</label>
-                {!! Form::text('business_name', $model->business_name, ['class' => 'form-control', 'id' => 'business_name']) !!}
+                {!! Form::text('business_name', $model->business_name, ['class' => 'form-control', 'id' => 'business_name', 
+                'autocomplete' => 'off']) !!}
             </div>
         </div>
         <div class="col-md-6">
@@ -24,32 +25,35 @@
             <div class="form-group">
                 <label class="control-label" for="rfc"><span class="required">* </span>RFC</label>
                 {!! Form::text('rfc', $model->rfc, ['class' => 'form-control', 'id' => 'rfc',
-                'maxlength' => '13', 'style' => 'text-transform: uppercase']) !!}
+                'maxlength' => '13', 'style' => 'text-transform: uppercase', 'autocomplete' => 'off']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="city"><span class="required">* </span>Ciudad</label>
-                {!! Form::text('city', $model->city, ['class' => 'form-control', 'id' => 'city']) !!}
+                {!! Form::text('city', $model->city, ['class' => 'form-control', 'id' => 'city', 
+                'autocomplete' => 'off']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="post_code"><span class="required">* </span>Código postal</label>
                 {!! Form::text('post_code', $model->post_code, ['class' => 'form-control integer-mask', 'id' => 'post_code',
-                'maxlength' => '5']) !!}
+                'maxlength' => '5', 'autocomplete' => 'off']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="street"><span class="required">* </span>Calle</label>
-                {!! Form::text('street', $model->street, ['class' => 'form-control', 'id' => 'street']) !!}
+                {!! Form::text('street', $model->street, ['class' => 'form-control', 'id' => 'street', 
+                'autocomplete' => 'off']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="contact_name"><span class="required">* </span>Contacto</label>
-                {!! Form::text('contact_name', $model->contact_name, ['class' => 'form-control', 'id' => 'contact_name']) !!}
+                {!! Form::text('contact_name', $model->contact_name, ['class' => 'form-control', 'id' => 'contact_name', 
+                'autocomplete' => 'off']) !!}
             </div>
         </div>
         <div class="col-md-6">
@@ -57,13 +61,15 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label" for="street_number"><span class="required">* </span>Número exterior</label>
-                        {!! Form::text('street_number', $model->street_number, ['class' => 'form-control', 'id' => 'street_number']) !!}
+                        {!! Form::text('street_number', $model->street_number, ['class' => 'form-control', 'id' => 'street_number', 
+                        'autocomplete' => 'off']) !!}
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label" for="unit_number"><span class="required">* </span>Número interior</label>
-                        {!! Form::text('unit_number', $model->unit_number, ['class' => 'form-control', 'id' => 'unit_number']) !!}
+                        {!! Form::text('unit_number', $model->unit_number, ['class' => 'form-control', 'id' => 'unit_number', 
+                        'autocomplete' => 'off']) !!}
                     </div>
                 </div>
             </div>
@@ -71,20 +77,22 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="credit_days"><span class="required">* </span>Días de crédito</label>
-                {!! Form::text('credit_days', $model->credit_days, ['class' => 'form-control integer-mask', 'id' => 'credit_days']) !!}
+                {!! Form::text('credit_days', $model->credit_days, ['class' => 'form-control integer-mask', 'id' => 'credit_days', 
+                'autocomplete' => 'off']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="suburb"><span class="required">* </span>Colonia</label>
-                {!! Form::text('suburb', $model->suburb, ['class' => 'form-control', 'id' => 'suburb']) !!}
+                {!! Form::text('suburb', $model->suburb, ['class' => 'form-control', 'id' => 'suburb', 
+                'autocomplete' => 'off']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="credit_amount"><span class="required">* </span>Monto de credito</label>
                 {!! Form::text('credit_amount', $model->credit_amount, ['class' => 'form-control currency-mask', 
-                'id' => 'credit_amount']) !!}
+                'id' => 'credit_amount', 'autocomplete' => 'off']) !!}
             </div>
         </div>
     </div>

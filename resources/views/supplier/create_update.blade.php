@@ -1,8 +1,8 @@
 @extends('layouts.admin.master')
 @section('meta-css')
-        <link href="/metronic-assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
-        <link href="/metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
-        <link href="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="/metronic-assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
+<link href="/metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/css/plugins.min.css" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
@@ -109,8 +109,11 @@
 @include('utils.form_masks')
 <script src="/metronic-assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
 <script src="/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script>
+@if(isset($model->id))
 <script src="/metronic-assets/global/plugins/datatables/datatables.min.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
+<script src="/js/supplier/brands.js" type="text/javascript"></script>
+@endif
 <script type="text/javascript">
     $(document).ready(function(){
         $('#sidebar_supplier').addClass('active');
@@ -118,17 +121,6 @@
 
         //In edit mode enable state select
         if($.isNumeric(model_id)) $('#states_id').removeAttr("disabled");
-
-        $('#brands_select2').select2({
-            tags: true
-        });
-
-        $('#brands_table').dataTable({
-            searching: false,
-            info: false,
-            lengthChange: false,
-            sDom: '<"row view-filter"<"col-sm-12"<"pull-left"l><"pull-right"f><"clearfix">>>t<"row view-pager"<"col-sm-12"<"text-center"ip>>>'
-        });
     });
 
     //We copy every select selected option value into a hidden input

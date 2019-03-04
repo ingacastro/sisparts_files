@@ -54,10 +54,8 @@
         </div>
         <div class="col-md-6">
             <div class="form-group" style="margin: 15px 0 0 0">
-                <label class="mt-checkbox" style="margin: 15px 0 0 0">Marketplace
-                    <input type="checkbox" value="1" name="marketplace" />
-                    <span></span>
-                </label>
+                <input type="checkbox" value="1" name="marketplace" {{$model->marketplace == 1 ? 'checked' : ''}} />
+                <label style="margin: 20px 0 0 0">Marketplace </label>
             </div>
         </div>
     </div>

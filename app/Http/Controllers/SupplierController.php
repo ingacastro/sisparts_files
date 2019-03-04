@@ -7,6 +7,7 @@ use IParts\Supplier;
 use Illuminate\Support\Facades\Log;
 use IParts\Http\Requests\SupplierRequest;
 use Illuminate\Support\Facades\Session;
+use IParts\Brand;
 use DB;
 
 class SupplierController extends Controller
@@ -93,6 +94,23 @@ class SupplierController extends Controller
         $selects_options = $this->formSelectsOptions();
         return view('supplier.create_update', compact(
             'model', 'selects_options'));
+    }
+
+    public function getBrandsKeyVal(Request $request)
+    {
+        $brands = Brand::select('id', 'name as text')
+        ->where('name', 'like', '%' . $request->get('term') . '%')->get();
+        return response()->json($brands);
+    }
+
+    /*Creates a new brand or simply returns the brand received*/
+    public function createBrand(Request $request)
+    {
+        $brand = Brand::find($request->get('value'));
+
+        if(is_null($brand)) Brand::create(['name' => $request->get('value')]);
+        
+        return response()->json($brand);
     }
 
     /**

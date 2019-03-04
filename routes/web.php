@@ -26,5 +26,7 @@ Route::get('logout', 'Auth\LoginController@logout');
 Route::get('country-states', 'UtilController@getCountryStates');
 
 //Supplier routes
+Route::get('brands-id-name', 'SupplierController@getBrandsKeyVal');
+Route::post('create-brand', 'SupplierController@createBrand');
 Route::resource('supplier', 'SupplierController');
 

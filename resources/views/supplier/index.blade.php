@@ -204,10 +204,25 @@
 <script type="text/javascript">
     $(document).ready(function(){
         $('#sidebar_supplier').addClass('active');
-        $('#suppliers_table').DataTable({
+/*        $('#suppliers_table').DataTable({
             language: {
                 "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
             }
+        });*/
+    $(document).ready(function(){
+            $('#suppliers_table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: '/supplier/get-list',
+                bSort: true,
+                columns: [
+                    { data: "name", name: "name" },
+                    { data: 'actions', name: 'actions', orderable: false, searchable: false }
+                ]
+                language: {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+                }, 
+            });
         });
     });
 </script>

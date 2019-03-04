@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use IParts\Http\Requests\SupplierRequest;
 use Illuminate\Support\Facades\Session;
 use IParts\Brand;
+use Yajra\Datatables\Datatables;
 use DB;
 
 class SupplierController extends Controller
@@ -25,6 +26,22 @@ class SupplierController extends Controller
     {
         $suppliers = Supplier::all();
         return view('supplier.index', compact('suppliers'));
+    }
+
+    public function getList(Request $request)
+    {
+        if($request->ajax()) {
+            return Datatables::of(Supplier::query())
+                  ->addColumn('actions', function($supplier) {
+                    return '<a href="/admin/supplier/'. $supplier->id . '/edit" class="btn btn-primary">Edit</a>
+                            <a href="/admin/supplier/'. $supplier->id . '" class="btn btn-danger"
+                            onclick="deleteSupplier(event, ' . $supplier->id . ')">Delete</a>';
+                  })
+                  ->rawColumns(['delete' => 'delete','actions' => 'actions'])
+                  ->make(true);
+        }
+
+        abort(403, 'Unauthorized action');
     }
 
     /**
@@ -137,7 +154,17 @@ class SupplierController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $data = $request->all();
+        if(!$request->has('marketplace')) $data['marketplace'] = 0;
+
+        try {
+            $model = Supplier::find($id);
+            $model->fill($data)->update();
+            $request->session()->flash('message', 'Proveedor actualizado correctamente.');
+        } catch(\Exception $e) {
+            return redirect()->back()->withErrors($e->getMessage());
+        }
+        return redirect()->route('supplier.edit', $model->id);
     }
 
     /**

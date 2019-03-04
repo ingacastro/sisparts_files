@@ -29,5 +29,6 @@ Route::get('country-states', 'UtilController@getCountryStates');
 Route::get('brands-id-name', 'SupplierController@getBrandsKeyVal');
 Route::post('create-brand', 'SupplierController@createBrand');
 Route::post('sync-brands', 'SupplierController@syncBrands')->name('supplier.sync-brands');
+Route::get('supplier/get-list', 'SupplierController@getList');
 Route::resource('supplier', 'SupplierController');
 

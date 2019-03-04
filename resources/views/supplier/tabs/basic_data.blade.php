@@ -62,6 +62,11 @@
 </div>
 <div class="form-actions right">
     <a href="{{ route('supplier.index') }}" class="btn default">Cancelar</a>
+    @if(!isset($model->id))
     <button type="button" class="btn blue" onclick="$('#tab_1').trigger('click')">
         <i class="fa fa-check"></i> Continuar</button>
+    @else
+    <button type="button" class="btn blue" onclick="$('#fiscal_form').submit()">
+    <i class="fa fa-check"></i> Guardar</button>
+    @endif
 </div>

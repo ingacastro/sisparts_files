@@ -50,17 +50,9 @@
                         </div>
                         <div class="portlet-body form">
                             <!-- BEGIN FORM-->
-                            @if(!isset($model->id))
-                            <!-- Create -->
                             <form action="" id="basic_form" class="horizontal-form">
                                 @include('supplier.tabs.basic_data')
                             </form>
-                            @else
-                            <!-- Update -->
-                            {!! Form::model(['route' => ['supplier.update', $model], 'class' => 'horizontal-form', 'id' => 'basic_form']) !!}
-                                @include('supplier.tabs.basic_data')
-                            {!! Form::close() !!}
-                            @endif
                             <!-- END FORM-->
                         </div>
                     </div>
@@ -73,10 +65,19 @@
                         </div>
                         <div class="portlet-body form">
                             <!-- BEGIN FORM-->
+                            <!-- Create -->
+                            @if(!isset($model->id))
                             {!! Form::open(['route' => 'supplier.store', 'class' => 'horizontal-form', 'id' => 'fiscal_form']) !!}
                                 <input type="hidden" name="tabs_config" value="">
                                 @include('supplier.tabs.fiscal_data')
                             {!! Form::close() !!}
+                            @else
+                            <!-- Update -->
+                            {!! Form::model($model, ['route' => ['supplier.update', $model->id], 'class' => 'horizontal-form', 'id' => 'fiscal_form', 'method' => 'put']) !!}
+                                <input type="hidden" name="tabs_config" value="">
+                                @include('supplier.tabs.fiscal_data')
+                            {!! Form::close() !!}
+                            @endif
                             <!-- END FORM-->
                         </div>
                     </div>
@@ -137,9 +138,9 @@
         $('#basic_form :input').not(':submit').clone().hide().prependTo('#fiscal_form');
     });
 
-    $('#basic_form').submit(function(e){
+/*    $('#basic_form').submit(function(e){
         $('#fiscal_form :input').not(':submit').clone().hide().appendTo('#basic_form');
-    });
+    });*/
 
     $('#country').change(function(){
         loadStates();

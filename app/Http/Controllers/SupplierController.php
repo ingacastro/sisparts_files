@@ -108,9 +108,24 @@ class SupplierController extends Controller
     {
         $brand = Brand::find($request->get('value'));
 
-        if(is_null($brand)) Brand::create(['name' => $request->get('value')]);
+        if(is_null($brand)) $brand = Brand::create(['name' => $request->get('value')]);
         
         return response()->json($brand);
+    }
+
+    /*Associate every brand received with supplier*/
+    public function syncBrands(Request $request)
+    {  
+        try {
+            $supp_id = $request->get('supplier_id');
+            $brands = json_decode($request->get('supplier_brands'));
+            Supplier::find($supp_id)->brands()->sync($brands);
+            $request->session()->flash('message', 'Marcas actualizadas correctamente.');
+        } catch(\Exception $e) {
+            return redirect()->back()->withErrors($e->getMessage());
+        }
+
+        return redirect()->route('supplier.edit', $supp_id);
     }
 
     /**

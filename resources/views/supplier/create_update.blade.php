@@ -90,9 +90,11 @@
                         </div>
                         <div class="portlet-body form">
                             <!-- BEGIN FORM-->
-                            {!! Form::open(['route' => 'supplier.store', 'method' => 'post', 'class' => 'horizontal-form', 
+                            {!! Form::open(['route' => 'supplier.sync-brands', 'method' => 'post', 'class' => 'horizontal-form', 
                             'id' => 'brands_form']) !!}
                                 @include('supplier.tabs.brands')
+                                <input type="hidden" name="supplier_id" value="{{ $model->id }}">
+                                <input type="hidden" name="supplier_brands" id="supplier_brands" value="">
                             {!! Form::close() !!}
                             <!-- END FORM-->
                         </div>
@@ -103,7 +105,7 @@
         </div>
     </div>
 </div>
-<input type="hidden" id="model_id" value="{{ $model->id }}">
+<input type="hidden" id="model_id" name="model_id" value="{{ $model->id }}">
 @endsection
 @push('scripts')
 @include('utils.form_masks')

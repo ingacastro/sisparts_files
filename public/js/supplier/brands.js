@@ -31,6 +31,7 @@ $(document).ready(function(){
 	        "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
 	    },
 	    columns: [
+	    	{'data': 'id'},
 	    	{'data': 'name'},
 	    	{'data': 'actions'}
 	    ]
@@ -41,6 +42,7 @@ $('#add_brand').click(function(){
 	
 	let select2_val = $('#brands_select2').val();
 	let token = $('#brands_form > input[name=_token]').val();
+	let model_id = $('#model_id').val();
 
 	$.ajax({
 		url: '/create-brand',
@@ -49,13 +51,11 @@ $('#add_brand').click(function(){
 		headers: {'X-CSRF-TOKEN': token},
 		data: {value: select2_val},
 		success: function(brand) {
-
-			let row_query = $('#row_' + brand.id); 
-			if(row_query.length > 0)
-				return;
+			let row_query = $('#row_' + brand.id);
+			if(select2_val == null || row_query.length > 0) return;
 
 			brands_table.row.add({
-				'name': brand.name, 'actions': '<a class="remove-brand" id="' + brand.id +'">Eliminar</a>'
+				'id': brand.id, 'name': brand.name, 'actions': '<a class="remove-brand" id="' + brand.id +'">Eliminar</a>'
 			}).node().id = 'row_' + brand.id;
 			brands_table.draw(false);
 		}
@@ -70,3 +70,8 @@ $(document).on('click', 'a.remove-brand', function(){
         .draw();
 });
 
+$('#brands_form').submit(function(e){
+	let rows = brands_table.rows();
+	let ids = JSON.stringify(brands_table.cells(rows.nodes(), 0).data().toArray());
+	$('#supplier_brands').val(ids);
+});

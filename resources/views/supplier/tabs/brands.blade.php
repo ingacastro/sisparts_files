@@ -21,10 +21,20 @@
 		    <table class="table table-striped table-hover table-bordered" id="brands_table">
 				<thead>
 				    <tr>
-				        <th>Name</th>
-				        <th></th>
+				    	<th>Id</th>
+				        <th>Nombre</th>
+				        <th>Acciones</th>
 				    </tr>
 				</thead>
+				<tbody>
+					@foreach($model->brands as $brand)
+					<tr id="row_{{ $brand->id }}">
+						<td>{{ $brand->id }}</td>
+						<td>{{ $brand->name }}</td>
+						<td><a class="remove-brand" id="{{ $brand->id }}">Eliminar</a></td>
+					</tr>
+					@endforeach
+				</tbody>
 			</table>
 		</div>
 		<div class="col-md-4"></div>
@@ -32,6 +42,6 @@
 </div>
 <div class="form-actions right">
     <button type="button" class="btn default">Cancelar</button>
-    <button type="button" class="btn blue">
+    <button type="submit" class="btn blue">
         <i class="fa fa-check"></i> Guardar</button>
 </div>

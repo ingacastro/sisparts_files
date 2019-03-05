@@ -44,6 +44,8 @@ $('#add_brand').click(function(){
 	let token = $('#brands_form > input[name=_token]').val();
 	let model_id = $('#model_id').val();
 
+	if(select2_val == null) return;
+	
 	$.ajax({
 		url: '/create-brand',
 		type: 'post',
@@ -52,7 +54,7 @@ $('#add_brand').click(function(){
 		data: {value: select2_val},
 		success: function(brand) {
 			let row_query = $('#row_' + brand.id);
-			if(select2_val == null || row_query.length > 0) return;
+			if(row_query.length > 0) return;
 
 			brands_table.row.add({
 				'id': brand.id, 'name': brand.name, 'actions': '<a class="remove-brand" id="' + brand.id +'">Eliminar</a>'

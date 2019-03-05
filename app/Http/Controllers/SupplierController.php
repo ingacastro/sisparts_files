@@ -30,18 +30,16 @@ class SupplierController extends Controller
 
     public function getList(Request $request)
     {
-        Log::notice("from controller");
         if($request->ajax()) {
             return Datatables::of(Supplier::query())
                   ->addColumn('actions', function($supplier) {
-                    return '<a href="/supplier/'. $supplier->id . '/edit" class="btn btn-primary">Edit</a>
-                            <a href="/supplier/'. $supplier->id . '" class="btn btn-danger"
-                            onclick="deleteSupplier(event, ' . $supplier->id . ')">Delete</a>';
+                    return '<a href="/supplier/'. $supplier->id . '/edit" class="btn btn-circle btn-icon-only default"><i class="fa fa-edit"></i></a>
+                            <button class="btn btn-circle btn-icon-only red"
+                            onclick="deleteModel(event, ' . $supplier->id . ')"><i class="fa fa-times"></i></a>';
                   })
-                  ->rawColumns(['delete' => 'delete','actions' => 'actions'])
+                  ->rawColumns(['actions' => 'actions'])
                   ->make(true);
         }
-
         abort(403, 'Unauthorized action');
     }
 
@@ -81,7 +79,7 @@ class SupplierController extends Controller
         if(!$request->has('marketplace')) $supp_data['marketplace'] = 0;
 
         try {
-            $model = Supplier::create($request->all());
+            $model = Supplier::create($supp_data);
             $request->session()->flash('message', 'Proveedor guardado correctamente, sección de marcas habilitada.');
         } catch(\Exception $e) {
             return redirect()->back()->withErrors($e->getMessage());
@@ -176,6 +174,13 @@ class SupplierController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $supp = Supplier::find($id);
+            $supp->brands()->detach();
+            $supp->delete();
+            Session::flash('message', 'Proveedor eliminado correctamente');
+        } catch(\Exception $e) {
+            back()->withErrors($e->getMessage());
+        }
     }
 }

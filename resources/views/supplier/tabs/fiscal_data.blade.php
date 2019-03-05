@@ -98,7 +98,7 @@
     </div>
 </div>
 <div class="form-actions right">
-    <a href="{{ route('supplier.index') }}" class="btn default">Cancelar</a>
-    <button type="submit" class="btn blue">
+    <a href="{{ route('supplier.index') }}" class="btn btn-circle default">{{ $cancel_btn }}</a>
+    <button type="submit" class="btn btn-circle blue">
         <i class="fa fa-check"></i> Guardar</button>
 </div>

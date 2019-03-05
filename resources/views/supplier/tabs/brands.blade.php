@@ -10,7 +10,7 @@
                 'style' => 'width: 100%']) !!}
 	    </div>
 	    <div class="col-md-1">
-	        <button id="add_brand" type="button" class="btn green" style="margin-top: 25px">
+	        <button id="add_brand" type="button" class="btn btn-circle green" style="margin-top: 25px">
 				<i class="fa fa-plus"></i> Agregar</button>
 		</div>
 		<div class="col-md-4"></div>
@@ -41,7 +41,7 @@
     </div>
 </div>
 <div class="form-actions right">
-    <button type="button" class="btn default">Cancelar</button>
-    <button type="submit" class="btn blue">
+    <a href="{{ route('supplier.index') }}" class="btn btn-circle default">{{ $cancel_btn }}</a>
+    <button type="submit" class="btn btn-circle blue">
         <i class="fa fa-check"></i> Guardar</button>
 </div>

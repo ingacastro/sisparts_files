@@ -33,7 +33,7 @@ class SupplierRequest extends FormRequest
               //'business_name' => 'required',
               'type' => 'required',
               //'states_id' => 'required',
-              'rfc' => ['nullable', 'regex:/^[a-zA-Z]{3,4}(\d{6})((\D|\d){2,3})?$/', 'unique'],
+              'rfc' => ['nullable', 'regex:/^[a-zA-Z]{3,4}(\d{6})((\D|\d){2,3})?$/', 'unique:suppliers'],
               //'city' => 'required',
               'post_code' => 'required',
               //'street' => 'required',

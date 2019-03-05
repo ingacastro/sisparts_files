@@ -1,4 +1,4 @@
-<?php $action = !isset($model->id) ? 'Nuevo' : 'Editar' ?>
+<?php $is_edit = isset($model->id); $action = $is_edit ? 'Editar' : 'Nuevo'; $cancel_btn = $is_edit ? 'Terminar' : 'Cancelar'; ?>
 @extends('layouts.admin.master')
 @section('meta-css')
 <link href="/metronic-assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
@@ -40,7 +40,7 @@
                 <li>
                     <a href="#tab_1_content" id="tab_1" data-toggle="tab"> Datos Fiscales </a>
                 </li>
-                @if(isset($model->id))
+                @if($is_edit)
                 <li>
                     <a href="#tab_2_content" id="tab_2" data-toggle="tab"> Marcas </a>
                 </li>
@@ -71,7 +71,7 @@
                         <div class="portlet-body form">
                             <!-- BEGIN FORM-->
                             <!-- Create -->
-                            @if(!isset($model->id))
+                            @if(!$is_edit)
                             {!! Form::open(['route' => 'supplier.store', 'class' => 'horizontal-form', 'id' => 'fiscal_form']) !!}
                                 <input type="hidden" name="tabs_config" value="">
                                 @include('supplier.tabs.fiscal_data')
@@ -87,7 +87,7 @@
                         </div>
                     </div>
                 </div>
-                @if(isset($model->id))
+                @if($is_edit)
                 <div class="tab-pane " id="tab_2_content">
                   <div class="portlet box blue">
                         <div class="portlet-title">
@@ -117,7 +117,7 @@
 @include('utils.form_masks')
 <script src="/metronic-assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
 <script src="/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script>
-@if(isset($model->id))
+@if($is_edit)
 <script src="/metronic-assets/global/plugins/datatables/datatables.min.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
 <script src="/js/supplier/brands.js" type="text/javascript"></script>

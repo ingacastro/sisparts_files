@@ -48,148 +48,11 @@
                 <table class="table table-striped table-hover table-bordered" id="suppliers_table">
                     <thead>
                         <tr>
-                            <th> Username </th>
-                            <th> Full Name </th>
-                            <th> Points </th>
-                            <th> Notes </th>
-                            <th> Edit </th>
-                            <th> Delete </th>
+                            <th> Nombre comercial </th>
+                            <th> Actions </th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td> alex </td>
-                            <td> Alex Nilson </td>
-                            <td> 1234 </td>
-                            <td class="center"> power user </td>
-                            <td>
-                                <a class="edit" href="javascript:;"> Edit </a>
-                            </td>
-                            <td>
-                                <a class="delete" href="javascript:;"> Delete </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td> lisa </td>
-                            <td> Lisa Wong </td>
-                            <td> 434 </td>
-                            <td class="center"> new user </td>
-                            <td>
-                                <a class="edit" href="javascript:;"> Edit </a>
-                            </td>
-                            <td>
-                                <a class="delete" href="javascript:;"> Delete </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td> lisa </td>
-                            <td> Lisa Wong </td>
-                            <td> 434 </td>
-                            <td class="center"> new user </td>
-                            <td>
-                                <a class="edit" href="javascript:;"> Edit </a>
-                            </td>
-                            <td>
-                                <a class="delete" href="javascript:;"> Delete </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td> lisa </td>
-                            <td> Lisa Wong </td>
-                            <td> 434 </td>
-                            <td class="center"> new user </td>
-                            <td>
-                                <a class="edit" href="javascript:;"> Edit </a>
-                            </td>
-                            <td>
-                                <a class="delete" href="javascript:;"> Delete </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td> lisa </td>
-                            <td> Lisa Wong </td>
-                            <td> 434 </td>
-                            <td class="center"> new user </td>
-                            <td>
-                                <a class="edit" href="javascript:;"> Edit </a>
-                            </td>
-                            <td>
-                                <a class="delete" href="javascript:;"> Delete </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td> nick12 </td>
-                            <td> Nick Roberts </td>
-                            <td> 232 </td>
-                            <td class="center"> power user </td>
-                            <td>
-                                <a class="edit" href="javascript:;"> Edit </a>
-                            </td>
-                            <td>
-                                <a class="delete" href="javascript:;"> Delete </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td> goldweb </td>
-                            <td> Sergio Jackson </td>
-                            <td> 132 </td>
-                            <td class="center"> elite user </td>
-                            <td>
-                                <a class="edit" href="javascript:;"> Edit </a>
-                            </td>
-                            <td>
-                                <a class="delete" href="javascript:;"> Delete </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td> alex </td>
-                            <td> Alex Nilson </td>
-                            <td> 1234 </td>
-                            <td class="center"> power user </td>
-                            <td>
-                                <a class="edit" href="javascript:;"> Edit </a>
-                            </td>
-                            <td>
-                                <a class="delete" href="javascript:;"> Delete </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td> webriver </td>
-                            <td> Antonio Sanches </td>
-                            <td> 462 </td>
-                            <td class="center"> new user </td>
-                            <td>
-                                <a class="edit" href="javascript:;"> Edit </a>
-                            </td>
-                            <td>
-                                <a class="delete" href="javascript:;"> Delete </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td> gist124 </td>
-                            <td> Nick Roberts </td>
-                            <td> 62 </td>
-                            <td class="center"> new user </td>
-                            <td>
-                                <a class="edit" href="javascript:;"> Edit </a>
-                            </td>
-                            <td>
-                                <a class="delete" href="javascript:;"> Delete </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td> alex </td>
-                            <td> Alex Nilson </td>
-                            <td> 1234 </td>
-                            <td class="center"> power user </td>
-                            <td>
-                                <a class="edit" href="javascript:;"> Edit </a>
-                            </td>
-                            <td>
-                                <a class="delete" href="javascript:;"> Delete </a>
-                            </td>
-                        </tr>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
@@ -209,20 +72,18 @@
                 "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
             }
         });*/
-    $(document).ready(function(){
-            $('#suppliers_table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: '/supplier/get-list',
-                bSort: true,
-                columns: [
-                    { data: "name", name: "name" },
-                    { data: 'actions', name: 'actions', orderable: false, searchable: false }
-                ]
-                language: {
-                    "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
-                }, 
-            });
+        $('#suppliers_table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '/supplier/get-list',
+            bSort: true,
+            columns: [
+                { data: "trade_name", name: "trade_name" },
+                { data: 'actions', name: 'actions', orderable: false, searchable: false }
+            ],
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+            }, 
         });
     });
 </script>

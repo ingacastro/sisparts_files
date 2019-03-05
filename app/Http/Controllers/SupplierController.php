@@ -30,11 +30,12 @@ class SupplierController extends Controller
 
     public function getList(Request $request)
     {
+        Log::notice("from controller");
         if($request->ajax()) {
             return Datatables::of(Supplier::query())
                   ->addColumn('actions', function($supplier) {
-                    return '<a href="/admin/supplier/'. $supplier->id . '/edit" class="btn btn-primary">Edit</a>
-                            <a href="/admin/supplier/'. $supplier->id . '" class="btn btn-danger"
+                    return '<a href="/supplier/'. $supplier->id . '/edit" class="btn btn-primary">Edit</a>
+                            <a href="/supplier/'. $supplier->id . '" class="btn btn-danger"
                             onclick="deleteSupplier(event, ' . $supplier->id . ')">Delete</a>';
                   })
                   ->rawColumns(['delete' => 'delete','actions' => 'actions'])

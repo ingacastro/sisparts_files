@@ -1,3 +1,4 @@
+<?php $action = !isset($model->id) ? 'Nuevo' : 'Editar' ?>
 @extends('layouts.admin.master')
 @section('meta-css')
 <link href="/metronic-assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
@@ -13,12 +14,16 @@
         <i class="fa fa-circle"></i>
     </li>
     <li>
-        <span>Proveedores</span>
+        <a href="{{ route('supplier.index') }}">Proveedores</a>
+        <i class="fa fa-circle"></i>
+    </li>
+    <li>
+        <span>{{ $action }} Proveedor</span>
     </li>
 </ul>
 @endsection
 @section('page-title')
-<h1 class="page-title"> Nuevo Proveedor
+<h1 class="page-title"> {{ $action }} Proveedor
     <small></small>
 </h1>
 @include('layouts.admin.includes.error_messages')

@@ -14,6 +14,8 @@
                 ['placeholder' => 'Seleccionar...', 'class' => 'form-control', 'id' => 'type']) !!}
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="states_id">Estado</label>
@@ -28,6 +30,8 @@
                 'maxlength' => '13', 'style' => 'text-transform: uppercase', 'autocomplete' => 'off']) !!}
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="city">Ciudad</label>
@@ -42,6 +46,8 @@
                 'maxlength' => '5', 'autocomplete' => 'off']) !!}
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="street">Calle</label>
@@ -56,6 +62,8 @@
                 'autocomplete' => 'off']) !!}
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-6">
             <div class="row">
                 <div class="col-md-6">
@@ -81,6 +89,8 @@
                 'autocomplete' => 'off']) !!}
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="suburb">Colonia</label>

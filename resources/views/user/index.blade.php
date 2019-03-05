@@ -13,12 +13,12 @@
         <i class="fa fa-circle"></i>
     </li>
     <li>
-        <span>Proveedores</span>
+        <span>Usuarios</span>
     </li>
 </ul>
 @endsection
 @section('page-title')
-<h1 class="page-title"> Proveedores
+<h1 class="page-title"> Usuarios
     <small></small>
 </h1>
 @include('layouts.admin.includes.error_messages')
@@ -42,17 +42,17 @@
                         </div>
                         <div class="col-md-6">
                             <div class="btn-group pull-right">
-                                <a href="{{ route('supplier.create') }}" class="btn btn-circle green"> Nuevo
+                                <a href="{{ route('user.create') }}" class="btn btn-circle green"> Nuevo
                                     <i class="fa fa-plus"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <table class="table table-striped table-hover table-bordered" id="suppliers_table">
+                <table class="table table-striped table-hover table-bordered" id="users_table">
                     <thead>
                         <tr>
-                            <th>Nombre comercial</th>
+                            <th>Nombre</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -71,15 +71,15 @@
 <script src="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.min.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(document).ready(function(){
-        $('#sidebar_supplier').addClass('active');
+        $('#sidebar_user').addClass('active');
 
-        $('#suppliers_table').DataTable({
+        $('#users_table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: '/supplier/get-list',
+            ajax: '/user/get-list',
             bSort: true,
             columns: [
-                { data: "trade_name", name: "trade_name" },
+                { data: "name", name: "name" },
                 { data: 'actions', name: 'actions', orderable: false, searchable: false }
             ],
             language: {
@@ -92,8 +92,8 @@
     function deleteModel(e, id) {
         e.preventDefault();
         swal({
-          title: "Eliminar proveedor",
-          text: "¿Seguro que deseas eliminar este proveedor?",
+          title: "Eliminar usuario",
+          text: "¿Seguro que deseas eliminar este usuario?",
           type: "warning",
           showCancelButton: true,
           confirmButtonClass: "btn-danger",
@@ -109,7 +109,7 @@
     function deleteRequest(id) {
         let token = $('meta[name=_token]').attr('content');
         $.ajax({
-            url: '/supplier/' + id,
+            url: '/user/' + id,
             method: 'delete',
             headers: {'X-CSRF-TOKEN': token},
             success: function() {

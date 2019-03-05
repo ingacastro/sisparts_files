@@ -32,3 +32,7 @@ Route::post('sync-brands', 'SupplierController@syncBrands')->name('supplier.sync
 Route::get('supplier/get-list', 'SupplierController@getList');
 Route::resource('supplier', 'SupplierController');
 
+//User routes
+Route::get('user/get-list', 'UserController@getList');
+Route::resource('user', 'UserController');
+

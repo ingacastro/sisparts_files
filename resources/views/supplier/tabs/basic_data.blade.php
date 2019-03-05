@@ -15,6 +15,8 @@
                 <input type="hidden" name="countries_id" value="{{ $model->countries_id }}" id="country_hidden">
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="email">Correo electrónico</label>
@@ -30,6 +32,8 @@
                 <input type="hidden" name="languages_id" value="{{ $model->languages_id }}" id="language_hidden">
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="landline">Teléfono fijo</label>
@@ -45,6 +49,8 @@
                 <input type="hidden" name="currencies_id" value="{{ $model->currencies_id }}" id="currency_hidden">
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="landline">Teléfono móvil</label>

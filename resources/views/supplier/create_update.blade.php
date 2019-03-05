@@ -143,10 +143,6 @@
         $('#basic_form :input').not(':submit').clone().hide().prependTo('#fiscal_form');
     });
 
-/*    $('#basic_form').submit(function(e){
-        $('#fiscal_form :input').not(':submit').clone().hide().appendTo('#basic_form');
-    });*/
-
     $('#country').change(function(){
         loadStates();
     });

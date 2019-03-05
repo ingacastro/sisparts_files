@@ -53,9 +53,9 @@
                 <span class="selected"></span>
             </a>
         </li>
-        <li class="nav-item">
-            <a href="javascript:;" class="nav-link nav-toggle">
-                <i class=""></i>
+        <li id="sidebar_user" class="nav-item">
+            <a href="{{ route('user.index') }}" class="nav-link nav-toggle">
+                <i class="icon-user"></i>
                 <span class="title">Usuarios</span>
                 <span class="selected"></span>
             </a>

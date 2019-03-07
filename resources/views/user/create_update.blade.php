@@ -1,4 +1,4 @@
-<?php $is_edit = isset($model->id); $action = $is_edit ? 'Editar' : 'Nuevo'; ?>
+<?php $is_edit = isset($user->id); $action = $is_edit ? 'Editar' : 'Nuevo'; ?>
 @extends('layouts.admin.master')
 @section('meta-css')
 <link href="/metronic-assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
@@ -58,26 +58,6 @@
 <script type="text/javascript">
 $(document).ready(function(){
     $('#sidebar_user').addClass('active');
-
-    $('#role').select2({
-        ajax: {
-            url: '/user/roles-id-name',
-            dataType: 'json',
-            type: "get",
-            delay: 250,
-            data: function(params) {
-                return {
-                    term: params.term
-                };
-            },
-            processResults: function (data) {
-                return {
-                    results: data
-                };
-            },
-            cache: true
-        }
-    });
 });
 </script>
 @endpush

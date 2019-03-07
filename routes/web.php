@@ -36,7 +36,6 @@ Route::resource('supplier', 'SupplierController');
 
 //User routes
 Route::prefix('user')->group(function(){
-	Route::get('roles-id-name', 'UserController@getRolesKeyVal');
 	Route::get('get-list', 'UserController@getList');
 });
 Route::resource('user', 'UserController');

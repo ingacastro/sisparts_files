@@ -19,7 +19,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="role">Rol</label>
-                {!! Form::select('role_id', [1 => 'admin', 2 => 'cotizador'], null, 
+                {!! Form::select('role_id', $selects_data['roles'], $role_id, 
                 ['placeholder' => 'Seleccionar...', 'class' => 'form-control', 'id' => 'role']) !!}
             </div>
         </div>
@@ -39,7 +39,7 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="email">Correl electrónico</label>
+                <label class="control-label" for="email">Correo electrónico</label>
                 {!! Form::text('user[email]', $user->email, ['class' => 'form-control', 'id' => 'email',
                 'autocomplete' => 'off'])!!}
             </div>
@@ -61,7 +61,7 @@
     </div>
 </div>
 <div class="form-actions right">
-    <button type="button" class="btn btn-circle default">Cancelar</button>
+    <a href="{{ route('user.index') }}" class="btn btn-circle default">Cancelar</a>
     <button type="submit" class="btn btn-circle blue">
         <i class="fa fa-check"></i> Guardar</button>
 </div>

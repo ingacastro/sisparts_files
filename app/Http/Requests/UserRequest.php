@@ -23,13 +23,20 @@ class UserRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        $rules = [
             'user.name' => 'required',
             'user.email' => ['required', 'email', 'unique:users,email'],
             'user.password' => 'required|confirmed|min:6',
             'role_id' => 'required',
             'employee.number' => 'required'
         ];
+
+        if($this->isMethod('put')) {
+            $rules['user.password'] = 'nullable|confirmed|min:6';
+            $rules['user.email'] = ['required', 'email'];
+        }
+
+        return $rules;
     }
 
     public function messages()

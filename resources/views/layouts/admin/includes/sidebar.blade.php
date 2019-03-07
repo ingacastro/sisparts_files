@@ -39,8 +39,9 @@
             </form>
             <!-- END RESPONSIVE QUICK SEARCH FORM -->
         </li> --}}
+        @role('superadmin|Cotizador')
         <li id="sidebar_dashboard" class="nav-item start">
-            <a href="{{ route('home') }}" class="nav-link nav-toggle">
+            <a href="{{ route('dashboard') }}" class="nav-link nav-toggle">
                 <i class="icon-bar-chart"></i>
                 <span class="title">Tablero</span>
                 <span class="selected"></span>
@@ -53,6 +54,7 @@
                 <span class="selected"></span>
             </a>
         </li>
+        @endrole
         <li id="sidebar_user" class="nav-item">
             <a href="{{ route('user.index') }}" class="nav-link nav-toggle">
                 <i class="icon-user"></i>

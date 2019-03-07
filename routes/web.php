@@ -18,7 +18,7 @@ Route::get('/', function () {
 Auth::routes(['register' => false]);
 
 Route::group(['middleware' => ['role:superadmin|Cotizador']], function(){
-	Route::get('dashboard', 'HomeController@index')->name('dashboard');
+	Route::get('dashboard', 'DashboardController@index')->name('dashboard');
 });
 
 //New logout route, since link is a get request and default logout route is post

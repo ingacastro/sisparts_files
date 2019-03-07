@@ -27,7 +27,7 @@ class UserRequest extends FormRequest
             'user.name' => 'required',
             'user.email' => ['required', 'email', 'unique:users,email'],
             'user.password' => 'required|confirmed|min:6',
-            'role' => 'required',
+            'role_id' => 'required',
             'employee.number' => 'required'
         ];
     }
@@ -39,7 +39,7 @@ class UserRequest extends FormRequest
             'user.email.required' => 'El correo es requerido.',
             'user.email.email' => 'El formato de correo es incorrecto.',
             'user.email.unique' => 'El correo ya existe.',
-            'role.required' => 'El rol es requerido.',
+            'role_id.required' => 'El rol es requerido.',
             'user.password.required' => 'La contraseña es requerida.',
             'user.password.min' => 'La contraseña debe ser de al menos 6 caracteres.',
             'user.password.confirmed' => 'Las contraseñas no coinciden.',

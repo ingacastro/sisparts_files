@@ -26,13 +26,18 @@ Route::get('logout', 'Auth\LoginController@logout');
 Route::get('country-states', 'UtilController@getCountryStates');
 
 //Supplier routes
-Route::get('brands-id-name', 'SupplierController@getBrandsKeyVal');
-Route::post('create-brand', 'SupplierController@createBrand');
-Route::post('sync-brands', 'SupplierController@syncBrands')->name('supplier.sync-brands');
-Route::get('supplier/get-list', 'SupplierController@getList');
+Route::prefix('supplier')->group(function(){
+	Route::get('brands-id-name', 'SupplierController@getBrandsKeyVal');
+	Route::post('create-brand', 'SupplierController@createBrand');
+	Route::post('sync-brands', 'SupplierController@syncBrands')->name('supplier.sync-brands');
+	Route::get('get-list', 'SupplierController@getList');
+});
 Route::resource('supplier', 'SupplierController');
 
 //User routes
-Route::get('user/get-list', 'UserController@getList');
+Route::prefix('user')->group(function(){
+	Route::get('roles-id-name', 'UserController@getRolesKeyVal');
+	Route::get('get-list', 'UserController@getList');
+});
 Route::resource('user', 'UserController');
 

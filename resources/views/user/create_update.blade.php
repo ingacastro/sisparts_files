@@ -50,15 +50,34 @@
         </div>
     </div>
 </div>
-
 @endsection
 @push('scripts')
 @include('utils.form_masks')
 <script src="/metronic-assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
 <script src="/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script>
 <script type="text/javascript">
-    $(document).ready(function(){
-        $('#sidebar_user').addClass('active');
+$(document).ready(function(){
+    $('#sidebar_user').addClass('active');
+
+    $('#role').select2({
+        ajax: {
+            url: '/user/roles-id-name',
+            dataType: 'json',
+            type: "get",
+            delay: 250,
+            data: function(params) {
+                return {
+                    term: params.term
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        }
     });
+});
 </script>
 @endpush

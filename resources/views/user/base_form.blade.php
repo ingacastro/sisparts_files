@@ -3,13 +3,15 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="name">Nombre</label>
-                {!! Form::text('user[name]', $user->name, ['class' => 'form-control', 'id' => 'name'])!!}
+                {!! Form::text('user[name]', $user->name, ['class' => 'form-control', 'id' => 'name',
+                'autocomplete' => 'off'])!!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="number">Numero Empleado</label>
-                {!! Form::text('employee[number]', $employee->name, ['class' => 'form-control', 'id' => 'name'])!!}
+                {!! Form::text('employee[number]', $employee->name, ['class' => 'form-control', 
+                'id' => 'name', 'autocomplete' => 'off'])!!}
             </div>
         </div>
     </div>
@@ -17,14 +19,14 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="role">Rol</label>
-                {!! Form::select('role', [1 => 'admin', 2 => 'cotizador'], null, 
+                {!! Form::select('role_id', [1 => 'admin', 2 => 'cotizador'], null, 
                 ['placeholder' => 'Seleccionar...', 'class' => 'form-control', 'id' => 'role']) !!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="buyer_number">Numero comprador</label>
-                {!! Form::text('employee[buyer_number]', $employee->buyer_number, ['class' => 'form-control', 'id' => 'buyer_number'])!!}
+                {!! Form::text('employee[buyer_number]', $employee->buyer_number, ['class' => 'form-control integer-mask', 'id' => 'buyer_number', 'autocomplete' => 'off'])!!}
             </div>
         </div>
     </div>
@@ -32,13 +34,14 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="seller_number">Numero vendedor</label>
-                {!! Form::text('employee[seller_number]', $employee->seller_number, ['class' => 'form-control', 'id' => 'seller_number'])!!}
+                {!! Form::text('employee[seller_number]', $employee->seller_number, ['class' => 'form-control integer-mask', 'id' => 'seller_number', 'autocomplete' => 'off'])!!}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="email">Correl electrónico</label>
-                {!! Form::text('user[email]', $user->email, ['class' => 'form-control', 'id' => 'email'])!!}
+                {!! Form::text('user[email]', $user->email, ['class' => 'form-control', 'id' => 'email',
+                'autocomplete' => 'off'])!!}
             </div>
         </div>
     </div>

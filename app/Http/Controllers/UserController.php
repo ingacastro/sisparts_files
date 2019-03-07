@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use IParts\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Session;
 use Yajra\Datatables\Datatables;
+use Spatie\Permission\Models\Role;
 use DB;
 
 class UserController extends Controller
@@ -51,7 +52,15 @@ class UserController extends Controller
     {
         $user = new User();
         $employee = new Employee();
+        $roles = Role::pluck('name', 'id');
         return view('user.create_update', compact('user', 'employee'));
+    }
+
+    public function getRolesKeyVal(Request $request)
+    {
+        $roles = Role::select('id', 'name as text')
+        ->where('name', 'like', '%' . $request->get('term') . '%')->get();
+        return response()->json($roles);
     }
 
     /**
@@ -62,11 +71,15 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
+        $user_data = $request->get('user');
+        $user_data['password'] = bcrypt($user_data['password']);
+        $role_name = Role::find($request->get('role_id'))->name;
         $employee_data = $request->get('employee');
 
         try {
-            DB::transaction(function() use ($request, $employee_data) {
-                $user = User::create($request->get('user'));
+            DB::transaction(function() use ($user_data, $role_name, $employee_data) {
+                $user = User::create($user_data);
+                $user->assignRole($role_name);
                 $employee_data['users_id'] = $user->id;
                 Employee::create($employee_data);
             });

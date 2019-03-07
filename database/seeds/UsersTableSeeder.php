@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use IParts\User;
 use Spatie\Permission\Models\Role;
+use IParts\User;
 
 class UsersTableSeeder extends Seeder
 {
@@ -14,14 +14,15 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
+        //Admin
         $user = User::create([
         	'name' => 'Admin',
         	'email' => 'admin@admin.com',
         	'password' => bcrypt('123456789')
         ]);
 
-        $role = Role::findByName('superadmin');
-
-        $user->assignRole($role);
+        $admin_role = Role::create(['guard_name' => 'web', 'name' => 'superadmin']);
+         
+        $user->assignRole($admin_role);
     }
 }

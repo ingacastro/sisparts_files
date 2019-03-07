@@ -122,7 +122,6 @@ class SupplierController extends Controller
     public function createBrand(Request $request)
     {
         $brand = Brand::find($request->get('value'));
-
         if(is_null($brand)) $brand = Brand::create(['name' => $request->get('value')]);
         
         return response()->json($brand);

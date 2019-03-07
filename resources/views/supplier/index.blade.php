@@ -74,7 +74,6 @@
         $('#sidebar_supplier').addClass('active');
 
         $('#suppliers_table').DataTable({
-            processing: true,
             serverSide: true,
             ajax: '/supplier/get-list',
             bSort: true,

@@ -74,7 +74,6 @@
         $('#sidebar_user').addClass('active');
 
         $('#users_table').DataTable({
-            processing: true,
             serverSide: true,
             ajax: '/user/get-list',
             bSort: true,

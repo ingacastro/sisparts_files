@@ -33,6 +33,5 @@
         .page-sidebar-menu { padding-top: 44px !important; }
         .page-title { color: #e7505a!important; font-weight: normal; }
         #user_data:hover { background-color: transparent !important; cursor: default !important; }
-        .page-header.navbar .page-logo .logo-default { margin-top: 8px !important; }
     </style>
 </head>

@@ -17,7 +17,7 @@ Route::get('/', function () {
 
 Auth::routes(['register' => false]);
 
-Route::group(['middleware' => ['role:superadmin|Cotizador']], function(){
+Route::group(['middleware' => ['role:Administrador|Cotizador']], function(){
 	Route::get('dashboard', 'DashboardController@index')->name('dashboard');
 });
 
@@ -41,4 +41,11 @@ Route::prefix('user')->group(function(){
 	Route::get('get-list', 'UserController@getList');
 });
 Route::resource('user', 'UserController');
+
+//ColorSettings
+Route::prefix('color-settings')->group(function(){	
+	Route::get('edit', 'ColorSettingController@edit')->name('settings.edit');
+	Route::post('', 'ColorSettingController@store')->name('settings.store');
+});
+
 

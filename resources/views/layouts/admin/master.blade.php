@@ -50,8 +50,13 @@ License: You must have a valid license purchased only from themeforest(the above
                             <li class="" id="">
                                 <a id="user_data">
                                     {{-- <i class="icon-bell"></i> --}}
-                                    <span class="badge"><strong>Cotizador</strong></span>
-                                    <span class="badge"><strong>Número: 005</strong></span>
+                                    <?php $user = Auth::user() ?>
+                                    <span class="badge"><strong>{{ $user->roles->first()->name }}</strong></span>
+                                    @if(isset($user->employee))
+                                    <span class="badge">
+                                        <strong>Número: {{ $user->employee->number}}</strong>
+                                    </span>
+                                    @endif
                                 </a>
 {{--                                 <ul class="dropdown-menu">
                                     <li class="external">

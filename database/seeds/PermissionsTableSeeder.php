@@ -19,9 +19,9 @@ class PermissionsTableSeeder extends Seeder
         $permissions[] = Permission::create(['name' => 'dashboard']);
         //$permissions[] = Permission::create(['name' => 'inbox']);
         //$permissions[] = Permission::create(['name' => 'file']);
-        $permissions[] = Permission::create(['name' => 'index supplier']);
-        $permissions[] = Permission::create(['name' => 'create supplier']);
-        $permissions[] = Permission::create(['name' => 'edit supplier']);
+        $permissions[] = Permission::create(['name' => 'supplier-index']);
+        $permissions[] = Permission::create(['name' => 'supplier-create']);
+        $permissions[] = Permission::create(['name' => 'supplier-edit']);
 
         $quotation_role->syncPermissions($permissions);
     }

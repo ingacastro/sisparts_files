@@ -16,12 +16,12 @@ class UsersTableSeeder extends Seeder
     {
         //Admin
         $user = User::create([
-        	'name' => 'Admin',
+        	'name' => 'Administrador',
         	'email' => 'admin@admin.com',
         	'password' => bcrypt('123456789')
         ]);
 
-        $admin_role = Role::create(['guard_name' => 'web', 'name' => 'superadmin']);
+        $admin_role = Role::create(['guard_name' => 'web', 'name' => 'Administrador']);
          
         $user->assignRole($admin_role);
     }

@@ -39,7 +39,8 @@
             </form>
             <!-- END RESPONSIVE QUICK SEARCH FORM -->
         </li> --}}
-        @role('superadmin|Cotizador')
+        <?php $user = Auth::user() ?>
+        @if($user->hasPermissionTo('dashboard') || $user->hasRole('Administrador'))
         <li id="sidebar_dashboard" class="nav-item start">
             <a href="{{ route('dashboard') }}" class="nav-link nav-toggle">
                 <i class="icon-bar-chart"></i>
@@ -54,7 +55,7 @@
                 <span class="selected"></span>
             </a>
         </li>
-        @endrole
+        @endif
         <li id="sidebar_user" class="nav-item">
             <a href="{{ route('user.index') }}" class="nav-link nav-toggle">
                 <i class="icon-user"></i>
@@ -69,9 +70,9 @@
                 <span class="selected"></span>
             </a>
         </li>
-        <li class="nav-item">
-            <a href="javascript:;" class="nav-link nav-toggle">
-                <i class=""></i>
+        <li id="sidebar_settings" class="nav-item">
+            <a href="{{ route('settings.edit') }}" class="nav-link nav-toggle">
+                <i class="fa fa-gear"></i>
                 <span class="title">Configuración</span>
                 <span class="selected"></span>
             </a>

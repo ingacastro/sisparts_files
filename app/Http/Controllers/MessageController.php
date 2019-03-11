@@ -4,6 +4,11 @@ namespace IParts\Http\Controllers;
 
 use Illuminate\Http\Request;
 use IParts\Message;
+use IParts\Language;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
+use Yajra\Datatables\Datatables;
+
 
 class MessageController extends Controller
 {
@@ -17,6 +22,20 @@ class MessageController extends Controller
         return view('message.index');
     }
 
+    public function getList(Request $request)
+    {
+        if($request->ajax()) {
+            return Datatables::of(Message::query())
+                  ->addColumn('actions', function($message) {
+                    return '<a href="/message/'. $message->id . '/edit" class="btn btn-circle btn-icon-only default"><i class="fa fa-edit"></i></a>
+                            <button class="btn btn-circle btn-icon-only red"
+                            onclick="deleteModel(event, ' . $message->id . ')"><i class="fa fa-times"></i></a>';
+                  })
+                  ->rawColumns(['actions' => 'actions'])
+                  ->make(true);
+        }
+        abort(403, 'Unauthorized action');
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -24,8 +43,17 @@ class MessageController extends Controller
      */
     public function create()
     {
+        $selects_options = $this->formSelectsOptions();
+        $is_create = true;
+        return view('message.create_update', compact('selects_options', 'is_create'));
+    }
 
-        return view('message.create_update');
+    private function formSelectsOptions()
+    {
+        return [
+            'messages' => Message::all(),
+            'languages' => Language::pluck('name', 'id')
+        ];
     }
 
     /**
@@ -36,7 +64,20 @@ class MessageController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $message_data = $request->all();
+        $is_edit = isset($message_data['id']);
+        $action = $is_edit ? 'actualizado' : 'guardado';
+
+        try {
+            if($is_edit)
+                Message::find($message_data['id'])->fill($message_data)->update();
+
+            $request->session()->flash('message', 'Mensaje ' . $action . ' correctamente.');
+            return redirect()->route('message.index');
+        } catch(\Exception $e) {
+            return redirect()->back()->withErrors($e->getMessage());
+        }
+        
     }
 
     /**
@@ -58,7 +99,9 @@ class MessageController extends Controller
      */
     public function edit($id)
     {
-        //
+        $selects_options = $this->formSelectsOptions();
+        $is_create = false;
+        return view('message.create_update', compact('selects_options', 'is_create'));
     }
 
     /**

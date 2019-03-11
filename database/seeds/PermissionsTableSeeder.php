@@ -14,7 +14,7 @@ class PermissionsTableSeeder extends Seeder
     public function run()
     {
         /*Quotation*/
-/*        $quotation_role = Role::create(['guard_name' => 'web', 'name' => 'Cotizador']);
+        $quotation_role = Role::create(['guard_name' => 'web', 'name' => 'Cotizador']);
 
         $permissions[] = Permission::create(['name' => 'dashboard']);
         //$permissions[] = Permission::create(['name' => 'inbox']);
@@ -26,7 +26,7 @@ class PermissionsTableSeeder extends Seeder
         $permissions[] = Permission::create(['name' => 'supplier-create']);
         $permissions[] = Permission::create(['name' => 'supplier-edit']);
 
-        $quotation_role->syncPermissions($permissions);*/
+        $quotation_role->syncPermissions($permissions);
         
         /*Other Permissions*/
         Permission::create(['name' => 'user-get-list']);

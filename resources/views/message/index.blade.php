@@ -74,7 +74,7 @@
     $(document).ready(function(){
         $('#sidebar_message').addClass('active');
 
-/*        $('#messages_table').DataTable({
+        $('#messages_table').DataTable({
             serverSide: true,
             ajax: '/message/get-list',
             bSort: true,
@@ -86,7 +86,7 @@
             language: {
                 "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
             }, 
-        });*/
+        });
     });
 
     function deleteModel(e, id) {

@@ -4,7 +4,6 @@ namespace IParts\Http\Controllers;
 
 use Illuminate\Http\Request;
 use IParts\Supplier;
-use Illuminate\Support\Facades\Log;
 use IParts\Http\Requests\SupplierRequest;
 use Illuminate\Support\Facades\Session;
 use IParts\Brand;

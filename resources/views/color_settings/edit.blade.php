@@ -49,7 +49,7 @@
 <script src="/metronic-assets/global/plugins/bootstrap-tagsinput/bootstrap-tagsinput.min.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function(){
-    $('#sidebar_settings').addClass('active');
+    $('#sidebar_color_settings').addClass('active');
     $('#color_settings_form').submit(function(e){
         e.preventDefault();
         let token = $('input[name=_token]').val();

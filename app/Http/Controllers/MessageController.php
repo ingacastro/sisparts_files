@@ -8,8 +8,8 @@ use IParts\Language;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Yajra\Datatables\Datatables;
-use DB;
 use Validator;
+use DB;
 
 class MessageController extends Controller
 {
@@ -52,17 +52,10 @@ class MessageController extends Controller
      */
     public function create()
     {
-        $selects_options = $this->formSelectsOptions();
-        return view('message.create_update', compact('selects_options'));
+        $message = new Message();
+        $languages = Language::all();
+        return view('message.create_update', compact('message', 'languages'));
     }
-
-/*    private function formSelectsOptions()
-    {
-        return [
-            'messages' => Message::all(),
-            'languages' => Language::pluck('name', 'id')
-        ];
-    }*/
 
     /**
      * Store a newly created resource in storage.
@@ -72,15 +65,38 @@ class MessageController extends Controller
      */
     public function store(Request $request)
     {
-        $message_data = $request->all();
-        
+        $data = $request->except('_method', '_token');
+        $validator = $this->messageValidations($data);
 
+        if($validator->fails())
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($validator)->render()]);
+        $message_id = null;
         try {
-            $request->session()->flash('message', 'Mensaje ' . $action . ' correctamente.');
-            return redirect()->route('message.index');
+            DB::beginTransaction();
+            //Form language sent
+            $message = Message::create();
+            $message->languages()->attach($data['languages_id'], $data);
+
+            //Missing message languages we have to create
+            $missing_languages_ids = Language::where('id', '!=', $data['languages_id'])->pluck('id');
+            foreach($missing_languages_ids as $id) {
+                $message->languages()->attach($id, ['title' => 'Título', 'subject' => 'Asunto']);
+            }
+            $message_id = $message->id;
+            DB::commit();
+            $request->session()->flash('message', 'Mensaje guardado correctamente, completa los idiomas faltantes.');
         } catch(\Exception $e) {
-            return redirect()->back()->withErrors($e->getMessage());
+            DB::rollback();
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($e->getMessage())->render()]);
         }
+
+        return response()->json(['errors' => false, 'url' => '/message/' . $message_id . '/edit']);
         
     }
 
@@ -97,11 +113,6 @@ class MessageController extends Controller
         ], $messages);
 
         return $validator;
-/*        
-        if($validator->fails())
-            return array('errors' => true, 'validator' => $validator);
-        
-        return array('errors' => false, 'data' => $setting_data);*/
     }
 
     /**
@@ -136,9 +147,7 @@ class MessageController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $language_id)
-    {
-        //Log::notice($request->all());
-        
+    {        
         $data = $request->except('_method', '_token');
         $validator = $this->messageValidations($data);
 
@@ -159,7 +168,7 @@ class MessageController extends Controller
                 ->withErrors($e->getMessage())->render()]);
         }
         
-        return response()->json(['errors' => false]);
+        return response()->json(['errors' => false, 'url' => '/message/' . $message->id . '/edit']);
     }
 
     /**
@@ -170,6 +179,11 @@ class MessageController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            Message::destroy($id);
+            Session::flash('message', 'Mensaje eliminado correctamente.');
+        } catch(\Exception $e) {
+            back()->withErrors($e->getMessage());
+        }
     }
 }

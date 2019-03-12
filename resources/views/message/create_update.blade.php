@@ -1,6 +1,7 @@
 <?php $is_create = !isset($message->id); $action = $is_create ? 'Nuevo' : 'Editar'; ?>
 @extends('layouts.admin.master')
 @section('meta-css')
+<meta name="is_create" content="{{ $is_create }}">
 <link href="/metronic-assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
 <link href="/plugins/quill-1.3.6/css/quill.snow.css" rel="stylesheet">
@@ -26,6 +27,7 @@
     <small></small>
 </h1>
 <div id="error_messages"></div>
+@include('layouts.admin.includes.success_messages')
 @endsection
 @section('page-content')
 <div class="row">
@@ -54,13 +56,13 @@
                         @else
                         {!! Form::model($language, ['route' => ['message.update', $language->id], 'class' => 'horizontal-form message-form', 
                         'method' => 'put']) !!}
-                        <input type="hidden" name="messages_id" id="messages_id_{{ $k }}" value="{{ $language->pivot->messages_id }}">
-                        <input type="hidden" name="languages_id" id="languages_id_{{ $k }}" value="{{ $language->id }}">
+                        <input type="hidden" name="messages_id" id="messages_id_{{ $k }}" value="{{ $message->id }}">
                         @endif
                         <div class="form-body">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
+                                        <input type="hidden" name="languages_id" id="languages_id_{{ $k }}" value="{{ $language->id }}">
                                         <label class="control-label" for="name"><span class="required">* </span>Título</label>
                                         {!! Form::text('title', $is_create ? null : $language->pivot->title, ['class' => 'form-control', 'id' => 'name', 'autocomplete' => 'off'])!!}
                                     </div>
@@ -148,13 +150,11 @@ $('.message-form').submit(function(e){
     let token = $('input[name=_token]').val();
     let serialized_form = $(this).serialize();
     
-    let languages_id = null;
-    languages_id = $('#languages_id_' + active_tab_id).val();
-
-    console.log(languages_id);
-
+    let is_create = $('meta[name=is_create]').attr('content');
+    let language_id = is_create ? '' : '/' + $('#languages_id_' + active_tab_id).val();
+    
     $.ajax({
-        url: '/message/' + languages_id,
+        url: '/message' + language_id,
         method: 'post',
         dataType: 'json',
         data: serialized_form,
@@ -164,7 +164,7 @@ $('.message-form').submit(function(e){
             if(response.errors)
                 $('#error_messages').html(response.errors_fragment);
             else
-                location = '/message';
+                location = response.url;
         }
     });
 });

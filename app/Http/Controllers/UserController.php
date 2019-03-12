@@ -31,7 +31,15 @@ class UserController extends Controller
     public function getList(Request $request)
     {
         if($request->ajax()) {
-            return Datatables::of(User::where('name', '!=', 'admin'))
+
+            $users = User::select('users.id', 'employees.number', 'employees.buyer_number', 'employees.seller_number',
+            'users.name', 'users.email', 'roles.name as role')
+            ->leftJoin('employees', 'employees.users_id', 'users.id')
+            ->join('model_has_roles', 'model_id', 'users.id')
+            ->join('roles', 'model_has_roles.role_id', 'roles.id')
+            ->where('roles.name', '!=', 'Administrador')->get();
+
+            return Datatables::of($users)
                   ->addColumn('actions', function($user) {
                     return '<a href="/user/'. $user->id . '/edit" class="btn btn-circle btn-icon-only default"><i class="fa fa-edit"></i></a>
                             <button class="btn btn-circle btn-icon-only red"

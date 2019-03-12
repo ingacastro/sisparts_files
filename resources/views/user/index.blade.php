@@ -52,7 +52,12 @@
                 <table class="table table-striped table-hover table-bordered" id="users_table">
                     <thead>
                         <tr>
+                            <th># Empleado</th>
+                            <th># Comprador</th>
+                            <th># Vendedor</th>
                             <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Rol</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -78,7 +83,12 @@
             ajax: '/user/get-list',
             bSort: true,
             columns: [
+                { data: "number", name: "number" },
+                { data: "buyer_number", name: "buyer_number" },
+                { data: "seller_number", name: "seller_number" },
                 { data: "name", name: "name" },
+                { data: "email", name: "email" },
+                { data: "role", name: "role" },
                 { data: 'actions', name: 'actions', orderable: false, searchable: false }
             ],
             language: {

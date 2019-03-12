@@ -8,8 +8,9 @@ class Message extends Model
 {
     protected $fillable = ['languages_id', 'title', 'subject', 'body'];
 
-    public function language()
+    public function languages()
     {
-    	return $this->belongsTo('IParts\Language', 'languages_id');
+    	return $this->belongsToMany('IParts\Language', 'messages_languages', 'messages_id', 'languages_id')
+    	->withPivot('title', 'subject', 'body');
     }
 }

@@ -1,4 +1,4 @@
-<?php $is_create = isset($model->id); $action = $is_create ? 'Nuevo' : 'Editar'; ?>
+<?php $is_create = !isset($message->id); $action = $is_create ? 'Nuevo' : 'Editar'; ?>
 @extends('layouts.admin.master')
 @section('meta-css')
 <link href="/metronic-assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
@@ -25,67 +25,58 @@
 <h1 class="page-title"> {{ $action }} Mensaje
     <small></small>
 </h1>
-@include('layouts.admin.includes.error_messages')
-@include('layouts.admin.includes.success_messages')
+<div id="error_messages"></div>
 @endsection
 @section('page-content')
 <div class="row">
     <div class="col-md-12">
         <div class="tabbable-line boxless tabbable-reversed">
             <ul class="nav nav-tabs" id="language_tabs">
-                @foreach($selects_options['messages'] as $k => $message)
+                @foreach($languages as $k => $language)
                 <li id="tab_{{ $k }}" class="{{ $k == 0 ? 'active' : null }}">
                     <a href="#tab_{{ $k }}_content" data-toggle="tab" id="tab_anchor_{{ $k }}" class="tab-anchor"> 
-                        {{ $message->language->name }} </a>
+                        {{ $language->name }} </a>
                 </li>
                 @endforeach
             </ul>
             <div class="tab-content">
-                @foreach($selects_options['messages'] as $k => $message)
+                @foreach($languages as $k => $language)
                 <div class="tab-pane {{ $k == 0 ? 'active' : null }}" id="tab_{{ $k }}_content">
                   <div class="portlet box blue">
                         <div class="portlet-title">
                             <div class="caption">
-                                <i class=""></i>{{ $message->language->name }}</div>
+                                <i class=""></i>{{ $language->name }}</div>
                         </div>
                         <div class="portlet-body form">
                         <!-- BEGIN FORM-->
-                        {{-- @if(!$is_edit) --}}
+                        @if($is_create)
                         {!! Form::open(['route' => 'message.store', 'class' => 'horizontal-form message-form']) !!}
-{{--                         @else
-                        {!! Form::model($model, ['route' => ['message.update', $model->id], 'class' => 'horizontal-form message-form', 
+                        @else
+                        {!! Form::model($language, ['route' => ['message.update', $language->id], 'class' => 'horizontal-form message-form', 
                         'method' => 'put']) !!}
-                        @endif --}}
+                        <input type="hidden" name="messages_id" id="messages_id_{{ $k }}" value="{{ $language->pivot->messages_id }}">
+                        <input type="hidden" name="languages_id" id="languages_id_{{ $k }}" value="{{ $language->id }}">
+                        @endif
                         <div class="form-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <input type="hidden" name="id" value="{{ $message->id }}">
-                                        <label for="languages_id" class="control-label"><span class="required">* </span>Idioma</label>
-                                        {!! Form::select('languages_id', $selects_options['languages'], $message->languages_id, ['class' => 'form-control', 'id' => 'languages_id', 'placeholder' => 'Seleccionar...']) !!}
-                                    </div>
-                                </div>
-                            </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="name"><span class="required">* </span>Título</label>
-                                        {!! Form::text('title', $message->title, ['class' => 'form-control', 'id' => 'name',
-                                        'autocomplete' => 'off'])!!}
+                                        {!! Form::text('title', $is_create ? null : $language->pivot->title, ['class' => 'form-control', 'id' => 'name', 'autocomplete' => 'off'])!!}
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="name"><span class="required">* </span>Asunto</label>
-                                        {!! Form::text('subject', $message->subject, ['class' => 'form-control', 'id' => 'subject',
-                                        'autocomplete' => 'off'])!!}
+                                        {!! Form::text('subject', $is_create ? null : $language->pivot->subject, ['class' => 'form-control', 'id' => 'subject', 'autocomplete' => 'off'])!!}
                                     </div>
                                 </div> 
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
                                     <div id="message_body_{{ $k }}" style="height: 350px"></div>
-                                    <input type="hidden" name="body" id="message_body_hidden">
+                                    <input type="hidden" name="body" id="message_body_hidden_{{ $k }}" 
+                                    value="{{ $is_create ? null : $language->pivot->body }}">
                                 </div>
                             </div>
                         </div>
@@ -114,12 +105,20 @@ $(document).ready(function(){
     $('#sidebar_message').addClass('active');
     let active_tab_id = $("#language_tabs li.active").attr('id').split('_')[1];
     initializeWYSIWYG(active_tab_id);
+    setWYSIWYGContent(active_tab_id);
 });
 
 $('.tab-anchor').click(function(){
     let active_tab_id = $(this).attr('id').split('_')[2];
     initializeWYSIWYG(active_tab_id);
+    setWYSIWYGContent(active_tab_id);
 });
+
+function setWYSIWYGContent(active_tab_id) {
+    let wysiwyg = document.querySelector('#message_body_' + active_tab_id);
+    let content = $('#message_body_hidden_' + active_tab_id).val();
+    wysiwyg.children[0].innerHTML = content;
+}
 
 function initializeWYSIWYG(id) {
         $('.ql-toolbar').remove();
@@ -140,10 +139,34 @@ function initializeWYSIWYG(id) {
 }
 
 $('.message-form').submit(function(e){
+    e.preventDefault();
     let active_tab_id = $("#language_tabs li.active").attr('id').split('_')[1];
     let wysiwyg = document.querySelector('#message_body_' + active_tab_id);
     let wysiwyg_content = wysiwyg.children[0].innerHTML;
-    $('#message_body_hidden').val(wysiwyg_content);
+    $('#message_body_hidden_' + active_tab_id).val(wysiwyg_content);
+
+    let token = $('input[name=_token]').val();
+    let serialized_form = $(this).serialize();
+    
+    let languages_id = null;
+    languages_id = $('#languages_id_' + active_tab_id).val();
+
+    console.log(languages_id);
+
+    $.ajax({
+        url: '/message/' + languages_id,
+        method: 'post',
+        dataType: 'json',
+        data: serialized_form,
+        headers: {'X-CSRF-TOKEN': token},
+        success: function(response) {
+            console.log(response);
+            if(response.errors)
+                $('#error_messages').html(response.errors_fragment);
+            else
+                location = '/message';
+        }
+    });
 });
 </script>
 @endpush

@@ -52,7 +52,14 @@
                 <table class="table table-striped table-hover table-bordered" id="suppliers_table">
                     <thead>
                         <tr>
-                            <th>Nombre comercial</th>
+                            <th>Nombre</th>
+                            <th>Razón Social</th>
+                            <th>País</th>
+                            <th>RFC</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Contacto</th>
+                            <th>Marcas</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -79,6 +86,18 @@
             bSort: true,
             columns: [
                 { data: "trade_name", name: "trade_name" },
+                { data: "business_name", name: "business_name" },
+                { data: "country", name: "country" },
+                { data: "rfc", name: "rfc" },
+                { data: "email", name: "email" },
+                { data: "landline", name: "landline" },
+                { data: "contact_name", name: "contact_name" },
+                { 
+                    data: 'brands',
+                    render: function(data, type, row){
+                        return data == null ? '' : data.split(',').join('</br>');
+                    }
+                },
                 { data: 'actions', name: 'actions', orderable: false, searchable: false }
             ],
             language: {

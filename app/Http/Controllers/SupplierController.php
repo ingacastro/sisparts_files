@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Session;
 use IParts\Brand;
 use Yajra\Datatables\Datatables;
 use DB;
+use Illuminate\Support\Facades\Log;
+
 
 class SupplierController extends Controller
 {
@@ -29,7 +31,17 @@ class SupplierController extends Controller
     public function getList(Request $request)
     {
         if($request->ajax()) {
-            return Datatables::of(Supplier::query())
+
+            $supps = Supplier::select('suppliers.id', 'trade_name', 'business_name', 
+                'countries.name as country', 'rfc', 'email', 'landline', 'contact_name', 
+                DB::raw("group_concat(brands.name) as brands"))
+            ->join('countries', 'countries.id', 'suppliers.countries_id')
+            ->leftJoin('suppliers_brands', 'suppliers.id', 'suppliers_brands.suppliers_id')
+            ->leftJoin('brands', 'suppliers_brands.brands_id', 'brands.id')
+            ->groupBy('suppliers.id')
+            ->get();
+
+            return Datatables::of($supps)
                   ->addColumn('actions', function($supplier) {
                     return '<a href="/supplier/'. $supplier->id . '/edit" class="btn btn-circle btn-icon-only default"><i class="fa fa-edit"></i></a>
                             <button class="btn btn-circle btn-icon-only red"

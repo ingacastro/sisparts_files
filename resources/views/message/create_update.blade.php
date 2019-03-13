@@ -35,7 +35,7 @@
         <div class="tabbable-line boxless tabbable-reversed">
             <ul class="nav nav-tabs" id="language_tabs">
                 @foreach($languages as $k => $language)
-                <li id="tab_{{ $k }}" class="{{ $k == 0 ? 'active' : null }}">
+                <li id="tab_{{ $k }}">
                     <a href="#tab_{{ $k }}_content" data-toggle="tab" id="tab_anchor_{{ $k }}" class="tab-anchor"> 
                         {{ $language->name }} </a>
                 </li>
@@ -43,7 +43,7 @@
             </ul>
             <div class="tab-content">
                 @foreach($languages as $k => $language)
-                <div class="tab-pane {{ $k == 0 ? 'active' : null }}" id="tab_{{ $k }}_content">
+                <div class="tab-pane " id="tab_{{ $k }}_content">
                   <div class="portlet box blue">
                         <div class="portlet-title">
                             <div class="caption">
@@ -104,11 +104,35 @@
 <script src="/plugins/quill-1.3.6/js/quill.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){
+    
     $('#sidebar_message').addClass('active');
-    let active_tab_id = $("#language_tabs li.active").attr('id').split('_')[1];
-    initializeWYSIWYG(active_tab_id);
-    setWYSIWYGContent(active_tab_id);
+
+    setActiveTab();
 });
+
+//Set active tab from local storage
+$('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+    localStorage.setItem('message_active_tab', $(e.target).attr('href'));
+    localStorage.setItem('from_message_index', false);
+});
+function setActiveTab() {
+    
+    let activeTab = localStorage.getItem('message_active_tab');
+    let fromSuppIndex = localStorage.getItem('from_message_index');
+
+    if(fromSuppIndex == 'false' && activeTab){
+        $('#language_tabs a[href="' + activeTab + '"]').tab('show');
+        let active_tab_id = activeTab.split('_')[1];
+        initializeWYSIWYG(active_tab_id);
+        setWYSIWYGContent(active_tab_id);
+    } else {
+        $('#language_tabs a[href="#tab_0_content"]').tab('show');
+        let active_tab_id = $("#language_tabs li.active").attr('id').split('_')[1];
+
+        initializeWYSIWYG(active_tab_id);
+        setWYSIWYGContent(active_tab_id);
+    }
+}
 
 $('.tab-anchor').click(function(){
     let active_tab_id = $(this).attr('id').split('_')[2];
@@ -160,7 +184,6 @@ $('.message-form').submit(function(e){
         data: serialized_form,
         headers: {'X-CSRF-TOKEN': token},
         success: function(response) {
-            console.log(response);
             if(response.errors)
                 $('#error_messages').html(response.errors_fragment);
             else

@@ -42,7 +42,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="btn-group pull-right">
-                                <a href="{{ route('supplier.create') }}" class="btn btn-circle green"> Nuevo
+                                <a href="{{ route('supplier.create') }}" id="new_supplier" class="btn btn-circle green"> Nuevo
                                     <i class="fa fa-plus"></i>
                                 </a>
                             </div>
@@ -104,6 +104,14 @@
                 "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
             }, 
         });
+    });
+
+    //needed to work with tab switching on create_update view
+    $('#new_supplier').click(function(){
+        localStorage.setItem('from_supplier_index', true);
+    });
+    $(document).click('.edit-supplier', function(e){
+        localStorage.setItem('from_supplier_index', true);
     });
 
     /*Supplier delete*/

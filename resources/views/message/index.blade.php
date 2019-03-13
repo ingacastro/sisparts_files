@@ -89,6 +89,14 @@
         });
     });
 
+    //needed to work with tab switching on create_update view
+    $('#new_supplier').click(function(){
+        localStorage.setItem('from_message_index', true);
+    });
+    $(document).click('.edit-message', function(e){
+        localStorage.setItem('from_message_index', true);
+    });
+
     function deleteModel(e, id) {
         e.preventDefault();
         swal({

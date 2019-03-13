@@ -43,7 +43,8 @@ class SupplierController extends Controller
 
             return Datatables::of($supps)
                   ->addColumn('actions', function($supplier) {
-                    return '<a href="/supplier/'. $supplier->id . '/edit" class="btn btn-circle btn-icon-only default"><i class="fa fa-edit"></i></a>
+                    return '<a href="/supplier/'. $supplier->id . '/edit" class="btn btn-circle btn-icon-only default edit-supplier">
+                            <i class="fa fa-edit"></i></a>
                             <button class="btn btn-circle btn-icon-only red"
                             onclick="deleteModel(event, ' . $supplier->id . ')"><i class="fa fa-times"></i></a>';
                   })

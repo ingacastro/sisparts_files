@@ -33,8 +33,8 @@
 <div class="row">
     <div class="col-md-12">
         <div class="tabbable-line boxless tabbable-reversed">
-            <ul class="nav nav-tabs">
-                <li class="active">
+            <ul class="nav nav-tabs" id="supplier_tabs">
+                <li>
                     <a href="#tab_0_content" id="tab_0" data-toggle="tab"> Datos Básicos </a>
                 </li>
                 <li>
@@ -47,7 +47,7 @@
                 @endif
             </ul>
 			<div class="tab-content">
-                <div class="tab-pane active" id="tab_0_content">
+                <div class="tab-pane " id="tab_0_content">
                   <div class="portlet box blue">
                         <div class="portlet-title">
                             <div class="caption">
@@ -129,7 +129,26 @@
 
         //In edit mode enable state select
         if($.isNumeric(model_id)) $('#states_id').removeAttr("disabled");
+
+        setActiveTab();
     });
+
+    //Set active tab from local storage
+    $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+        localStorage.setItem('supplier_active_tab', $(e.target).attr('href'));
+        localStorage.setItem('from_supplier_index', false);
+    });
+    function setActiveTab() {
+        
+        let activeTab = localStorage.getItem('supplier_active_tab');
+        let fromSuppIndex = localStorage.getItem('from_supplier_index');
+
+        if(fromSuppIndex == 'false' && activeTab){
+            $('#supplier_tabs a[href="' + activeTab + '"]').tab('show');
+        } else {
+            $('#supplier_tabs a[href="#tab_0_content"]').tab('show');
+        }
+    }
 
     //We copy every select selected option value into a hidden input
     $('.drop-down').change(function(){

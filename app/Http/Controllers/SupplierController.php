@@ -161,7 +161,7 @@ class SupplierController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(SupplierRequest $request, $id)
     {
         $data = $request->all();
         if(!$request->has('marketplace')) $data['marketplace'] = 0;

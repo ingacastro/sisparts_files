@@ -33,7 +33,7 @@ $(document).ready(function(){
 	    columns: [
 	    	{'data': 'id'},
 	    	{'data': 'name'},
-	    	{'data': 'actions'}
+	    	{'data': 'actions', name: 'actions', orderable: false, searchable: false}
 	    ]
     });
 });

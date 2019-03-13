@@ -135,7 +135,6 @@
     $('.drop-down').change(function(){
         let select_val = $(this).val();
         $('#' + $(this).attr('id') + '_hidden').val(select_val);
-        //console.log($('#' + $(this).attr('id') + '_hidden').val());
     });
 
     //We merge basic and fiscal forms every time one of them is submitted

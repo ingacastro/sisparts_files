@@ -23,7 +23,7 @@ $second_row_cols = $model_exist ? [3, 6, 3] : [1, 10, 1];
     <div class="row" style="margin-top: 20px">
     	<div class="col-md-{{$second_row_cols[0]}}"></div>
     	<div class="col-md-{{$second_row_cols[1]}}">
-		    <table class="table table-striped table-hover table-bordered" id="brands_table">
+		    <table class="table table-striped table-hover table-bordered" id="brands_table" style="width: 100%">
 				<thead>
 				    <tr>
 				    	<th>Id</th>

@@ -37,7 +37,7 @@ class UserController extends Controller
             ->leftJoin('employees', 'employees.users_id', 'users.id')
             ->join('model_has_roles', 'model_id', 'users.id')
             ->join('roles', 'model_has_roles.role_id', 'roles.id')
-            ->where('roles.name', '!=', 'Administrador')->get();
+            ->where('users.email', '!=', 'admin@admin.com')->get();
 
             return Datatables::of($users)
                   ->addColumn('actions', function($user) {

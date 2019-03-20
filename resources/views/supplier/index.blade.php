@@ -179,6 +179,7 @@
         $('#supplier_id').val(id);
 
         $('#brands_table').DataTable({
+            destroy: true,
             ajax: '/supplier/get-brands/' + id,
             searching: false,
             info: false,

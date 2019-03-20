@@ -4,6 +4,8 @@
 <link href="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/css/plugins.min.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.css" rel="stylesheet" type="text/css" />
+<link href="/metronic-assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
+<link href="/metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
 @section('breadcumb')
@@ -70,12 +72,39 @@
         <!-- END EXAMPLE TABLE PORTLET-->
     </div>
 </div>
+<div class="modal fade bs-modal-lg" id="brands_modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Marcas</h4>
+            </div>
+            {!! Form::open(['route' => 'supplier.sync-brands', 'method' => 'post', 'class' => 'horizontal-form', 'id' => 'brands_form']) !!}
+                <input type="hidden" name="supplier_id" id="supplier_id">
+                <input type="hidden" name="supplier_brands" id="supplier_brands" value="">
+                <input type="hidden" name="redirect_to" value="supplier.index">
+                <div class="modal-body">
+                    @include('supplier.tabs.brands')
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-circle default" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-circle blue">Guardar</button>
+                </div>
+            {!! Form::close() !!}
+        </div>
+    </div>
+</div>
+
 @endsection
 @endsection
 @push('scripts')
 <script src="/metronic-assets/global/plugins/datatables/datatables.min.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.min.js" type="text/javascript"></script>
+<script src="/metronic-assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
+<script src="/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script>
+<script src="/js/supplier/brands.js" type="text/javascript"></script>
+
 <script type="text/javascript">
     $(document).ready(function(){
         $('#sidebar_supplier').addClass('active');
@@ -143,5 +172,28 @@
             }
         });
     }
+
+    $(document).on('click', '.show-brands', function(e) {
+
+        let id = $(this).attr('data-id');
+        $('#supplier_id').val(id);
+
+        $('#brands_table').DataTable({
+            ajax: '/supplier/get-brands/' + id,
+            searching: false,
+            info: false,
+            lengthChange: false,
+            sDom: '<"row view-filter"<"col-sm-12"<"pull-left"l><"pull-right"f><"clearfix">>>t<"row view-pager"<"col-sm-12"<"text-center"ip>>>',
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+            },
+            columns: [
+                {'data': 'id'},
+                {'data': 'name'},
+                {'data': 'actions', name: 'actions', orderable: false, searchable: false}
+            ]
+        });
+    });
+
 </script>
 @endpush

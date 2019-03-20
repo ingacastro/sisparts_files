@@ -30,6 +30,7 @@ Route::get('country-states', 'UtilController@getCountryStates');
 //Supplier
 Route::get('supplier/brands-id-name', 'SupplierController@getBrandsKeyVal');
 Route::group(['middleware' => ['role:Administrador|Cotizador']], function(){
+	Route::get('supplier/get-brands/{id}', 'SupplierController@getModelBrands');
 	Route::get('supplier/get-list', 'SupplierController@getList');
 	Route::post('supplier/create-brand', 'SupplierController@createBrand');
 	Route::post('supplier/sync-brands', 'SupplierController@syncBrands')->name('supplier.sync-brands');

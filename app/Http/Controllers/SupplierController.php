@@ -43,10 +43,13 @@ class SupplierController extends Controller
 
             return Datatables::of($supps)
                   ->addColumn('actions', function($supplier) {
-                    return '<a href="/supplier/'. $supplier->id . '/edit" class="btn btn-circle btn-icon-only default edit-supplier">
+
+                    return '<a data-toggle="modal" data-id="' . $supplier->id .'" href="#brands_modal" 
+                            class ="btn btn-circle btn-icon-only green show-brands"><i class="fa fa-eye"></i></a>
+                            <a href="/supplier/'. $supplier->id . '/edit" class="btn btn-circle btn-icon-only default edit-supplier">
                             <i class="fa fa-edit"></i></a>
                             <button class="btn btn-circle btn-icon-only red"
-                            onclick="deleteModel(event, ' . $supplier->id . ')"><i class="fa fa-times"></i></a>';
+                            onclick="deleteModel(event, ' . $supplier->id . ')"><i class="fa fa-times"></i></button>';
                   })
                   ->rawColumns(['actions' => 'actions'])
                   ->make(true);
@@ -123,6 +126,20 @@ class SupplierController extends Controller
             'model', 'selects_options'));
     }
 
+    public function getModelBrands(Request $request, $id)
+    {
+        if($request->ajax()) {
+            $brands = Supplier::find($id)->brands;
+            return Datatables::of($brands)
+                  ->addColumn('actions', function($brand) {
+                    return '<a class="remove-brand" id="' . $brand->id . '">Eliminar</a>';
+                  })
+                  ->rawColumns(['actions' => 'actions'])
+                  ->make(true);
+        }
+        abort(403, 'Unauthorized action');
+    }
+
     public function getBrandsKeyVal(Request $request)
     {
         $brands = Brand::select('id', 'name as text')
@@ -151,7 +168,7 @@ class SupplierController extends Controller
             return redirect()->back()->withErrors($e->getMessage());
         }
 
-        return redirect()->route('supplier.edit', $supp_id);
+        return redirect()->route($request->get('redirect_to'), $supp_id);
     }
 
     /**

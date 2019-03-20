@@ -101,6 +101,7 @@
                                 @include('supplier.tabs.brands')
                                 <input type="hidden" name="supplier_id" value="{{ $model->id }}">
                                 <input type="hidden" name="supplier_brands" id="supplier_brands" value="">
+                                <input type="hidden" name="redirect_to" value="supplier.edit">
                             {!! Form::close() !!}
                             <!-- END FORM-->
                         </div>
@@ -131,6 +132,21 @@
         if($.isNumeric(model_id)) $('#states_id').removeAttr("disabled");
 
         setActiveTab();
+
+        $('#brands_table').DataTable({
+            searching: false,
+            info: false,
+            lengthChange: false,
+            sDom: '<"row view-filter"<"col-sm-12"<"pull-left"l><"pull-right"f><"clearfix">>>t<"row view-pager"<"col-sm-12"<"text-center"ip>>>',
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+            },
+            columns: [
+                {'data': 'id'},
+                {'data': 'name'},
+                {'data': 'actions', name: 'actions', orderable: false, searchable: false}
+            ]
+        });
     });
 
     //Set active tab from local storage

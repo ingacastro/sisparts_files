@@ -44,7 +44,7 @@
                 {{ old('remember') ? 'checked' : '' }}/>Recordar
                 <span></span>
             </label>
-            <a href="{{ route('password.request') }}" id="forget-password" class="forget-password">¿Olvidaste tu contraseña?</a>
+            <a href="{{ route('password.request') }}" class="forget-password">¿Olvidaste tu contraseña?</a>
         </div>
     </form>
     <!-- END LOGIN FORM -->

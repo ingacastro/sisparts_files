@@ -48,26 +48,6 @@
         </div>
     </form>
     <!-- END LOGIN FORM -->
-    <!-- BEGIN FORGOT PASSWORD FORM -->
-    <form class="forget-form" action="{{ route('password.email') }}" method="post">
-        @csrf
-        <h3 class="font-green">Recuperar contraseña</h3>
-        <p> Ingresa to correo electrónico para restablecer tu contraseña. </p>
-        <div class="form-group">
-            <input type="email" autocomplete="off" placeholder="Correo electrónico" 
-            name="email" id="email" class="placeholder-no-fix form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" required/> 
-            @if ($errors->has('email'))
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $errors->first('email') }}</strong>
-                </span>
-            @endif
-        </div>
-        <div class="form-actions">
-            <button type="button" id="back-btn" class="btn green btn-outline">Regresar</button>
-            <button type="submit" class="btn btn-success uppercase pull-right btn-primary">Enviar</button>
-        </div>
-    </form>
-    <!-- END FORGOT PASSWORD FORM -->
 </div>
 <!-- END LOGIN -->
 @endsection

@@ -134,8 +134,6 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, $id)
     {
-
-
         $user_data = $request->get('user');
 
         if(empty($user_data['password']))
@@ -147,7 +145,6 @@ class UserController extends Controller
         $employee_data = $request->get('employee');
 
         try {
-            Log::notice($employee_data);
             $user = User::find($id);
             DB::transaction(function() use ($user_data, $role_name, $employee_data, $user) {
                 $user->fill($user_data)->update();

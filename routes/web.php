@@ -39,7 +39,6 @@ Route::group(['middleware' => ['role:Administrador|Cotizador']], function(){
 
 //Admin
 Route::group(['middleware' => ['role:Administrador']], function(){
-	
 	//User
 	Route::get('user/get-list', 'UserController@getList');
 	Route::resource('user', 'UserController');
@@ -53,3 +52,5 @@ Route::group(['middleware' => ['role:Administrador']], function(){
 	Route::resource('message', 'MessageController');
 });
 
+//TEMPORARY
+Route::get('siavcom-quotations-sync', 'DocumentSyncController@siavcomQuotationsSync');

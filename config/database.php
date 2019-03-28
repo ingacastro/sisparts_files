@@ -38,7 +38,6 @@ return [
             'database' => env('DB_DATABASE', database_path('database.sqlite')),
             'prefix' => '',
         ],
-
         'mysql' => [
             'driver' => 'mysql',
             'host' => env('DB_HOST', '127.0.0.1'),
@@ -53,20 +52,43 @@ return [
             'strict' => true,
             'engine' => null,
         ],
-
-        'pgsql' => [
+        /*Siavcom connections*/
+        'pgsql_mxmro' => [
             'driver' => 'pgsql',
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '5432'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
+            'host' => env('MXMRO_DB_HOST', '127.0.0.1'),
+            'port' => env('MXMRO_DB_PORT', '5432'),
+            'database' => env('MXMRO_DB_DATABASE', 'forge'),
+            'username' => env('MXMRO_DB_USERNAME', 'forge'),
+            'password' => env('MXMRO_DB_PASSWORD', ''),
             'charset' => 'utf8',
             'prefix' => '',
             'schema' => 'public',
             'sslmode' => 'prefer',
         ],
-
+        'pgsql_pavan' => [
+            'driver' => 'pgsql',
+            'host' => env('PAVAN_DB_HOST', '127.0.0.1'),
+            'port' => env('PAVAN_DB_PORT', '5432'),
+            'database' => env('PAVAN_DB_DATABASE', 'forge'),
+            'username' => env('PAVAN_DB_USERNAME', 'forge'),
+            'password' => env('PAVAN_DB_PASSWORD', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'schema' => 'public',
+            'sslmode' => 'prefer',
+        ],
+        'pgsql_zukaely' => [
+            'driver' => 'pgsql',
+            'host' => env('DBZUKAELY_DB_HOST', '127.0.0.1'),
+            'port' => env('ZUKAELY_DB_PORT', '5432'),
+            'database' => env('ZUKAELY_DB_DATABASE', 'forge'),
+            'username' => env('ZUKAELY_DB_USERNAME', 'forge'),
+            'password' => env('ZUKAELY_DB_PASSWORD', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'schema' => 'public',
+            'sslmode' => 'prefer',
+        ],
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'host' => env('DB_HOST', 'localhost'),

@@ -80,8 +80,6 @@ class DocumentSyncController extends Controller
     	$documentNumber = $document->number;
 
 		$documentSuppliesTable = env('SIAVCOM_DOCUMENTS_SUPPLIES');
-		$suppliesTable = env('SIAVCOM_SUPPLIES');
-		$manufacturersTable = env('SIAVCOM_MANUFACTURERS');
 
     	$siavcomDocumentSupplies = DB::connection($dbConnection)->table($documentSuppliesTable)
     	->where('ndo_doc', $documentNumber)->get();
@@ -90,49 +88,57 @@ class DocumentSyncController extends Controller
     	if(empty($siavcomDocumentSupplies)) return;
 
     	foreach($siavcomDocumentSupplies as $pivot) {
-    		//Supply
-			$siavcom_supply = DB::connection($dbConnection)->table($suppliesTable)
-			->where('cla_isu', $pivot->cla_isu)->first();
-
-			if(!isset($siavcom_supply)) continue;
-
-    		//Manufacturer
-			$siavcom_manufacturer = DB::connection($dbConnection)->table($manufacturersTable)
-			->where('key_xmd', $siavcom_supply->key_pri)->first();
-
-			if(!isset($siavcom_manufacturer)) continue;
-
-			DB::beginTransaction();
-			try {				
-				//Retrieve manufacturer or create it
-				$key_xmd = $siavcom_manufacturer->key_xmd;
-				$manufacturer = Manufacturer::find($key_xmd);
-				if(!isset($manufacturer))
-					$manufacturer = Manufacturer::create([
-						'id' => $key_xmd, 
-						'document_type' => $siavcom_manufacturer->xml_xmd]);
-
-				//Retrieve supply or create it
-				$cla_isu = $siavcom_supply->cla_isu;
-				$supply = Supply::where('number', $cla_isu)->first();
-				if(!isset($supply))
-					$supply = Supply::create([
-						'number' => $cla_isu, 
-						'manufacturers_id' => $manufacturer->id]);
-
-				$document->supplies()->attach($supply->id, [
-					'set' => $pivot->mov_mov,
-					'product_description' => $pivot->dse_mov,
-					'products_amount' => $pivot->can_mov,
-					'measurement_unit_code' => $pivot->med_mov,
-					'sale_unit_price' => $pivot->pve_mov
-				]);
-				DB::commit();
-			} catch(\Exception $e) {
-				DB::rollback();
-				Log::notice($e->getMessage());
-			}
+    		$this->attachDocumentSupplies($pivot, $dbConnection,  $document);
     	}
+    }
+
+    private function attachDocumentSupplies(\stdClass $pivot, $dbConnection, $document)
+    {
+		$suppliesTable = env('SIAVCOM_SUPPLIES');
+		$manufacturersTable = env('SIAVCOM_MANUFACTURERS');
+
+	    //Supply
+		$siavcom_supply = DB::connection($dbConnection)->table($suppliesTable)
+		->where('cla_isu', $pivot->cla_isu)->first();
+
+		if(!isset($siavcom_supply)) return;
+
+		//Manufacturer
+		$siavcom_manufacturer = DB::connection($dbConnection)->table($manufacturersTable)
+		->where('key_xmd', $siavcom_supply->key_pri)->first();
+
+		if(!isset($siavcom_manufacturer)) return;
+
+		DB::beginTransaction();
+		try {				
+			//Retrieve manufacturer or create it
+			$key_xmd = $siavcom_manufacturer->key_xmd;
+			$manufacturer = Manufacturer::find($key_xmd);
+			if(!isset($manufacturer))
+				$manufacturer = Manufacturer::create([
+					'id' => $key_xmd, 
+					'document_type' => $siavcom_manufacturer->xml_xmd]);
+
+			//Retrieve supply or create it
+			$cla_isu = $siavcom_supply->cla_isu;
+			$supply = Supply::where('number', $cla_isu)->first();
+			if(!isset($supply))
+				$supply = Supply::create([
+					'number' => $cla_isu, 
+					'manufacturers_id' => $manufacturer->id]);
+
+			$document->supplies()->attach($supply->id, [
+				'set' => $pivot->mov_mov,
+				'product_description' => $pivot->dse_mov,
+				'products_amount' => $pivot->can_mov,
+				'measurement_unit_code' => $pivot->med_mov,
+				'sale_unit_price' => $pivot->pve_mov
+			]);
+			DB::commit();
+		} catch(\Exception $e) {
+			DB::rollback();
+			Log::notice($e->getMessage());
+		}
     }
 
     /*Retrieves the founded customer by code on siavcom database*/

@@ -52,5 +52,3 @@ Route::group(['middleware' => ['role:Administrador']], function(){
 	Route::resource('message', 'MessageController');
 });
 
-//TEMPORARY
-Route::get('siavcom-quotations-sync', 'DocumentSyncController@siavcomQuotationsSync');

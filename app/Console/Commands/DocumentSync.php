@@ -86,7 +86,7 @@ class DocumentSync extends Command
         }
     }
 
-    /*Insert all the necessary data in the required tables, to create a document(type pct) */
+    /*Insert all the necessary data in the required tables, to create a document(type pct)*/
     private function createUpdateDocument(\stdClass $siavcomDocument, \stdClass $conn)
     {
         $customerCode = $siavcomDocument->cod_nom;
@@ -157,6 +157,7 @@ class DocumentSync extends Command
         }
     }
 
+    //Inserts on document_supplies table
     private function attachDocumentSupply(\stdClass $pivot, \stdClass $conn, $document)
     {
         $suppliesTable = env('SIAVCOM_SUPPLIES');
@@ -190,9 +191,8 @@ class DocumentSync extends Command
         }
     }
 
-    //documents-supplies relationshipt
+    //documents-supplies relationship
     private function insertDocumentSupply(\stdClass $pivot, Document $document, Supply $supply) {
-        //Pivot
         $pivot_data = [
             'set' => $pivot->mov_mov,
             'product_description' => $pivot->dse_mov,
@@ -248,7 +248,7 @@ class DocumentSync extends Command
         return $manufacturer;
     }
 
-    /*Retrieves the founded customer by code on siavcom database*/
+    /*Retrieves created/found customer based on siavcom database customer code*/
     private function getCustomer($code, \stdClass $conn)
     {
         $customersTable = env('SIAVCOM_CUSTOMERS');

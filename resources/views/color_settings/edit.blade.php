@@ -1,4 +1,3 @@
-
 @extends('layouts.admin.master')
 @section('meta-css')
 <link href="/metronic-assets/global/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet" type="text/css" />
@@ -54,7 +53,7 @@ $(document).ready(function(){
         e.preventDefault();
         let token = $('input[name=_token]').val();
         let serialized_form = $(this).serialize();
-        console.log(serialized_form);
+        
         $.ajax({
             url: '/color-settings',
             type: 'post',

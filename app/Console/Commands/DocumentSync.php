@@ -252,7 +252,10 @@ class DocumentSync extends Command
     private function getCustomer($code, \stdClass $conn)
     {
         $customersTable = env('SIAVCOM_CUSTOMERS');
-        $siavcom_customer = DB::connection($conn->name)->table($customersTable)->where('cod_nom', $code)->first();
+        $siavcom_customer = DB::connection($conn->name)->table($customersTable)
+        ->where('cod_nom', $code)
+        ->where('cop_nom', 'C')
+        ->first();
 
         //If customer were found on siavcom db, we're not gonna try to find it or create it
         if(!isset($siavcom_customer)) return null;

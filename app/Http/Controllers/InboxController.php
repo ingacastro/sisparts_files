@@ -27,15 +27,19 @@ class InboxController extends Controller
     public function index()
     {
         $logged_user_role = Auth::user()->roles()->first()->name;
-        $dealerships = User::role('Cotizador')->pluck('name', 'id');
-        return view('inbox.index', compact('logged_user_role', 'dealerships'));
+        $sync_connections = DB::table('sync_connections')->pluck('display_name', 'id')->prepend('TODAS', 0);
+        $dealerships = User::role('Cotizador')->pluck('name', 'id')->prepend('TODOS', 0);
+        return view('inbox.index', compact('logged_user_role', 'dealerships', 'sync_connections', 'dealerships'));
     }
 
-    //Admin's inbox list
+    //Inbox list
     public function getList(Request $request)
     {
-        $colorSettings = ColorSetting::all();
         if($request->ajax()) {
+
+            $sync_connection = $request->get('sync_connection') ?? 0;
+            $status = $request->get('status') ?? 0;
+            $dealer_ship = $request->get('dealer_ship') ?? 0;
 
             $fields = ['documents.id', 'documents.created_at', 'sync_connections.display_name as sync_connection',
             'users.name as buyer', 'documents.number', 'customers.trade_name as customer', 
@@ -51,44 +55,57 @@ class InboxController extends Controller
                          ->join('users', 'users.id', 'employees.users_id')
                          ->join('customers', 'customers.id', 'documents.customers_id')
                          ->join('sync_connections', 'documents.sync_connections_id', 'sync_connections.id');
+
             $logged_user = Auth::user();
+            //Dealership won't see customer
             if($logged_user->roles()->first()->name == "Cotizador") {
                 $query->where('employees_users_id', $logged_user->id);
                 unset($fields[5]);
             }
+
+            if($sync_connection > 0)
+                $query->where('documents.sync_connections_id', $sync_connection);
+            if($status > 0)
+                $query->where('documents.status', $status);
+            if($dealer_ship > 0)
+                $query->where('documents.employees_users_id', $dealer_ship);
                          
              $documents = $query->get($fields);
-            
-            return Datatables::of($documents)
-                  ->editColumn('semaphore', function($document) use($colorSettings) {
-                    $color = env('SEMAPHORE_FIRST_COLOR');
-                    foreach($colorSettings as $colorSetting) {
-                        if($document->semaphore >= $colorSetting->days)
-                            $color = $colorSetting->color;
-                    }
-                    return '<div class="form-control" style="background-color: ' . $color . '; width: 100%; height: 25px;
-                                line-height: 100%; vertical-align: middle; text-align: center; color: #fff">
-                                '. $document->semaphore .' días
-                            </div>';
-                  })
-                  ->editColumn('created_at', function($document) {
-                    return date_format(new \DateTime($document->created_at), 'd/m/Y');
-                  })
-                  ->addColumn('actions', function($document) {
-                    return 
-                    '<a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '">
-                        <i class="fa fa-user"></i>
-                    </a>
-                    <a class="btn btn-circle btn-icon-only default blue" onClick="archiveDocument(event, ' . $document->id . ')">
-                        <i class="fa fa-archive"></i>
-                    </a>';
-                  })
-                  ->rawColumns(['semaphore' => 'semaphore', 'actions' => 'actions'])
-                  ->make(true);
+             return $this->buildInboxDataTable($documents);
         }
         abort(403, 'Unauthorized action');
     }
 
+    private function buildInboxDataTable($documents)
+    {
+        $colorSettings = ColorSetting::all();
+        return Datatables::of($documents)
+              ->editColumn('semaphore', function($document) use($colorSettings) {
+                $color = env('SEMAPHORE_FIRST_COLOR');
+                foreach($colorSettings as $colorSetting) {
+                    if($document->semaphore >= $colorSetting->days)
+                        $color = $colorSetting->color;
+                }
+                return '<div class="form-control" style="background-color: ' . $color . '; width: 100%; height: 25px;
+                            line-height: 100%; vertical-align: middle; text-align: center; color: #fff">
+                            '. $document->semaphore .' días
+                        </div>';
+              })
+              ->editColumn('created_at', function($document) {
+                return date_format(new \DateTime($document->created_at), 'd/m/Y');
+              })
+              ->addColumn('actions', function($document) {
+                return 
+                '<a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '">
+                    <i class="fa fa-user"></i>
+                </a>
+                <a class="btn btn-circle btn-icon-only default blue" onClick="archiveDocument(event, ' . $document->id . ')">
+                    <i class="fa fa-archive"></i>
+                </a>';
+              })
+              ->rawColumns(['semaphore' => 'semaphore', 'actions' => 'actions'])
+              ->make(true);
+    }
     public function changeDealerShip(Request $request)
     {
         $data = $request->all();

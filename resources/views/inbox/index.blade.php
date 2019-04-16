@@ -36,6 +36,34 @@
                 </div>
             </div>
             <div class="portlet-body">
+                {!! Form::open(['route' => 'inbox.get-list', 'id' => 'filters_form']) !!}
+                    <label class="control-label" for="language">Filtros</label>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                {!! Form::select('sync_connection', $sync_connections, null, 
+                                ['placeholder' => 'Empresa...', 'class' => 'form-control drop-down', 'id' => 'filters_sync_connection']) !!}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                {!! Form::select('status', [0 => 'TODOS', 1 => 'Nueva', 2 => 'En proceso', 3 => 'Terminada'], null, 
+                                ['placeholder' => 'Estatus...', 'class' => 'form-control drop-down', 'id' => 'filters_status']) !!}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                {!! Form::select('dealer_ship',  $dealerships, null, 
+                                ['placeholder' => 'Asignado...', 'class' => 'form-control drop-down', 'id' => 'filters_dealer_ship']) !!}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-circle blue">Filtrar</button>
+                            </div>
+                        </div>
+                    </div>
+                {!! Form::close() !!}
                 <div class="table-toolbar">
                     <div class="row">
                         <div class="col-md-6"></div>
@@ -46,11 +74,11 @@
                     <thead>
                         <tr>
                             <th>Fecha</th>
-                            <th>Razón social</th>
+                            <th>Empresa</th>
                             <th>Folio</th>
-                            <th>Cotizador</th>
+                            <th>Asignado</th>
                             @if($logged_user_role == 'Administrador')<th>Cliente</th>@endif
-                            <th>Semáforo</th>
+                            <th>Edad</th>
                             <th>Estatus</th>
                             <th>Acciones</th>
                         </tr>
@@ -70,7 +98,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
                 <h4 class="modal-title">Reasignar cotizador</h4>
             </div>
-            {!! Form::open(['route' => ['inbox.change-dealership', 34], 'method' => 'post', 'class' => 'horizontal-form',
+            {!! Form::open(['route' => 'inbox.change-dealership', 'method' => 'post', 'class' => 'horizontal-form',
                 'id' => 'change_dealership_form']) !!}
                 <div class="modal-body">
                     <div id="error_messages"></div>
@@ -100,6 +128,7 @@
 <script src="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.min.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
 <script src="/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script>
+<script src="/js/inbox/index.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function(){
     $('#sidebar_inbox').addClass('active');
@@ -108,6 +137,7 @@ $(document).ready(function(){
         serverSide: true,
         ajax: '/inbox/get-list',
         bSort: true,
+        destroy: true,
         columns: [
             { data: "created_at", name: "created_at" },
             { data: "sync_connection", name: "sync_connection" },
@@ -124,62 +154,35 @@ $(document).ready(function(){
     });
 });
 
-$(document).on('click', '.change-dealership', function(){
-    let current_dealership = $(this).attr('data-buyer');
-    $('#current_dealership').html('Cotizador actual: ' + current_dealership);
-    let document_id = $(this).attr('data-document_id');
-    $('#document_id').val(document_id);
-});
-
-$('#change_dealership_form').submit(function(e){
+$('#filters_form').submit(function(e){
     e.preventDefault();
     let serialized_form = $(this).serialize();
-    let token = $('meta[name=_token]').attr('content');
-    $.ajax({
-        url: '/inbox/change-dealership',
-        dataType: 'json',
-        method: 'post',
-        headers: {'X-CSRF-TOKEN': token},
-        data: serialized_form,
-        success: function(response) {
-            if(response.errors)
-                $('#error_messages').html(response.errors_fragment);
-            else
-                location.reload();
-        }
+    let sync_connection = $('#filters_sync_connection').val();
+    let status = $('#filters_status').val();
+    let dealer_ship = $('#filters_dealer_ship').val();
+
+    $('#inbox_table').DataTable({
+        serverSide: true,
+        destroy: true,
+        ajax: {
+            url: '/inbox/get-list',
+            data: {'sync_connection': sync_connection, 'status': status, 'dealer_ship': dealer_ship}
+        },
+        bSort: true,
+        columns: [
+            { data: "created_at", name: "created_at" },
+            { data: "sync_connection", name: "sync_connection" },
+            { data: "number", name: "number" },
+            { data: "buyer", name: "buyer" },
+            @if($logged_user_role == 'Administrador'){ data: "customer", name: "customer" },@endif
+            { data: "semaphore", name: "semaphore" },
+            { data: "status", name: "status" },
+            { data: 'actions', name: 'actions', orderable: false, searchable: false }
+        ],
+        language: {
+            url: "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json",
+        }, 
     });
 });
-
-
-function archiveDocument(e, id) {
-    e.preventDefault();
-    swal({
-      title: "Archivar",
-      text: "¿Está seguro de archivar el elemento seleccionado?",
-      type: "warning",
-      showCancelButton: true,
-      confirmButtonClass: "btn-danger",     
-      cancelButtonText: "Cancelar",
-      confirmButtonText: "Aceptar",
-      closeOnConfirm: false
-    },
-    function(isConfirm) {
-      if (isConfirm) { archiveRequest(id); }
-    });
-}
-
-function archiveRequest(id) {
-    let token = $('meta[name=_token]').attr('content');
-    $.ajax({
-        url: '/inbox/' + id + '/archive',
-        method: 'post',
-        headers: {'X-CSRF-TOKEN': token},
-        success: function() {
-            document.location.reload();
-        }
-    });
-}
-
-
 </script>
 @endpush

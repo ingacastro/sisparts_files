@@ -150,66 +150,36 @@ $('#change_dealership_form').submit(function(e){
     });
 });
 
-    //needed to work with tab switching on create_update view
-/*    $('#new_supplier').click(function(){
-        localStorage.setItem('from_supplier_index', true);
+
+function archiveDocument(e, id) {
+    e.preventDefault();
+    swal({
+      title: "Archivar",
+      text: "¿Está seguro de archivar el elemento seleccionado?",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonClass: "btn-danger",     
+      cancelButtonText: "Cancelar",
+      confirmButtonText: "Aceptar",
+      closeOnConfirm: false
+    },
+    function(isConfirm) {
+      if (isConfirm) { archiveRequest(id); }
     });
-    $(document).click('.edit-supplier', function(e){
-        localStorage.setItem('from_supplier_index', true);
+}
+
+function archiveRequest(id) {
+    let token = $('meta[name=_token]').attr('content');
+    $.ajax({
+        url: '/inbox/' + id + '/archive',
+        method: 'post',
+        headers: {'X-CSRF-TOKEN': token},
+        success: function() {
+            document.location.reload();
+        }
     });
+}
 
-
-    function deleteModel(e, id) {
-        e.preventDefault();
-        swal({
-          title: "Eliminar proveedor",
-          text: "¿Seguro que deseas eliminar este proveedor?",
-          type: "warning",
-          showCancelButton: true,
-          confirmButtonClass: "btn-danger",
-          cancelButtonText: "Cancelar",
-          confirmButtonText: "Aceptar",
-          closeOnConfirm: false
-        },
-        function(isConfirm) {
-          if (isConfirm) { deleteRequest(id); }
-        });
-    }
-
-    function deleteRequest(id) {
-        let token = $('meta[name=_token]').attr('content');
-        $.ajax({
-            url: '/supplier/' + id,
-            method: 'delete',
-            headers: {'X-CSRF-TOKEN': token},
-            success: function() {
-                document.location.reload();
-            }
-        });
-    }
-
-    $(document).on('click', '.show-brands', function(e) {
-
-        let id = $(this).attr('data-id');
-        $('#supplier_id').val(id);
-
-        $('#brands_table').DataTable({
-            destroy: true,
-            ajax: '/supplier/get-brands/' + id,
-            searching: false,
-            info: false,
-            lengthChange: false,
-            sDom: '<"row view-filter"<"col-sm-12"<"pull-left"l><"pull-right"f><"clearfix">>>t<"row view-pager"<"col-sm-12"<"text-center"ip>>>',
-            language: {
-                "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
-            },
-            columns: [
-                {'data': 'id'},
-                {'data': 'name'},
-                {'data': 'actions', name: 'actions', orderable: false, searchable: false}
-            ]
-        });
-    });*/
 
 </script>
 @endpush

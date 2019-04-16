@@ -8,6 +8,7 @@ use IParts\Document;
 use IParts\ColorSetting;
 use IParts\User;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Validator;
 use DB;
 use Auth;
@@ -42,6 +43,7 @@ class InboxController extends Controller
              DB::raw('(CASE WHEN documents.status = 1 THEN "Nueva"
                       WHEN documents.status = 2 THEN "En proceso"
                       WHEN documents.status = 3 THEN "Terminada"
+                      WHEN documents.status = 4 THEN "Archivada"
                       ELSE "Indefinido" END) as status')];
 
             $query = DB::table('documents')
@@ -76,6 +78,9 @@ class InboxController extends Controller
                     return 
                     '<a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '">
                         <i class="fa fa-user"></i>
+                    </a>
+                    <a class="btn btn-circle btn-icon-only default blue" onClick="archiveDocument(event, ' . $document->id . ')">
+                        <i class="fa fa-archive"></i>
                     </a>';
                   })
                   ->rawColumns(['semaphore' => 'semaphore', 'actions' => 'actions'])
@@ -87,7 +92,6 @@ class InboxController extends Controller
     public function changeDealerShip(Request $request)
     {
         $data = $request->all();
-        Log::notice($data);
         $validator = $this->dealerShipValidations($data);
 
         if($validator->fails())
@@ -118,6 +122,16 @@ class InboxController extends Controller
         ], $messages);
 
         return $validator;
+    }
+
+    public function archive($document_id)
+    {
+        try {
+            Document::find($document_id)->fill(['status' => 4])->update();
+            Session::flash('message', 'Elemento archivado correctamente.');
+        } catch(\Exception $e) {
+            back()->withErrors($e->getMessage());
+        }
     }
 
     /**

@@ -52,3 +52,8 @@ Route::group(['middleware' => ['role:Administrador']], function(){
 	Route::resource('message', 'MessageController');
 });
 
+//Inbox
+Route::get('inbox/get-list', 'InboxController@getList');
+Route::post('inbox/change-dealership', 'InboxController@changeDealerShip')->name('inbox.change-dealership');
+Route::resource('inbox', 'InboxController');
+

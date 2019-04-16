@@ -15,15 +15,15 @@
         <i class="fa fa-circle"></i>
     </li>
     <li>
-        <span>Proveedores</span>
+        <span>Bandeja de entrada</span>
     </li>
 </ul>
 @endsection
 @section('page-title')
-<h1 class="page-title"> Proveedores
+<h1 class="page-title"> Bandeja de entrada
     <small></small>
 </h1>
-@include('layouts.admin.includes.error_messages')
+{{-- @include('layouts.admin.includes.error_messages') --}}
 @include('layouts.admin.includes.success_messages')
 @endsection
 @section('page-content')
@@ -38,30 +38,20 @@
             <div class="portlet-body">
                 <div class="table-toolbar">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="btn-group">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="btn-group pull-right">
-                                <a href="{{ route('supplier.create') }}" id="new_supplier" class="btn btn-circle green"> Nuevo
-                                    <i class="fa fa-plus"></i>
-                                </a>
-                            </div>
-                        </div>
+                        <div class="col-md-6"></div>
+                        <div class="col-md-6"></div>
                     </div>
                 </div>
-                <table class="table table-striped table-hover table-bordered" id="suppliers_table">
+                <table class="table table-striped table-hover table-bordered" id="inbox_table">
                     <thead>
                         <tr>
-                            <th>Nombre</th>
-                            <th>Razón Social</th>
-                            <th>País</th>
-                            <th>RFC</th>
-                            <th>Email</th>
-                            <th>Teléfono</th>
-                            <th>Contacto</th>
-                            <th>Marcas</th>
+                            <th>Fecha</th>
+                            <th>Razón social</th>
+                            <th>Folio</th>
+                            <th>Cotizador</th>
+                            @if($logged_user_role == 'Administrador')<th>Cliente</th>@endif
+                            <th>Semáforo</th>
+                            <th>Estatus</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -72,23 +62,31 @@
         <!-- END EXAMPLE TABLE PORTLET-->
     </div>
 </div>
-<div class="modal fade bs-modal-lg" id="brands_modal" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+<!--Reasign dealership's modal-->
+<div class="modal fade bs-modal" id="brands_modal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                <h4 class="modal-title">Marcas</h4>
+                <h4 class="modal-title">Reasignar cotizador</h4>
             </div>
-            {!! Form::open(['route' => 'supplier.sync-brands', 'method' => 'post', 'class' => 'horizontal-form', 'id' => 'brands_form']) !!}
-                <input type="hidden" name="supplier_id" id="supplier_id">
-                <input type="hidden" name="supplier_brands" id="supplier_brands" value="">
-                <input type="hidden" name="redirect_to" value="supplier.index">
+            {!! Form::open(['route' => ['inbox.change-dealership', 34], 'method' => 'post', 'class' => 'horizontal-form',
+                'id' => 'change_dealership_form']) !!}
                 <div class="modal-body">
-                    @include('supplier.tabs.brands')
+                    <div id="error_messages"></div>
+                    <div class="form-group">
+                        <label class="control-label" id="current_dealership"></label>
+                    </div>
+                    <div class="form-group">
+                        <label for="dealerships_select2" class="control-label">Nuevo cotizador</label>
+                        {!! Form::select('employees_users_id', $dealerships, null, ['class' => 'form-control', 'id' => 'dealerships_select2',
+                        'style' =>'width: 100%', 'placeholder' => 'Seleccionar...']) !!}
+                    </div>
+                    <input type="hidden" name="document_id" id="document_id">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-circle default" data-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-circle blue">Guardar</button>
+                    <button type="submit" class="btn btn-circle blue">Cambiar</button>
                 </div>
             {!! Form::close() !!}
         </div>
@@ -102,47 +100,65 @@
 <script src="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.min.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
 <script src="/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script>
-<script src="/js/supplier/brands.js" type="text/javascript"></script>
-
 <script type="text/javascript">
-    $(document).ready(function(){
-        $('#sidebar_supplier').addClass('active');
+$(document).ready(function(){
+    $('#sidebar_inbox').addClass('active');
 
-        $('#suppliers_table').DataTable({
-            serverSide: true,
-            ajax: '/supplier/get-list',
-            bSort: true,
-            columns: [
-                { data: "trade_name", name: "trade_name" },
-                { data: "business_name", name: "business_name" },
-                { data: "country", name: "country" },
-                { data: "rfc", name: "rfc" },
-                { data: "email", name: "email" },
-                { data: "landline", name: "landline" },
-                { data: "contact_name", name: "contact_name" },
-                { 
-                    data: 'brands',
-                    render: function(data, type, row){
-                        return data == null ? '' : data.split(',').join('</br>');
-                    }
-                },
-                { data: 'actions', name: 'actions', orderable: false, searchable: false }
-            ],
-            language: {
-                "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
-            }, 
-        });
+    $('#inbox_table').DataTable({
+        serverSide: true,
+        ajax: '/inbox/get-list',
+        bSort: true,
+        columns: [
+            { data: "created_at", name: "created_at" },
+            { data: "sync_connection", name: "sync_connection" },
+            { data: "number", name: "number" },
+            { data: "buyer", name: "buyer" },
+            @if($logged_user_role == 'Administrador'){ data: "customer", name: "customer" },@endif
+            { data: "semaphore", name: "semaphore" },
+            { data: "status", name: "status" },
+            { data: 'actions', name: 'actions', orderable: false, searchable: false }
+        ],
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+        }, 
     });
+});
+
+$(document).on('click', '.change-dealership', function(){
+    let current_dealership = $(this).attr('data-buyer');
+    $('#current_dealership').html('Cotizador actual: ' + current_dealership);
+    let document_id = $(this).attr('data-document_id');
+    $('#document_id').val(document_id);
+});
+
+$('#change_dealership_form').submit(function(e){
+    e.preventDefault();
+    let serialized_form = $(this).serialize();
+    let token = $('meta[name=_token]').attr('content');
+    $.ajax({
+        url: '/inbox/change-dealership',
+        dataType: 'json',
+        method: 'post',
+        headers: {'X-CSRF-TOKEN': token},
+        data: serialized_form,
+        success: function(response) {
+            if(response.errors)
+                $('#error_messages').html(response.errors_fragment);
+            else
+                location.reload();
+        }
+    });
+});
 
     //needed to work with tab switching on create_update view
-    $('#new_supplier').click(function(){
+/*    $('#new_supplier').click(function(){
         localStorage.setItem('from_supplier_index', true);
     });
     $(document).click('.edit-supplier', function(e){
         localStorage.setItem('from_supplier_index', true);
     });
 
-    /*Supplier delete*/
+
     function deleteModel(e, id) {
         e.preventDefault();
         swal({
@@ -193,7 +209,7 @@
                 {'data': 'actions', name: 'actions', orderable: false, searchable: false}
             ]
         });
-    });
+    });*/
 
 </script>
 @endpush

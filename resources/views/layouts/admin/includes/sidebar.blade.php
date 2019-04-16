@@ -35,6 +35,15 @@
             </a>
         </li>
         @endif
+        @if($user->hasRole('Cotizador') || $user->hasRole('Administrador'))
+        <li id="sidebar_inbox" class="nav-item ">
+            <a href="{{ route('inbox.index') }}" class="nav-link nav-toggle">
+                <i class="icon-envelope-open"></i>
+                <span class="title">Bandeja de entrada</span>
+                <span class="selected"></span>
+            </a>
+        </li>
+        @endif
         @role('Administrador')
         <li id="sidebar_user" class="nav-item">
             <a href="{{ route('user.index') }}" class="nav-link nav-toggle">

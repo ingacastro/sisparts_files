@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Session;
 use Yajra\Datatables\Datatables;
 use Spatie\Permission\Models\Role;
 use DB;
+use Auth;
 
 class UserController extends Controller
 {
@@ -29,7 +30,8 @@ class UserController extends Controller
     }
 
     public function getList(Request $request)
-    {
+    {   
+        $logged_admin_id = Auth::user()->id;
         if($request->ajax()) {
 
             $users = User::select('users.id', 'employees.number', 'employees.buyer_number', 'employees.seller_number',
@@ -37,7 +39,7 @@ class UserController extends Controller
             ->leftJoin('employees', 'employees.users_id', 'users.id')
             ->join('model_has_roles', 'model_id', 'users.id')
             ->join('roles', 'model_has_roles.role_id', 'roles.id')
-            ->where('users.email', '!=', 'admin@admin.com')->get();
+            ->where('users.id', '!=', $logged_admin_id)->get();
 
             return Datatables::of($users)
                   ->addColumn('actions', function($user) {

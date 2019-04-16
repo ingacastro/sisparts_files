@@ -8,8 +8,6 @@ $second_row_cols = $model_exist ? [3, 6, 3] : [1, 10, 1];
     	<div class="col-md-{{$first_row_cols[0]}}"></div>
 	    <div class="col-md-{{$first_row_cols[1]}}">
 	        <label for="brands_select2" class="control-label">Marca</label>
-{{-- 	        <select id="brands_select2" class="form-control input-sm select2-multiple" style="width: 100%">
-	        </select> --}}
 	        {!! Form::select(null, [], null, 
                 ['class' => 'form-control input-sm select2-multiple', 'id' => 'brands_select2',
                 'style' => 'width: 100%']) !!}

@@ -12,8 +12,8 @@ class SyncConnectionsTableSeeder extends Seeder
     public function run()
     {
     	//Postgres db connections for pct sync
-        DB::table('sync_connections')->insert(['name' => 'pgsql_mxmro']);
-        DB::table('sync_connections')->insert(['name' => 'pgsql_pavan']);
-        DB::table('sync_connections')->insert(['name' => 'pgsql_zukaely']);
+        DB::table('sync_connections')->insert(['name' => 'pgsql_mxmro', 'display_name' => 'Mxmro']);
+        DB::table('sync_connections')->insert(['name' => 'pgsql_pavan', 'display_name' => 'Pavan']);
+        DB::table('sync_connections')->insert(['name' => 'pgsql_zukaely', 'display_name' => 'Zukaely']);
     }
 }

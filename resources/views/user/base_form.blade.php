@@ -26,7 +26,7 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="buyer_number">Numero comprador</label>
+                <label class="control-label" for="buyer_number"><span class="required">* </span>Numero comprador</label>
                 {!! Form::text('employee[buyer_number]', $employee->buyer_number, ['class' => 'form-control integer-mask', 'id' => 'buyer_number', 'autocomplete' => 'off'])!!}
             </div>
         </div>

@@ -28,12 +28,14 @@ class UserRequest extends FormRequest
             'user.email' => ['required', 'email', 'unique:users,email'],
             'user.password' => 'required|confirmed|min:6',
             'role_id' => 'required',
-            'employee.number' => 'required'
+            'employee.number' => 'required',
+            'employee.buyer_number' => 'required|unique:employees,buyer_number'
         ];
 
         if($this->isMethod('put')) {
             $rules['user.password'] = 'nullable|confirmed|min:6';
             $rules['user.email'] = ['required', 'email'];
+            $rules['employee.buyer_number'] = 'required';
         }
 
         return $rules;
@@ -50,7 +52,8 @@ class UserRequest extends FormRequest
             'user.password.required' => 'La contraseña es requerida.',
             'user.password.min' => 'La contraseña debe ser de al menos 6 caracteres.',
             'user.password.confirmed' => 'Las contraseñas no coinciden.',
-            'employee.number.required' => 'El número de empleado es requerido.'
+            'employee.number.required' => 'El número de empleado es requerido.',
+            'employee.buyer_number.required' => 'El número de comprador es requerido.'
         ];
     }
 }

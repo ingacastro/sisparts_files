@@ -8,6 +8,7 @@ use IParts\Document;
 use IParts\Customer;
 use IParts\Supply;
 use IParts\Manufacturer;
+use IParts\Employee;
 use DB;
 
 class DocumentSync extends Command
@@ -91,7 +92,12 @@ class DocumentSync extends Command
     {
         $customerCode = $siavcomDocument->cod_nom;
         $documentNumber = $siavcomDocument->ndo_doc;
-        
+        $quoter = Employee::where('buyer_number', $siavcomDocument->tcd_tcd)->first();
+
+        //Default quoter
+        if($quoter == null)
+            $quoter = Employee::where('buyer_number', env('GENERIC_QUOTER_BUYER_NUM'))->first();
+         
         $data = [
             'type' => $siavcomDocument->tdo_tdo,
             'number' => $siavcomDocument->ndo_doc,
@@ -99,11 +105,13 @@ class DocumentSync extends Command
             'customer_code' => $customerCode,
             'seller_number' => $siavcomDocument->ven_ven,
             'state' => $siavcomDocument->sta_doc,
+            'status' => 1,
             'currency_id' => $siavcomDocument->mon_doc,
             'mxn_currency_exchange_rate' => $siavcomDocument->vmo_doc,
             'customer_requirement_number' => $siavcomDocument->ob1_doc,
             'buyer_name' => $siavcomDocument->ob2_doc,
             'buyer_number' => $siavcomDocument->tcd_tcd,
+            'employees_users_id' => $quoter->users_id
         ];
 
         DB::beginTransaction();

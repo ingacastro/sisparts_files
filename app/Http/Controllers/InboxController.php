@@ -86,7 +86,6 @@ class InboxController extends Controller
         //$colorSettings = ColorSetting::all();
         return Datatables::of($documents)
               ->editColumn('semaphore', function($document) {
-
                 return '<div class="form-control" style="background-color: ' . $document->semaphore_color . '; width: 100%; height: 25px;
                             line-height: 100%; vertical-align: middle; text-align: center; color: #fff">' . 
                             $document->semaphore_days . ' días </div>';
@@ -95,7 +94,7 @@ class InboxController extends Controller
                 return date_format(new \DateTime($document->created_at), 'd/m/Y');
               })
               ->addColumn('actions', function($document) {
-                return '<a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '"><i class="fa fa-user"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="archiveDocument(event, ' . $document->id . ')"><i class="fa fa-archive"></i></a>';
+                return '<a href="/inbox/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a><a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '"><i class="fa fa-user"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="archiveDocument(event, ' . $document->id . ')"><i class="fa fa-archive"></i></a>';
               })
               ->rawColumns(['semaphore' => 'semaphore', 'actions' => 'actions'])
               ->make(true);
@@ -174,7 +173,8 @@ class InboxController extends Controller
      */
     public function show($id)
     {
-        //
+        $pct = Document::find($id);
+        return view('inbox.show', compact('pct'));
     }
 
     /**

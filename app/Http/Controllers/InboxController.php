@@ -41,15 +41,20 @@ class InboxController extends Controller
             $status = $request->get('status') ?? 0;
             $dealer_ship = $request->get('dealer_ship') ?? 0;
 
+            $first_color_setting = DB::table('color_settings')->orderBy('days', 'asc')->first();
+
             $fields = ['documents.id', 'documents.created_at', 'sync_connections.display_name as sync_connection',
             'users.name as buyer', 'documents.number', 'customers.trade_name as customer', 
-             DB::raw('DATEDIFF(NOW(), documents.created_at) as semaphore'), 
+             DB::raw('DATEDIFF(NOW(), documents.created_at) as semaphore_days'), 
              DB::raw('(CASE WHEN documents.status = 1 THEN "Nueva"
                       WHEN documents.status = 2 THEN "En proceso"
                       WHEN documents.status = 3 THEN "Terminada"
                       WHEN documents.status = 4 THEN "Archivada"
-                      ELSE "Indefinido" END) as status')];
-
+                      ELSE "Indefinido" END) as status'),
+            DB::raw('(CASE WHEN (SELECT color
+                     FROM color_settings WHERE semaphore_days >= days ORDER BY days DESC limit 1)
+                     IS NULL THEN "' . $first_color_setting->color . '" ELSE (SELECT color
+                     FROM color_settings WHERE semaphore_days >= days ORDER BY days DESC limit 1) END) as semaphore_color')];
             $query = DB::table('documents')
                          ->join('employees', 'employees.users_id', 'documents.employees_users_id')
                          ->join('users', 'users.id', 'employees.users_id')
@@ -69,7 +74,7 @@ class InboxController extends Controller
                 $query->where('documents.status', $status);
             if($dealer_ship > 0)
                 $query->where('documents.employees_users_id', $dealer_ship);
-                         
+
              $documents = $query->get($fields);
              return $this->buildInboxDataTable($documents);
         }
@@ -78,34 +83,23 @@ class InboxController extends Controller
 
     private function buildInboxDataTable($documents)
     {
-        $colorSettings = ColorSetting::all();
+        //$colorSettings = ColorSetting::all();
         return Datatables::of($documents)
-              ->editColumn('semaphore', function($document) use($colorSettings) {
-                $color = env('SEMAPHORE_FIRST_COLOR');
-                foreach($colorSettings as $colorSetting) {
-                    if($document->semaphore >= $colorSetting->days)
-                        $color = $colorSetting->color;
-                }
-                return '<div class="form-control" style="background-color: ' . $color . '; width: 100%; height: 25px;
-                            line-height: 100%; vertical-align: middle; text-align: center; color: #fff">
-                            '. $document->semaphore .' días
-                        </div>';
+              ->editColumn('semaphore', function($document) {
+
+                return '<div class="form-control" style="background-color: ' . $document->semaphore_color . '; width: 100%; height: 25px;
+                            line-height: 100%; vertical-align: middle; text-align: center; color: #fff">' . 
+                            $document->semaphore_days . ' días </div>';
               })
               ->editColumn('created_at', function($document) {
                 return date_format(new \DateTime($document->created_at), 'd/m/Y');
               })
               ->addColumn('actions', function($document) {
-                return 
-                '<a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '">
-                    <i class="fa fa-user"></i>
-                </a>
-                <a class="btn btn-circle btn-icon-only default blue" onClick="archiveDocument(event, ' . $document->id . ')">
-                    <i class="fa fa-archive"></i>
-                </a>';
+                return '<a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '"><i class="fa fa-user"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="archiveDocument(event, ' . $document->id . ')"><i class="fa fa-archive"></i></a>';
               })
               ->rawColumns(['semaphore' => 'semaphore', 'actions' => 'actions'])
               ->make(true);
-    }
+    }   
     public function changeDealerShip(Request $request)
     {
         $data = $request->all();
@@ -131,7 +125,7 @@ class InboxController extends Controller
     private function dealerShipValidations($message_data)
     {
         $messages = [
-            'employees_users_id.required' => 'El campo cotizador es requerido.'
+            'employees_users_id.required' => 'El campo nuevo cotizador es requerido.'
         ];
         
         $validator = Validator::make($message_data, [

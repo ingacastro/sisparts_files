@@ -15,9 +15,20 @@ class Document extends Model
    		return $this->belongsToMany('IParts\Supply', 'documents_supplies', 'documents_id', 'supplies_id')
    		->withPivot('set', 'product_description', 'products_amount', 'measurement_unit_code', 'sale_unit_price');
    	}
-
-   	public function quoter()
+   	public function dealership()
    	{
-   		return $this->hasOne('IParts\Employee', 'employees_users_id');
+   		return $this->hasOne('IParts\Employee', 'users_id', 'employees_users_id');
    	}
+    public function sync_connection()
+    {
+      return $this->hasOne('IParts\SyncConnection', 'id', 'sync_connections_id');
+    }
+    public function customer()
+    {
+      return $this->hasOne('IParts\Customer', 'id', 'customers_id');
+    }
+    public function currency()
+    {
+      return $this->hasOne('IParts\Currency', 'id', 'currency_id');
+    }
 }

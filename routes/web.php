@@ -56,6 +56,6 @@ Route::group(['middleware' => ['role:Administrador']], function(){
 Route::get('inbox/get-list', 'InboxController@getList')->name('inbox.get-list');
 Route::post('inbox/change-dealership', 'InboxController@changeDealerShip')->name('inbox.change-dealership');
 Route::post('inbox/{document}/archive', 'InboxController@archive');
-//Route::post('inbox/filtered-list', 'InboxController@filteredList')->name('inbox.filtered-list');
+Route::post('inbox/document-supplies/{document_id}', 'InboxController@getDocumentSupplies');
 Route::resource('inbox', 'InboxController');
 

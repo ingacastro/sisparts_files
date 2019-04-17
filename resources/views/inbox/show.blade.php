@@ -45,7 +45,6 @@
 @section('page-content')
 <div class="row">
     <div class="col-md-12">
-        <!-- BEGIN EXAMPLE TABLE PORTLET-->
         <div class="portlet light portlet-fit bordered">
             <div class="portlet-title">
                 <div class="caption">
@@ -79,37 +78,41 @@
                         <tbody>
                             <tr>
                                 <td>
-                                    <span><span class="detail-title">Razón social:</span> International Parts</span>
+                                    <span><span class="detail-title">Razón social: </span>{{ $pct->sync_connection->display_name }}</span>
                                 </td>
                                 <td>
-                                    <span><span class="detail-title">Número requerimiento:</span> 01234</span>
+                                    <span><span class="detail-title">Número requerimiento: </span>{{ $pct->customer_requirement_number }}</span>
                                 </td>
 
                             </tr>
                             <tr>
                                 <td>
-                                    <span><span class="detail-title">Folio:</span> 001500</span>
+                                    <span><span class="detail-title">Folio: </span>{{ $pct->number }}</span>
                                 </td>
                                 <td>
-                                    <span><span class="detail-title">Comprador:</span> 002</span>
-                                </td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span><span class="detail-title">Cliente:</span> Altech S.A. de C.V.</span>
-                                </td>
-                                <td>
-                                    <span><span class="detail-title">Cotizador:</span> 005 - Juan Pérez</span>
+                                    <span><span class="detail-title">Comprador: </span>{{ $pct->buyer_name }}</span>
                                 </td>
                                 <td></td>
                             </tr>
                             <tr>
                                 <td>
-                                    <span><span class="detail-title">Vendedor:</span> 003</span>
+                                    <span><span class="detail-title">Cliente: </span>{{ $pct->customer->trade_name }}</span>
                                 </td>
                                 <td>
-                                    <span><span class="detail-title">Moneda:</span> MXN</span>
+                                    <?php $dealership = $pct->dealership; ?>
+                                    <span>
+                                        <span class="detail-title">Cotizador: </span>
+                                        {{ $dealership->number }} - {{ $dealership->user->name }}
+                                    </span>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span><span class="detail-title">Vendedor: </span>{{ $pct->seller_number }}</span>
+                                </td>
+                                <td>
+                                    <span><span class="detail-title">Moneda: </span>{{ $pct->currency->name }}</span>
                                 </td>
                                 <td></td>
                             </tr>
@@ -159,7 +162,6 @@
                 </table>
             </div>
         </div>
-        <!-- END EXAMPLE TABLE PORTLET-->
     </div>
 </div>
 @endsection
@@ -176,19 +178,20 @@ $(document).ready(function(){
     $('#sidebar_inbox').addClass('active');
 
     $('#supplies_table').DataTable({
-/*        serverSide: true,
-        ajax: '/inbox/get-list',
+        serverSide: true,
+        ajax: '/inbox/document-supplies',
         bSort: true,
         destroy: true,
         columns: [
-            { data: "created_at", name: "created_at" },
-            { data: "sync_connection", name: "sync_connection" },
             { data: "number", name: "number" },
-            { data: "buyer", name: "buyer" },
-            { data: "semaphore", name: "semaphore" },
+            { data: "manufacturer", name: "sync_connection" },
+            { data: "products_amount", name: "products_amount" },
+            { data: "measurement_unit_code", name: "measurement_unit_code" },
+            { data: "total_cost", name: "total_cost" },
+            { data: "total_price", name: "total_price" },
             { data: "status", name: "status" },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }
-        ],*/
+        ],
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
         }, 

@@ -83,7 +83,6 @@ class InboxController extends Controller
 
     private function buildInboxDataTable($documents)
     {
-        //$colorSettings = ColorSetting::all();
         return Datatables::of($documents)
               ->editColumn('semaphore', function($document) {
                 return '<div class="form-control" style="background-color: ' . $document->semaphore_color . '; width: 100%; height: 25px;
@@ -173,8 +172,34 @@ class InboxController extends Controller
      */
     public function show($id)
     {
-        $pct = Document::find($id);
-        return view('inbox.show', compact('pct'));
+        $document = Document::find($id);
+        return view('inbox.show', compact('document'));
+    }
+
+    /*Document supplies sets*/
+    public function getDocumentSupplies(Request $request)
+    {
+        if($request->ajax()) {            
+            $supplies_sets = Document::select('supplies.number', 'manufacturers.name as manufacturer', 
+            DB::raw('CAST(documents_supplies.products_amount as UNSIGNED) as products_amount'),
+            'documents_supplies.measurement_unit_code', 
+            DB::raw('CONCAT("$ ", FORMAT(documents_supplies.sale_unit_price, 2)) as total_cost'),
+            DB::raw('CONCAT("$ ", FORMAT(documents_supplies.sale_unit_price * documents_supplies.products_amount, 2)) as total_price'),
+            'documents_supplies.type as status')
+            ->leftJoin('documents_supplies', 'documents.id', 'documents_supplies.documents_id')
+            ->leftJoin('supplies', 'documents_supplies.supplies_id', 'supplies.id')
+            ->leftjoin('manufacturers', 'manufacturers.id', 'supplies.manufacturers_id')
+            ->where('documents.id', $request->document_id)->get();
+
+            return Datatables::of($supplies_sets)
+                  ->addColumn('actions', function($supplies_set) {
+                    return '<a data-target="#edit_set_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default"><i class="fa fa-edit"></i></a>';
+                  })
+                  ->rawColumns(['actions' => 'actions'])
+                  ->make(true);
+
+        }
+        abort(403, 'Unauthorized action');
     }
 
     /**

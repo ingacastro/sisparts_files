@@ -17,6 +17,37 @@
 .detail-title {
     font-weight: bold;
 }
+#edit_set_modal {
+    padding-right: 0 !important;
+}
+.modal-xl {
+    width: 95%;
+}
+.modal-xl .modal-body {
+    padding-bottom: 0px !important;
+}
+.modal-content-border {
+    border-style: solid;
+    border-width: thin;
+    padding-top: 10px;
+    margin-left: -5px !important;
+    margin-right: -5px !important;
+}
+.budget-currency-data {
+    padding-top: 0 !important;
+}
+.checklist-container {
+    padding-bottom: 10px;
+}
+.checklist-container > .checklist-buttons-container {
+    text-align: center;
+}
+.checklist-question-mark {
+    font-size: 18px;
+}
+.tab-content {
+    border-top: none !important;
+}
 </style>
 @endsection
 @section('content')
@@ -36,7 +67,7 @@
 </ul>
 @endsection
 @section('page-title')
-<h1 class="page-title"> Detalle PCT: {{ $pct->number }}
+<h1 class="page-title"> Detalle PCT: {{ $document->number }}
     <small></small>
 </h1>
 {{-- @include('layouts.admin.includes.error_messages') --}}
@@ -78,28 +109,27 @@
                         <tbody>
                             <tr>
                                 <td>
-                                    <span><span class="detail-title">Razón social: </span>{{ $pct->sync_connection->display_name }}</span>
+                                    <span><span class="detail-title">Razón social: </span>{{ $document->sync_connection->display_name }}</span>
                                 </td>
                                 <td>
-                                    <span><span class="detail-title">Número requerimiento: </span>{{ $pct->customer_requirement_number }}</span>
+                                    <span><span class="detail-title">Número requerimiento: </span>{{ $document->customer_requirement_number }}</span>
                                 </td>
-
                             </tr>
                             <tr>
                                 <td>
-                                    <span><span class="detail-title">Folio: </span>{{ $pct->number }}</span>
+                                    <span><span class="detail-title">Folio: </span>{{ $document->number }}</span>
                                 </td>
                                 <td>
-                                    <span><span class="detail-title">Comprador: </span>{{ $pct->buyer_name }}</span>
+                                    <span><span class="detail-title">Comprador: </span>{{ $document->buyer_name }}</span>
                                 </td>
                                 <td></td>
                             </tr>
                             <tr>
                                 <td>
-                                    <span><span class="detail-title">Cliente: </span>{{ $pct->customer->trade_name }}</span>
+                                    <span><span class="detail-title">Cliente: </span>{{ $document->customer->trade_name }}</span>
                                 </td>
                                 <td>
-                                    <?php $dealership = $pct->dealership; ?>
+                                    <?php $dealership = $document->dealership; ?>
                                     <span>
                                         <span class="detail-title">Cotizador: </span>
                                         {{ $dealership->number }} - {{ $dealership->user->name }}
@@ -109,10 +139,10 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <span><span class="detail-title">Vendedor: </span>{{ $pct->seller_number }}</span>
+                                    <span><span class="detail-title">Vendedor: </span>{{ $document->seller_number }}</span>
                                 </td>
                                 <td>
-                                    <span><span class="detail-title">Moneda: </span>{{ $pct->currency->name }}</span>
+                                    <span><span class="detail-title">Moneda: </span>{{ $document->currency->name }}</span>
                                 </td>
                                 <td></td>
                             </tr>
@@ -164,6 +194,54 @@
         </div>
     </div>
 </div>
+<!--Edit supplies set-->
+<div class="modal fade bs-modal" id="edit_set_modal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Editar partida</h4>
+            </div>
+            {!! Form::open(['route' => 'inbox.change-dealership', 'method' => 'post', 'class' => 'horizontal-form',
+                'id' => 'change_dealership_form']) !!}
+                <div class="modal-body">
+                    <div id="error_messages"></div>
+                    {{-- <input type="hidden" name="document_id" id="document_id"> --}}
+
+                    <div class="tabbable-line boxless tabbable-reversed">
+                        <ul class="nav nav-tabs" id="">
+                            <li>
+                                <a href="#tab_0_content" id="tab_0" data-toggle="tab"> Presupuesto </a>
+                            </li>
+                            <li>
+                                <a href="#tab_1_content" id="tab_1" data-toggle="tab"> Condiciones </a>
+                            </li>
+                            <li>
+                                <a href="#tab_2_content" id="tab_2" data-toggle="tab"> Archivos </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" style="padding-top: 2px">
+                            <div class="tab-pane active" id="tab_0_content">
+                                @include('inbox.set_edition_modal_tabs.budget')
+                            </div>
+                            <div class="tab-pane " id="tab_1_content">
+                                Condiciones
+                            </div>
+                            <div class="tab-pane " id="tab_2_content">
+                                Archivos
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="text-align: center;">
+                    <button type="button" class="btn btn-circle default" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-circle blue">Guardar</button>
+                </div>
+            {!! Form::close() !!}
+        </div>
+    </div>
+</div>
+
 @endsection
 @endsection
 @push('scripts')
@@ -176,10 +254,13 @@
 <script type="text/javascript">
 $(document).ready(function(){
     $('#sidebar_inbox').addClass('active');
-
+    
     $('#supplies_table').DataTable({
         serverSide: true,
-        ajax: '/inbox/document-supplies',
+        ajax: {
+            url: '/inbox/document-supplies',
+            data: {'document_id': 3}
+        },
         bSort: true,
         destroy: true,
         columns: [

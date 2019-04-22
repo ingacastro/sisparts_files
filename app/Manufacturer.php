@@ -8,5 +8,5 @@ class Manufacturer extends Model
 {
 	protected $primaryKey = 'id';
     public $incrementing = false;
-    protected $fillable = ['id', 'document_type'];
+    protected $fillable = ['id', 'name', 'document_type'];
 }

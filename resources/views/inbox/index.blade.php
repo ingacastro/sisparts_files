@@ -107,8 +107,8 @@
                     </div>
                     <div class="form-group">
                         <label for="dealerships_select2" class="control-label">Nuevo cotizador</label>
-                        {!! Form::select('employees_users_id', $dealerships, null, ['class' => 'form-control', 'id' => 'dealerships_select2',
-                        'style' =>'width: 100%', 'placeholder' => 'Seleccionar...']) !!}
+                        {!! Form::select('employees_users_id', $dealerships, null, ['class' => 'form-control', 
+                            'id' => 'dealerships_select2', 'style' =>'width: 100%', 'placeholder' => 'Seleccionar...']) !!}
                     </div>
                     <input type="hidden" name="document_id" id="document_id">
                 </div>

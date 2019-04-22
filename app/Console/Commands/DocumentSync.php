@@ -81,7 +81,7 @@ class DocumentSync extends Command
         $siavcomDocuments = DB::connection($conn->name)->table($documentsTable)
         ->where('tdo_tdo', $quotation_acronym)
         ->whereIn('ndo_doc', [201,1068,1082,2096,5233,2468,3370,3389,2865,5399])
-        ->take(10)->get();
+        ->get();
         foreach($siavcomDocuments as $siavcomDocument) {
             if($this->createUpdateDocument($siavcomDocument, $conn) == false) continue;
         }
@@ -152,10 +152,8 @@ class DocumentSync extends Command
         $documentSuppliesTable = env('SIAVCOM_DOCUMENTS_SUPPLIES');
 
         $siavcomDocumentSupplies = DB::connection($conn->name)->table($documentSuppliesTable)
-        ->where('ndo_doc', $documentNumber)
-        ->where('tdo_tdo', env('ACR_QUOTATION'))->get();
-
-        Log::notice($documentNumber);
+        ->where('ndo_doc', $documentNumber)->get();
+        //->where('tdo_tdo', env('ACR_QUOTATION'))->get();
 
         //Document has no supplies
         if(empty($siavcomDocumentSupplies)) return;
@@ -187,9 +185,7 @@ class DocumentSync extends Command
         try {    
 
             $manufacturer = $this->getManufacturer($siavcom_manufacturer);
-            
             $supply = $this->getSupply($siavcom_supply, $manufacturer->id);
-
             $this->insertDocumentSupply($pivot, $document, $supply);
 
             DB::commit();
@@ -206,7 +202,8 @@ class DocumentSync extends Command
             'product_description' => $pivot->dse_mov,
             'products_amount' => $pivot->can_mov,
             'measurement_unit_code' => $pivot->med_mov,
-            'sale_unit_price' => $pivot->pve_mov
+            'sale_unit_price' => $pivot->pve_mov,
+            'type' => $pivot->tdo_tdo
         ];
 
         $supply_id = $supply->id;
@@ -245,7 +242,8 @@ class DocumentSync extends Command
         $key_xmd = $siavcom_manufacturer->key_xmd;
         $manufacturer = Manufacturer::find($key_xmd);
         $manufacturer_data = [
-            'id' => $key_xmd, 
+            'id' => $key_xmd,
+            'name' => simplexml_load_string($siavcom_manufacturer->xml_xmd)->data[0]->attributes()['FABRICANTE'] ?? null,
             'document_type' => $siavcom_manufacturer->xml_xmd
         ];
         if(isset($manufacturer))

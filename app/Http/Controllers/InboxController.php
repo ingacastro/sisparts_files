@@ -173,7 +173,12 @@ class InboxController extends Controller
     public function show($id)
     {
         $document = Document::find($id);
-        return view('inbox.show', compact('document'));
+        return view('inbox.show', compact('document', 'manufacturers'));
+    }
+
+    public function getSetTabs($set_id)
+    {
+        Log::notice($set_id);
     }
 
     /*Document supplies sets*/
@@ -182,18 +187,20 @@ class InboxController extends Controller
         if($request->ajax()) {            
             $supplies_sets = Document::select('supplies.number', 'manufacturers.name as manufacturer', 
             DB::raw('CAST(documents_supplies.products_amount as UNSIGNED) as products_amount'),
-            'documents_supplies.measurement_unit_code', 
-            DB::raw('CONCAT("$ ", FORMAT(documents_supplies.sale_unit_price, 2)) as total_cost'),
-            DB::raw('CONCAT("$ ", FORMAT(documents_supplies.sale_unit_price * documents_supplies.products_amount, 2)) as total_price'),
-            'documents_supplies.type as status')
+            DB::raw('CASE WHEN documents_supplies.measurement_unit_code = 1 THEN "Pieza" ELSE "Caja" END AS measurement_unit_code'), 
+            DB::raw('CONCAT("$ ", FORMAT(documents_supplies.sale_unit_price, 2), " ", currencies.name) as total_cost'),
+            DB::raw('CONCAT("$ ", FORMAT(documents_supplies.sale_unit_price * documents_supplies.products_amount, 2), " ", currencies.name) as total_price'),
+            'documents_supplies.type as status', 'documents_supplies.documents_id', 'documents_supplies.supplies_id')
             ->leftJoin('documents_supplies', 'documents.id', 'documents_supplies.documents_id')
             ->leftJoin('supplies', 'documents_supplies.supplies_id', 'supplies.id')
-            ->leftjoin('manufacturers', 'manufacturers.id', 'supplies.manufacturers_id')
+            ->leftjoin('manufacturers', 'manufacturers.id', 'documents_supplies.manufacturers_id')
+            ->leftJoin('currencies', 'currencies.id', 'documents_supplies.currencies_id')
             ->where('documents.id', $request->document_id)->get();
 
             return Datatables::of($supplies_sets)
                   ->addColumn('actions', function($supplies_set) {
-                    return '<a data-target="#edit_set_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default edit-set"><i class="fa fa-edit"></i></a>';
+                    return '<a data-target="#edit_set_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default edit-set" data-id="' 
+                           . $supplies_set->documents_id . '_' . $supplies_set->supplies_id . '"><i class="fa fa-edit"></i></a>';
                   })
                   ->rawColumns(['actions' => 'actions'])
                   ->make(true);

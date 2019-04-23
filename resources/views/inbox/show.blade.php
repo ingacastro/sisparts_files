@@ -221,7 +221,7 @@
                         </ul>
                         <div class="tab-content" style="padding-top: 2px">
                             <div class="tab-pane active" id="tab_0_content">
-                                @include('inbox.set_edition_modal_tabs.budget')
+                                {{-- @include('inbox.set_edition_modal_tabs.budget') --}}
                             </div>
                             <div class="tab-pane " id="tab_1_content">
                                 @include('inbox.set_edition_modal_tabs.conditions')
@@ -244,6 +244,7 @@
 @endsection
 @endsection
 @push('scripts')
+@include('utils.form_masks')
 <script src="/metronic-assets/global/plugins/datatables/datatables.min.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.min.js" type="text/javascript"></script>
@@ -297,6 +298,7 @@ $(document).ready(function(){
 });
 
 $(document).on('click', '.edit-set', function() {
+
     $('#files_table').DataTable({
         iDisplayLength: 8,
         destroy: true,
@@ -309,6 +311,18 @@ $(document).on('click', '.edit-set', function() {
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
         },
+    });
+
+    let set_id = $(this).attr('data-id');
+    console.log(set_id);
+    //Set tabs
+    $.ajax({
+        url: '/inbox/get-set-tabs/' + set_id,
+        method: 'get',
+        dataType: 'json',
+        success: function() {
+
+        }
     });
 });
 </script>

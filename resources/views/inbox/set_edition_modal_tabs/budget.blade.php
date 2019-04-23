@@ -5,8 +5,7 @@
                 <div class="row">
                     <div class="col-md-7">
                         <div class="form-group">
-                            {!! Form::select('supplier_id', [], null, ['class' => 'form-control', 'id' => 'dealerships_select2',
-                            'style' =>'width: 100%', 'placeholder' => 'Proveedor elegido...']) !!}
+                            {!! Form::select('manufacturers_id', $manufacturers, null, ['class' => 'form-control', 'id' => 'dealerships_select2', 'style' =>'width: 100%', 'placeholder' => 'Proveedor elegido...']) !!}
                         </div>
                     </div>
                     <div class="col-md-5">
@@ -19,35 +18,35 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => 'Costo unitario']) !!}
+                            {!! Form::text('wtv', null, ['class' => 'form-control currency-mask', 'placeholder' => 'Costo unitario']) !!}
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => 'Importación']) !!}
+                            {!! Form::text('wtv', null, ['class' => 'form-control currency-mask', 'placeholder' => 'Importación']) !!}
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => 'Envío al almacen']) !!}
+                            {!! Form::text('wtv', null, ['class' => 'form-control currency-mask', 'placeholder' => 'Envío al almacen']) !!}
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => 'Envío al cliente']) !!}
+                            {!! Form::text('wtv', null, ['class' => 'form-control currency-mask', 'placeholder' => 'Envío al cliente']) !!}
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => 'Gastos extra']) !!}
+                            {!! Form::text('wtv', null, ['class' => 'form-control currency-mask', 'placeholder' => 'Gastos extra']) !!}
                         </div>
                     </div>
                 </div>
@@ -62,39 +61,39 @@
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">
-                            {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => 'cm']) !!}
+                            {!! Form::text('wtv', null, ['class' => 'form-control numeric-mask', 'placeholder' => 'cm']) !!}
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => 'cm']) !!}
+                            {!! Form::text('wtv', null, ['class' => 'form-control numeric-mask', 'placeholder' => 'cm']) !!}
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => 'cm']) !!}
+                            {!! Form::text('wtv', null, ['class' => 'form-control numeric-mask', 'placeholder' => 'cm']) !!}
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => 'kgs']) !!}
+                            {!! Form::text('wtv', null, ['class' => 'form-control numeric-mask', 'placeholder' => 'kgs']) !!}
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">
-                            {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => 'in']) !!}
+                            {!! Form::text('wtv', null, ['class' => 'form-control numeric-mask', 'placeholder' => 'in']) !!}
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => 'in']) !!}
+                            {!! Form::text('wtv', null, ['class' => 'form-control numeric-mask', 'placeholder' => 'in']) !!}
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => 'in']) !!}
+                            {!! Form::text('wtv', null, ['class' => 'form-control numeric-mask', 'placeholder' => 'in']) !!}
                         </div>
                     </div>
                 </div>

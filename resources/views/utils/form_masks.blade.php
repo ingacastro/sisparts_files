@@ -22,5 +22,15 @@ $(document).ready(function(){
 	    removeMaskOnSubmit: true,
 	    oncleared: function () { self.Value(''); }
 	});
+	$('.numeric-mask').inputmask("numeric", {
+	    radixPoint: ".",
+	    groupSeparator: ",",
+	    digits: 2,
+	    autoGroup: true,
+	    allowMinus: false,
+	    rightAlign: false,
+	    removeMaskOnSubmit: true,
+	    oncleared: function () { self.Value(''); }
+	});
 });
 </script>

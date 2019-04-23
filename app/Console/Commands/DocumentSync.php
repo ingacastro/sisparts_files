@@ -185,8 +185,8 @@ class DocumentSync extends Command
         try {    
 
             $manufacturer = $this->getManufacturer($siavcom_manufacturer);
-            $supply = $this->getSupply($siavcom_supply, $manufacturer->id);
-            $this->insertDocumentSupply($pivot, $document, $supply);
+            $supply = $this->getSupply($siavcom_supply);
+            $this->insertDocumentSupply($pivot, $document, $supply, $manufacturer->id);
 
             DB::commit();
         } catch(\Exception $e) {
@@ -196,14 +196,16 @@ class DocumentSync extends Command
     }
 
     //documents-supplies relationship
-    private function insertDocumentSupply(\stdClass $pivot, Document $document, Supply $supply) {
+    private function insertDocumentSupply(\stdClass $pivot, Document $document, Supply $supply, $manufacturer_id) {
         $pivot_data = [
             'set' => $pivot->mov_mov,
             'product_description' => $pivot->dse_mov,
             'products_amount' => $pivot->can_mov,
             'measurement_unit_code' => $pivot->med_mov,
             'sale_unit_price' => $pivot->pve_mov,
-            'type' => $pivot->tdo_tdo
+            'type' => $pivot->tdo_tdo,
+            'currencies_id' => $pivot->mon_mov,
+            'manufacturers_id' => $manufacturer_id
         ];
 
         $supply_id = $supply->id;
@@ -216,14 +218,13 @@ class DocumentSync extends Command
     }
 
     //Find or create a supply
-    private function getSupply(\stdClass $siavcom_supply, $manufacturer_id)
+    private function getSupply(\stdClass $siavcom_supply)
     {
         //Retrieve supply or create it
         $cla_isu = $siavcom_supply->cla_isu;
         $supply = Supply::where('number', $cla_isu)->first();
         $supply_data = [
-            'number' => $cla_isu, 
-            'manufacturers_id' => $manufacturer_id
+            'number' => $cla_isu
         ];
 
         $is_new_supply = true;

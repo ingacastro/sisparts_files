@@ -193,7 +193,7 @@ class InboxController extends Controller
 
             return Datatables::of($supplies_sets)
                   ->addColumn('actions', function($supplies_set) {
-                    return '<a data-target="#edit_set_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default"><i class="fa fa-edit"></i></a>';
+                    return '<a data-target="#edit_set_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default edit-set"><i class="fa fa-edit"></i></a>';
                   })
                   ->rawColumns(['actions' => 'actions'])
                   ->make(true);

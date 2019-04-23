@@ -27,8 +27,8 @@
     padding-bottom: 0px !important;
 }
 .modal-content-border {
-    border-style: solid;
-    border-width: thin;
+    border: 1px solid #869ab3;
+    border-radius: 4px;
     padding-top: 10px;
     margin-left: -5px !important;
     margin-right: -5px !important;
@@ -207,10 +207,9 @@
                 <div class="modal-body">
                     <div id="error_messages"></div>
                     {{-- <input type="hidden" name="document_id" id="document_id"> --}}
-
                     <div class="tabbable-line boxless tabbable-reversed">
                         <ul class="nav nav-tabs" id="">
-                            <li>
+                            <li class="active">
                                 <a href="#tab_0_content" id="tab_0" data-toggle="tab"> Presupuesto </a>
                             </li>
                             <li>
@@ -225,10 +224,10 @@
                                 @include('inbox.set_edition_modal_tabs.budget')
                             </div>
                             <div class="tab-pane " id="tab_1_content">
-                                Condiciones
+                                @include('inbox.set_edition_modal_tabs.conditions')
                             </div>
                             <div class="tab-pane " id="tab_2_content">
-                                Archivos
+                                @include('inbox.set_edition_modal_tabs.files')
                             </div>
                         </div>
                     </div>
@@ -294,6 +293,22 @@ $(document).ready(function(){
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
         }, 
+    });
+});
+
+$(document).on('click', '.edit-set', function() {
+    $('#files_table').DataTable({
+        iDisplayLength: 8,
+        destroy: true,
+        lengthChange: false,
+        columns: [
+            { data: "date", name: "date", searchable: false },
+            { data: "name", name: "name" },
+            { data: 'actions', name: 'actions', orderable: false, searchable: false }
+        ],
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+        },
     });
 });
 </script>

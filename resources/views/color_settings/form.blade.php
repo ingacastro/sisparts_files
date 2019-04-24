@@ -25,7 +25,7 @@
                                 </td>
                                 <td style="width: 100px !important; padding-right: 16px">
                                     <div class="form-group">
-                                        {!! Form::text('settings[' . $setting->id . '][days]', $setting->days, ['class' => 'form-control', 'id' => 'days_' . $setting->id, 'autocomplete' => 'off'])!!}
+                                        {!! Form::text('settings[' . $setting->id . '][days]', $setting->days, ['class' => 'form-control integer-mask', 'id' => 'days_' . $setting->id, 'autocomplete' => 'off'])!!}
                                     </div>
                                 </td>
                                 <td>

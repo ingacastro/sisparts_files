@@ -58,6 +58,7 @@
 <script type="text/javascript">
 $(document).ready(function(){
     $('#sidebar_user').addClass('active');
+    applyFieldsMasks();
 });
 </script>
 @endpush

@@ -49,6 +49,9 @@
 <script type="text/javascript">
 $(document).ready(function(){
     $('#sidebar_color_settings').addClass('active');
+
+    applyFieldsMasks();
+
     $('#color_settings_form').submit(function(e){
         e.preventDefault();
         let token = $('input[name=_token]').val();

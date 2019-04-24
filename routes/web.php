@@ -58,5 +58,6 @@ Route::post('inbox/change-dealership', 'InboxController@changeDealerShip')->name
 Route::post('inbox/{document}/archive', 'InboxController@archive');
 Route::get('inbox/document-supplies', 'InboxController@getDocumentSupplies');
 Route::get('inbox/get-set-tabs/{set_id}', 'InboxController@getSetTabs');
+Route::post('inbox/{document}/update-budget', 'InboxController@updateBudget')->name('inbox.update-budget');
 Route::resource('inbox', 'InboxController');
 

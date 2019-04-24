@@ -7,6 +7,8 @@ use Yajra\Datatables\Datatables;
 use IParts\Document;
 use IParts\ColorSetting;
 use IParts\User;
+use IParts\Manufacturer;
+use IParts\Currency;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Validator;
@@ -176,9 +178,28 @@ class InboxController extends Controller
         return view('inbox.show', compact('document', 'manufacturers'));
     }
 
-    public function getSetTabs($set_id)
+    public function getSetTabs(Request $request, $set_id)
     {
-        Log::notice($set_id);
+        if($request->ajax()) {
+
+            $set_pri_key = explode('_', $set_id);
+            $set = DB::table('documents_supplies')->where('documents_id', $set_pri_key[0])
+            ->where('supplies_id', $set_pri_key[1])->first();
+            
+            $manufacturers = Manufacturer::pluck('name', 'id');
+            $currencies = Currency::pluck('name', 'id');
+            $measurement = DB::table('measurements')->find($set->measurements_id);
+            $countries = DB::table('countries')->pluck('name', 'id');
+            $utility_percentages = DB::table('utility_percentages')->get()->toArray();
+            $utility_percentages[] = (object)['id' => 0, 'name' => 'Otro', 'percentage' => 'null'];
+            return response()->json(
+                ['errors' => false,
+                'budget_tab' => \View::make('inbox.set_edition_modal_tabs.budget', compact('set', 'manufacturers', 'currencies', 
+                    'measurement', 'countries', 'utility_percentages'))
+                ->render()]);
+        }
+        
+        abort(403, 'Unauthorized action');
     }
 
     /*Document supplies sets*/
@@ -188,25 +209,39 @@ class InboxController extends Controller
             $supplies_sets = Document::select('supplies.number', 'manufacturers.name as manufacturer', 
             DB::raw('CAST(documents_supplies.products_amount as UNSIGNED) as products_amount'),
             DB::raw('CASE WHEN documents_supplies.measurement_unit_code = 1 THEN "Pieza" ELSE "Caja" END AS measurement_unit_code'), 
-            DB::raw('CONCAT("$ ", FORMAT(documents_supplies.sale_unit_price, 2), " ", currencies.name) as total_cost'),
-            DB::raw('CONCAT("$ ", FORMAT(documents_supplies.sale_unit_price * documents_supplies.products_amount, 2), " ", currencies.name) as total_price'),
+            'documents_supplies.sale_unit_cost', 'currencies.name as currency',
             'documents_supplies.type as status', 'documents_supplies.documents_id', 'documents_supplies.supplies_id')
             ->leftJoin('documents_supplies', 'documents.id', 'documents_supplies.documents_id')
             ->leftJoin('supplies', 'documents_supplies.supplies_id', 'supplies.id')
             ->leftjoin('manufacturers', 'manufacturers.id', 'documents_supplies.manufacturers_id')
             ->leftJoin('currencies', 'currencies.id', 'documents_supplies.currencies_id')
+            //->leftJoin('utility_percentages', 'utility_percentages.id', 'documents_supplies.utility_percentages_id')
             ->where('documents.id', $request->document_id)->get();
-
             return Datatables::of($supplies_sets)
                   ->addColumn('actions', function($supplies_set) {
                     return '<a data-target="#edit_set_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default edit-set" data-id="' 
                            . $supplies_set->documents_id . '_' . $supplies_set->supplies_id . '"><i class="fa fa-edit"></i></a>';
                   })
-                  ->rawColumns(['actions' => 'actions'])
-                  ->make(true);
+                  ->addColumn('total_cost', function($supplies_set) {
+                    
+                    $total_cost = ($supplies_set->sale_unit_cost * $supplies_set->products_amount) + $supplies_set->importation_cost + 
+                    $supplies_set->warehouse_shipment_cost + $supplies_set->customer_shipment_cost + $supplies_set->extra_charges;
 
+                    return '$ ' . $total_cost . ' ' . $supplies_set->currency;
+                  })
+                  ->addColumn('total_price', function($supplies_set) {
+                    return '$ ' . $supplies_set->currency;
+                  })
+                  ->rawColumns(['actions' => 'actions', 'total_cost' => 'total_cost', 'total_price' => 'total_price'])
+                  ->make(true);
         }
         abort(403, 'Unauthorized action');
+    }
+
+
+    public function updateBudget(Request $request)
+    {
+        //Log::notice($request);
     }
 
     /**

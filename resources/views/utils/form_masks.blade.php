@@ -1,6 +1,6 @@
 <script src="/metronic-assets/global/plugins/jquery-inputmask/jquery.inputmask.bundle.min.js" type="text/javascript"></script>
 <script type="text/javascript">
-$(document).ready(function(){
+function applyFieldsMasks() {
 	 //Applying masks
 	$('.phone-mask').inputmask("mask", {
 		mask:"(99) 9999-9999"
@@ -32,5 +32,5 @@ $(document).ready(function(){
 	    removeMaskOnSubmit: true,
 	    oncleared: function () { self.Value(''); }
 	});
-});
+}
 </script>

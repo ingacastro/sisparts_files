@@ -90,7 +90,15 @@ License: You must have a valid license purchased only from themeforest(the above
                 <!-- END SIDEBAR -->
                 <!-- END SIDEBAR -->
                 <!-- BEGIN CONTENT -->
-                @include('layouts.admin.includes.content')
+                <div class="page-content-wrapper">
+                    <div class="page-content">
+                        <div class="page-bar">
+                            @yield('breadcumb')
+                        </div>
+                        @yield('page-title')
+                        @yield('page-content')
+                    </div>
+                </div>
                 <!-- END CONTENT -->
             </div>
             <!-- END CONTAINER -->

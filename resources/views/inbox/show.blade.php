@@ -48,6 +48,10 @@
 .tab-content {
     border-top: none !important;
 }
+.modal-footer {
+    border-top: none;
+    padding: 20px 0 0 0;
+}
 </style>
 @endsection
 @section('content')
@@ -97,7 +101,8 @@
                                                 </th>
                                                 <th>
                                                     <a style="text-decoration: none;">
-                                                        <span aria-hidden="true" style="font-size: 18px; margin-left: 20px" class="icon-paper-clip"></span>
+                                                        <span aria-hidden="true" style="font-size: 18px; margin-left: 20px" class="icon-paper-clip">
+                                                        </span>
                                                     </a>
                                                 </th>
                                             </tr>
@@ -202,41 +207,32 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
                 <h4 class="modal-title">Editar partida</h4>
             </div>
-            {!! Form::open(['route' => 'inbox.change-dealership', 'method' => 'post', 'class' => 'horizontal-form',
-                'id' => 'change_dealership_form']) !!}
-                <div class="modal-body">
-                    <div id="error_messages"></div>
-                    {{-- <input type="hidden" name="document_id" id="document_id"> --}}
-                    <div class="tabbable-line boxless tabbable-reversed">
-                        <ul class="nav nav-tabs" id="">
-                            <li class="active">
-                                <a href="#tab_0_content" id="tab_0" data-toggle="tab"> Presupuesto </a>
-                            </li>
-                            <li>
-                                <a href="#tab_1_content" id="tab_1" data-toggle="tab"> Condiciones </a>
-                            </li>
-                            <li>
-                                <a href="#tab_2_content" id="tab_2" data-toggle="tab"> Archivos </a>
-                            </li>
-                        </ul>
-                        <div class="tab-content" style="padding-top: 2px">
-                            <div class="tab-pane active" id="tab_0_content">
-                                {{-- @include('inbox.set_edition_modal_tabs.budget') --}}
-                            </div>
-                            <div class="tab-pane " id="tab_1_content">
-                                @include('inbox.set_edition_modal_tabs.conditions')
-                            </div>
-                            <div class="tab-pane " id="tab_2_content">
-                                @include('inbox.set_edition_modal_tabs.files')
-                            </div>
+            <div class="modal-body">
+                <div id="error_messages"></div>
+                {{-- <input type="hidden" name="document_id" id="document_id"> --}}
+                <div class="tabbable-line boxless tabbable-reversed">
+                    <ul class="nav nav-tabs" id="">
+                        <li class="active">
+                            <a href="#tab_budget_content" id="tab_0" data-toggle="tab"> Presupuesto </a>
+                        </li>
+                        <li>
+                            <a href="#tab_conditions_content" id="tab_1" data-toggle="tab"> Condiciones </a>
+                        </li>
+                        <li>
+                            <a href="#tab_files_content" id="tab_2" data-toggle="tab"> Archivos </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" style="padding-top: 2px">
+                        <div class="tab-pane active" id="tab_budget_content"></div>
+                        <div class="tab-pane " id="tab_conditions_content">
+                            {{-- @include('inbox.set_edition_modal_tabs.conditions') --}}
+                        </div>
+                        <div class="tab-pane " id="tab_files_content">
+                            {{-- @include('inbox.set_edition_modal_tabs.files') --}}
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer" style="text-align: center;">
-                    <button type="button" class="btn btn-circle default" data-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-circle blue">Guardar</button>
-                </div>
-            {!! Form::close() !!}
+            </div>
         </div>
     </div>
 </div>
@@ -251,6 +247,7 @@
 {{-- <script src="/metronic-assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
 <script src="/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script> --}}
 <script src="/js/inbox/index.js" type="text/javascript"></script>
+<script src="/js/inbox/pct_edit.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function(){
     $('#sidebar_inbox').addClass('active');
@@ -297,33 +294,5 @@ $(document).ready(function(){
     });
 });
 
-$(document).on('click', '.edit-set', function() {
-
-    $('#files_table').DataTable({
-        iDisplayLength: 8,
-        destroy: true,
-        lengthChange: false,
-        columns: [
-            { data: "date", name: "date", searchable: false },
-            { data: "name", name: "name" },
-            { data: 'actions', name: 'actions', orderable: false, searchable: false }
-        ],
-        language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
-        },
-    });
-
-    let set_id = $(this).attr('data-id');
-    console.log(set_id);
-    //Set tabs
-    $.ajax({
-        url: '/inbox/get-set-tabs/' + set_id,
-        method: 'get',
-        dataType: 'json',
-        success: function() {
-
-        }
-    });
-});
 </script>
 @endpush

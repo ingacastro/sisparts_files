@@ -197,15 +197,22 @@ class DocumentSync extends Command
 
     //documents-supplies relationship
     private function insertDocumentSupply(\stdClass $pivot, Document $document, Supply $supply, $manufacturer_id) {
+
+        $checklist_id = DB::table('checklist')->insertGetId([]);
+        $measurements_id = DB::table('measurements')->insertGetId([]);
+        $currency = DB::table('currencies')->where('id', $pivot->mon_mov)->first();
+
         $pivot_data = [
             'set' => $pivot->mov_mov,
             'product_description' => $pivot->dse_mov,
             'products_amount' => $pivot->can_mov,
             'measurement_unit_code' => $pivot->med_mov,
-            'sale_unit_price' => $pivot->pve_mov,
+            'sale_unit_cost' => $pivot->pve_mov,
             'type' => $pivot->tdo_tdo,
-            'currencies_id' => $pivot->mon_mov,
-            'manufacturers_id' => $manufacturer_id
+            'currencies_id' => $currency->id ?? null,
+            'manufacturers_id' => $manufacturer_id,
+            'checklist_id' => $checklist_id,
+            'measurements_id' => $measurements_id
         ];
 
         $supply_id = $supply->id;

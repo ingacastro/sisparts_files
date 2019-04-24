@@ -126,6 +126,9 @@
 <script type="text/javascript">
     $(document).ready(function(){
         $('#sidebar_supplier').addClass('active');
+
+        applyFieldsMasks();
+
         let model_id = $('#model_id').val();
 
         //In edit mode enable state select

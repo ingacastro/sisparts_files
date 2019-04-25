@@ -283,10 +283,14 @@ class InboxController extends Controller
             $data['set']['utility_percentages_id'] = $utility_percent_arr[0];
             $data['set']['custom_utility_percentage'] = null;
         }
-        
+
         try {
             $document_supply = DB::table('documents_supplies')->where('documents_id', $set_id[0])
+            ->where('supplies_id', $set_id[1])->first();
+            DB::table('documents_supplies')->where('documents_id', $set_id[0])
             ->where('supplies_id', $set_id[1])->update($data['set']);
+            //Log::notice($document_supply);
+            DB::table('measurements')->where('id', $document_supply->id)->update($data['measurement']);
         } catch(\Exception $e) {
             return response()->json(
                 ['errors' => true,

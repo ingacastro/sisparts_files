@@ -209,6 +209,7 @@
             </div>
             <div class="modal-body">
                 <div id="error_messages"></div>
+                <div id="success_message"></div>
                 {{-- <input type="hidden" name="document_id" id="document_id"> --}}
                 <div class="tabbable-line boxless tabbable-reversed">
                     <ul class="nav nav-tabs" id="">

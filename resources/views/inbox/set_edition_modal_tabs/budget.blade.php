@@ -1,4 +1,5 @@
-{!! Form::open(['route' => ['inbox.update-budget', $set->documents_id . '_' . $set->supplies_id], 'method' => 'post', 'id' => 'edit_budget_form']) !!}
+{!! Form::open(['route' => ['inbox.update-set-budget', $set->documents_id . '_' . $set->supplies_id], 'method' => 'post', 'id' => 'edit_budget_form']) !!}
+    <input type="hidden" id="set_id" value="{{ $set->documents_id . '_' . $set->supplies_id }}">
     <div class="row modal-content-row">
         <div class="col-md-8">
             <div class="row modal-content-border">
@@ -6,12 +7,13 @@
                     <div class="row">
                         <div class="col-md-7">
                             <div class="form-group">
-                                {!! Form::select('set[manufacturers_id]', $manufacturers, $set->manufacturers_id, ['class' => 'form-control', 'id' => 'dealerships_select2', 'placeholder' => 'Proveedor elegido...']) !!}
+                                {!! Form::select('set[manufacturers_id]', $manufacturers, $set->manufacturers_id, ['class' => 'form-control']) !!}
                             </div>
                         </div>
                         <div class="col-md-5">
                             <div class="form-group">
-                                {!! Form::select('set[currencies_id]', $currencies, $set->currencies_id, ['class' => 'form-control', 'placeholder' => 'Moneda...']) !!}
+                                {!! Form::select('set[currencies_id]', $currencies, $set->currencies_id, ['class' => 'form-control',
+                                'placeholder' => 'Moneda...']) !!}
                             </div>
                         </div>
                     </div>
@@ -25,7 +27,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                {!! Form::text('set[imporation_cost]', $set->importation_cost, ['class' => 'form-control currency-mask', 'placeholder' => 'Importación']) !!}
+                                {!! Form::text('set[importation_cost]', $set->importation_cost, ['class' => 'form-control currency-mask', 'placeholder' => 'Importación']) !!}
                             </div>
                         </div>
                     </div>

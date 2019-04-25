@@ -188,7 +188,7 @@ class InboxController extends Controller
             
             $manufacturers = Manufacturer::pluck('name', 'id');
             $currencies = Currency::pluck('name', 'id');
-            $measurement = DB::table('measurements')->find($set->measurements_id);
+            $measurement = DB::table('measurements')->find($set->id);
             $countries = DB::table('countries')->pluck('name', 'id');
             $utility_percentages = DB::table('utility_percentages')->get()->toArray();
             $utility_percentages[] = (object)['id' => 0, 'name' => 'Otro', 'percentage' => 'null'];
@@ -239,13 +239,15 @@ class InboxController extends Controller
                     data-total_profit="' . '$ ' . number_format($total_profit, 2, '.', ',') . $currency . '"><i class="fa fa-edit"></i></a>';
                   })
                   ->editColumn('total_cost', function($supplies_set) {
+
                     return '$ ' . number_format($supplies_set->total_cost, 2, '.', ',') . ' ' . $supplies_set->currency;
+
                   })
                   ->addColumn('total_price', function($supplies_set) {
 
                     $total_price = $this->calculateTotalPrice($supplies_set->total_cost, $supplies_set->utility_percentage);
-
                     return '$ ' .  number_format($total_price, 2, '.', ',') . ' ' . $supplies_set->currency;
+
                   })
                   ->rawColumns(['actions' => 'actions', 'total_cost' => 'total_cost', 'total_price' => 'total_price'])
                   ->make(true);
@@ -259,9 +261,69 @@ class InboxController extends Controller
     }
 
 
-    public function updateBudget(Request $request)
+    public function updateBudget(Request $request, $set_id)
     {
-        //Log::notice($request);
+        $data = $request->all();
+        $utility_percent_arr = explode('_', $data['utility_percentage']);
+        $data['utility_percentage'] = $utility_percent_arr[1];
+        $validator = $this->budgetValidations($data);
+        
+        if($validator->fails())
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($validator)->render()]);
+
+        $set_id = explode('_', $set_id);
+
+        if($utility_percent_arr[0] == 0) {
+            $data['set']['custom_utility_percentage'] = $utility_percent_arr[1];
+            $data['set']['utility_percentages_id'] = null;
+        }else {
+            $data['set']['utility_percentages_id'] = $utility_percent_arr[0];
+            $data['set']['custom_utility_percentage'] = null;
+        }
+        
+        try {
+            $document_supply = DB::table('documents_supplies')->where('documents_id', $set_id[0])
+            ->where('supplies_id', $set_id[1])->update($data['set']);
+        } catch(\Exception $e) {
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($e->getMessage())->render()]);
+        }
+        
+        return response()->json([
+            'errors' => false,
+            'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
+            ->with('success_message', 'Presupuesto correctamente actualizado.')->render()
+        ]);
+    }
+
+    private function budgetValidations($data)
+    {
+        $messages = [
+            'set.sale_unit_cost.required' => 'El campo costo unitario es requerido.',
+            'set.importation_cost.required' => 'El campo importación es requerido.',
+            'set.warehouse_shipment_cost.required' => 'El campo envío al almacen es requerido.',
+            'set.customer_shipment_cost.required' => 'El campo envío al cliente es requerido.',
+            'set.extra_charges.required' => 'El campo gastos extra es requerido.',
+            'utility_percentage.required' => 'El porcentaje de utilidad es requerido.',
+            'utility_percentage.min' => 'El porcentaje de utilidad mínimo, es 1.',
+            'utility_percentage.max' => 'El porcentaje de utilidad máximo, es 100.'
+        ];
+        
+        $validator = Validator::make($data, [
+            'set.sale_unit_cost' => 'required',
+            'set.importation_cost' => 'required',
+            'set.warehouse_shipment_cost' => 'required',
+            'set.customer_shipment_cost' => 'required',
+            'set.extra_charges' => 'required',
+            'utility_percentage' => 'required|numeric|min:1|max:100'
+        ], $messages);
+
+        return $validator;
     }
 
     /**

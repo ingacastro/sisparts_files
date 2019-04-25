@@ -198,8 +198,6 @@ class DocumentSync extends Command
     //documents-supplies relationship
     private function insertDocumentSupply(\stdClass $pivot, Document $document, Supply $supply, $manufacturer_id) {
 
-        $checklist_id = DB::table('checklist')->insertGetId([]);
-        $measurements_id = DB::table('measurements')->insertGetId([]);
         $currency = DB::table('currencies')->where('id', $pivot->mon_mov)->first();
 
         $pivot_data = [
@@ -211,8 +209,6 @@ class DocumentSync extends Command
             'type' => $pivot->tdo_tdo,
             'currencies_id' => $currency->id ?? null,
             'manufacturers_id' => $manufacturer_id,
-            'checklist_id' => $checklist_id,
-            'measurements_id' => $measurements_id
         ];
 
         $supply_id = $supply->id;
@@ -220,8 +216,15 @@ class DocumentSync extends Command
 
         if(isset($document_supply))
             $document->supplies()->updateExistingPivot($supply_id, $pivot_data);
-        else
-            $document->supplies()->attach($supply_id, $pivot_data);
+        else{
+
+            $pivot_data['documents_id'] = $document->id;
+            $pivot_data['supplies_id'] = $supply_id;
+            $document_supply_id = DB::table('documents_supplies')->insertGetId($pivot_data);
+
+            $checklist_id = DB::table('checklist')->insert(['id' => $document_supply_id]);
+            $measurements_id = DB::table('measurements')->insert(['id' => $document_supply_id]);
+        }
     }
 
     //Find or create a supply

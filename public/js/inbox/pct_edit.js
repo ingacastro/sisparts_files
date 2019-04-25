@@ -1,6 +1,10 @@
 $(document).on('click', '.edit-set', function() {
 
     let set_id = $(this).attr('data-id');
+    let total_cost = $(this).attr('data-total_cost');
+    let total_price = $(this).attr('data-total_price');
+    let unit_price = $(this).attr('data-unit_price');
+    let total_profit = $(this).attr('data-total_profit');
     
     //Set tabs
     $.ajax({
@@ -10,6 +14,10 @@ $(document).on('click', '.edit-set', function() {
         success: function(response) {
             $('#tab_budget_content').html(response.budget_tab);
             applyFieldsMasks();
+            $('#budget_total_cost').html(total_cost);
+            $('#budget_total_price').html(total_price);
+            $('#budget_unit_price').html(unit_price);
+            $('#budget_total_profit').html(total_profit);
         }
     });
 

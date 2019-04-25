@@ -125,7 +125,8 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        {!! Form::text(null, null, ['class' => 'form-control numeric-mask', 'id' => 'custom_utility_percentage']) !!}
+                                        {!! Form::text(null, $set->custom_utility_percentage == 0 ? null : $set->custom_utility_percentage, 
+                                            ['class' => 'form-control numeric-mask', 'id' => 'custom_utility_percentage', 'autocomplete' => 'off']) !!}
                                     </div>
                                 </div>                          
                             </div>
@@ -143,33 +144,25 @@
                                             <td>Costo total: </td>
                                         </tr>
                                         <tr>
-                                            <td class="budget-currency-data detail-title">
-                                                $ {{ number_format($set->sale_unit_cost, 2, '.', ',') }} USD
-                                            </td>
+                                            <td id="budget_total_cost" class="budget-currency-data detail-title"></td>
                                         </tr>
                                         <tr>
                                             <td>Precio total: </td>
                                         </tr>
                                         <tr>
-                                            <td class="budget-currency-data detail-title">
-                                                $ {{ number_format($set->sale_unit_cost * $set->products_amount, 2, '.', ',') }} USD
-                                            </td>
+                                            <td id="budget_total_price" class="budget-currency-data detail-title"></td>
                                         </tr>
                                         <tr>
                                             <td>Precio unitario: </td>
                                         </tr>
                                         <tr>
-                                            <td class="budget-currency-data detail-title">
-                                                $ {{ number_format($set->sale_unit_cost, 2, '.', ',') }} USD
-                                            </td>
+                                            <td id="budget_unit_price" class="budget-currency-data detail-title"></td>
                                         </tr>
                                         <tr>
                                             <td>Ganancia total: </td>
                                         </tr>
                                         <tr>
-                                            <td class="budget-currency-data detail-title">
-                                                $ {{ number_format($set->sale_unit_cost, 2, '.', ',') }} USD
-                                            </td>
+                                            <td id="budget_total_profit" class="budget-currency-data detail-title"></td>
                                         </tr>
                                     </tbody>
                                 </table>

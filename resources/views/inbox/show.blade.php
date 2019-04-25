@@ -256,7 +256,7 @@ $(document).ready(function(){
         serverSide: true,
         ajax: {
             url: '/inbox/document-supplies',
-            data: {'document_id': 3}
+            data: {'document_id': '{{ $document->id }}'}
         },
         bSort: true,
         destroy: true,

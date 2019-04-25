@@ -192,6 +192,7 @@ class InboxController extends Controller
             $countries = DB::table('countries')->pluck('name', 'id');
             $utility_percentages = DB::table('utility_percentages')->get()->toArray();
             $utility_percentages[] = (object)['id' => 0, 'name' => 'Otro', 'percentage' => 'null'];
+
             return response()->json(
                 ['errors' => false,
                 'budget_tab' => \View::make('inbox.set_edition_modal_tabs.budget', compact('set', 'manufacturers', 'currencies', 
@@ -209,33 +210,52 @@ class InboxController extends Controller
             $supplies_sets = Document::select('supplies.number', 'manufacturers.name as manufacturer', 
             DB::raw('CAST(documents_supplies.products_amount as UNSIGNED) as products_amount'),
             DB::raw('CASE WHEN documents_supplies.measurement_unit_code = 1 THEN "Pieza" ELSE "Caja" END AS measurement_unit_code'), 
-            'documents_supplies.sale_unit_cost', 'currencies.name as currency',
-            'documents_supplies.type as status', 'documents_supplies.documents_id', 'documents_supplies.supplies_id')
+            DB::raw('documents_supplies.sale_unit_cost * documents_supplies.products_amount + documents_supplies.importation_cost
+            + documents_supplies.warehouse_shipment_cost + documents_supplies.customer_shipment_cost + documents_supplies.extra_charges as total_cost'), 
+            'currencies.name as currency', 'documents_supplies.type as status', 'documents_supplies.documents_id', 
+            'documents_supplies.supplies_id',
+            DB::raw('CASE WHEN documents_supplies.utility_percentages_id IS NOT null THEN utility_percentages.percentage
+                ELSE documents_supplies.custom_utility_percentage END AS utility_percentage'))
             ->leftJoin('documents_supplies', 'documents.id', 'documents_supplies.documents_id')
             ->leftJoin('supplies', 'documents_supplies.supplies_id', 'supplies.id')
             ->leftjoin('manufacturers', 'manufacturers.id', 'documents_supplies.manufacturers_id')
             ->leftJoin('currencies', 'currencies.id', 'documents_supplies.currencies_id')
-            //->leftJoin('utility_percentages', 'utility_percentages.id', 'documents_supplies.utility_percentages_id')
+            ->leftJoin('utility_percentages', 'utility_percentages.id', 'documents_supplies.utility_percentages_id')
             ->where('documents.id', $request->document_id)->get();
+
             return Datatables::of($supplies_sets)
                   ->addColumn('actions', function($supplies_set) {
-                    return '<a data-target="#edit_set_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default edit-set" data-id="' 
-                           . $supplies_set->documents_id . '_' . $supplies_set->supplies_id . '"><i class="fa fa-edit"></i></a>';
-                  })
-                  ->addColumn('total_cost', function($supplies_set) {
-                    
-                    $total_cost = ($supplies_set->sale_unit_cost * $supplies_set->products_amount) + $supplies_set->importation_cost + 
-                    $supplies_set->warehouse_shipment_cost + $supplies_set->customer_shipment_cost + $supplies_set->extra_charges;
 
-                    return '$ ' . $total_cost . ' ' . $supplies_set->currency;
+                    $total_price = $this->calculateTotalPrice($supplies_set->total_cost, $supplies_set->utility_percentage);
+                    $unit_price = $total_price / $supplies_set->products_amount;
+                    $total_profit = $total_price - $supplies_set->total_cost;
+                    $currency = ' ' . $supplies_set->currency;
+
+                    return '<a data-target="#edit_set_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default edit-set" 
+                    data-id="' . $supplies_set->documents_id . '_' . $supplies_set->supplies_id . '"
+                    data-total_cost="' . '$ ' . number_format($supplies_set->total_cost, 2, '.', ',') . $currency . '" 
+                    data-total_price="' . '$ ' . number_format($total_price, 2, '.', ',') . $currency . '"
+                    data-unit_price="' . '$ ' . number_format($unit_price, 2, '.', ',') . $currency . '"
+                    data-total_profit="' . '$ ' . number_format($total_profit, 2, '.', ',') . $currency . '"><i class="fa fa-edit"></i></a>';
+                  })
+                  ->editColumn('total_cost', function($supplies_set) {
+                    return '$ ' . number_format($supplies_set->total_cost, 2, '.', ',') . ' ' . $supplies_set->currency;
                   })
                   ->addColumn('total_price', function($supplies_set) {
-                    return '$ ' . $supplies_set->currency;
+
+                    $total_price = $this->calculateTotalPrice($supplies_set->total_cost, $supplies_set->utility_percentage);
+
+                    return '$ ' .  number_format($total_price, 2, '.', ',') . ' ' . $supplies_set->currency;
                   })
                   ->rawColumns(['actions' => 'actions', 'total_cost' => 'total_cost', 'total_price' => 'total_price'])
                   ->make(true);
         }
         abort(403, 'Unauthorized action');
+    }
+
+    private function calculateTotalPrice($total_cost, $utility_percentage)
+    {
+        return $total_cost / ((100 - $utility_percentage) / 100);
     }
 
 

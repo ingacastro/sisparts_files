@@ -60,5 +60,7 @@ Route::get('inbox/document-supplies', 'InboxController@getDocumentSupplies');
 Route::get('inbox/get-set-tabs/{set_id}', 'InboxController@getSetTabs');
 Route::post('inbox/update-set-budget/{set_id}', 'InboxController@updateBudget')->name('inbox.update-set-budget');
 Route::post('inbox/update-set-checklist/{checklist_id}', 'InboxController@updateChecklist')->name('inbox.update-set-checklist');
+Route::post('inbox/update-set-conditions/{set_id}', 'InboxController@updateConditions')->name('inbox.update-set-conditions');
+Route::get('inbox/get-condition-value/{condition_id}/{field}', 'InboxController@getConditionValue');
 Route::resource('inbox', 'InboxController');
 

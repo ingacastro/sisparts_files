@@ -1,28 +1,40 @@
 <div class="row modal-content-row">
     <div class="col-md-8">
+        {!! Form::open(['route' => ['inbox.update-set-conditions', $set->id], 'method' => 'post', 'id' => 'edit_conditions_form']) !!}
+        <input type="hidden" id="conditions_id" value="{{ $set->id }}">
         <div class="row modal-content-border">
             <div class="col-md-6 checklist-container">
                 <div class="form-group">
                     <div class="radio-list">
                         <label>
-                            <input type="checkbox" name="" id="" value="1"> Salvo previa venta
-                            {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => '']) !!}
+                            <input type="checkbox" {{ $set_conditions->previous_sale == $conditions->previous_sale ? 'checked' : ''}}
+                            data-id="{{ $conditions->id }}" data-field="previous_sale" class="condition-checkbox"> Salvo previa venta
+                            {!! Form::text('previous_sale', $set_conditions->previous_sale, ['class' => 'form-control', 'placeholder' => '',
+                            'id' => 'previous_sale_input']) !!}
                         </label>
                         <label>
-                            <input type="checkbox" name="" id="" value="1"> Precios válidos
-                            {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => '']) !!}
+                            <input type="checkbox" {{ $set_conditions->valid_prices == $conditions->valid_prices ? 'checked' : ''}}
+                            data-id="{{ $conditions->id }}" data-field="valid_prices" class="condition-checkbox"> Precios válidos
+                            {!! Form::text('valid_prices', $set_conditions->valid_prices, ['class' => 'form-control', 'placeholder' => '',
+                            'id' => 'valid_prices_input']) !!}
                         </label>
                         <label>
-                            <input type="checkbox" name="" id="" value="1"> Remplazo
-                            {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => '']) !!}
+                            <input type="checkbox" {{ $set_conditions->replacement == $conditions->replacement ? 'checked' : ''}}
+                            data-id="{{ $conditions->id }}" data-field="replacement" class="condition-checkbox"> Remplazo
+                            {!! Form::text('replacement', $set_conditions->replacement, ['class' => 'form-control', 'placeholder' => '',
+                            'id' => 'replacement_input']) !!}
                         </label>
                         <label>
-                            <input type="checkbox" name="" id="" value="1"> Remplazo de fabrica
-                            {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => '']) !!}
+                            <input type="checkbox" {{ $set_conditions->factory_replacement == $conditions->factory_replacement ? 'checked' : ''}}
+                            data-id="{{ $conditions->id }}" data-field="factory_replacement" class="condition-checkbox"> Remplazo de fabrica
+                            {!! Form::text('factory_replacement', $set_conditions->factory_replacement, ['class' => 'form-control', 'placeholder' => '',
+                            'id' => 'factory_replacement_input']) !!}
                         </label>
                         <label>
-                            <input type="checkbox" name="" id="" value="1"> Condición: USADO
-                            {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => '']) !!}
+                            <input type="checkbox" {{ $set_conditions->condition == $conditions->condition ? 'checked' : ''}}
+                            data-id="{{ $conditions->id }}" data-field="condition" class="condition-checkbox"> Condición: USADO
+                            {!! Form::text('condition', $set_conditions->condition, ['class' => 'form-control', 'placeholder' => '',
+                            'id' => 'condition_input']) !!}
                         </label>
                     </div>
                 </div>
@@ -31,88 +43,37 @@
                 <div class="form-group">
                     <div class="radio-list">
 		                <label>
-		                    <input type="checkbox" name="" id="" value="1"> Mínimo de compra
-		                    {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => '']) !!}
+		                    <input type="checkbox" {{ $set_conditions->minimum_purchase == $conditions->minimum_purchase ? 'checked' : ''}}
+                            data-id="{{ $conditions->id }}" data-field="minimum_purchase" class="condition-checkbox"> Mínimo de compra
+		                    {!! Form::text('minimum_purchase', $set_conditions->minimum_purchase, ['class' => 'form-control', 'placeholder' => '',
+                            'id' => 'minimum_purchase_input']) !!}
 		                </label>
 		                <label>
-		                    <input type="checkbox" name="" id="" value="1"> Ex-works
-		                    {!! Form::text('wtv', null, ['class' => 'form-control', 'placeholder' => '']) !!}
+		                    <input type="checkbox" {{ $set_conditions->exworks == $conditions->exworks ? 'checked' : ''}}
+                            data-id="{{ $conditions->id }}" data-field="exworks" class="condition-checkbox"> Ex-works
+		                    {!! Form::text('exworks', $set_conditions->exworks, ['class' => 'form-control', 'placeholder' => '',
+                            'id' => 'exworks_input']) !!}
 		                </label>
 		                <label>
 		                	<input type="checkbox" style="visibility: hidden;">
-		                	{!! Form::textarea('wtv', null, ['class' => 'form-control', 'style' => 'resize: vertical; height: 155px',
+		                	{!! Form::textarea('description', $set_conditions->description, ['class' => 'form-control', 'style' => 'resize: vertical; height: 155px',
 		                	'placeholder' => 'Descripción...']) !!}
 		                </label>
 					</div>
 				</div>
             </div>
         </div>
+        <div class="modal-footer" style="text-align: center;">
+            <button type="button" class="btn btn-circle default" data-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn btn-circle blue">Guardar</button>
+        </div>
+        {!! Form::close() !!}
     </div>
     <div class="col-md-4">
-        <div class="row modal-content-border" style="background: #f1f4f7;">
-            <div class="col-md-12 checklist-container">                            
-                <h4 class="form-section">Checklist</h4>
-                <div class="form-group">
-                    <div class="radio-list">
-                        <label>
-                            <input type="checkbox" name="" id="" value="1"> Revisar especificaciones del material
-                            <span aria-hidden="true" class="icon-question pull-right checklist-question-mark"></span>
-                        </label>
-                        <label>
-                            <input type="checkbox" name="" id="" value="1"> Revisar cantidades cotizadas
-                            <span aria-hidden="true" class="icon-question pull-right checklist-question-mark"></span>
-                        </label>
-                        <label>
-                            <input type="checkbox" name="" id="" value="1"> Revisar moneda de la cotización
-                            <span aria-hidden="true" class="icon-question pull-right checklist-question-mark"></span>
-                        </label>
-                        <label>
-                            <input type="checkbox" name="" id="" value="1"> Revisar el precio unitario
-                            <span aria-hidden="true" class="icon-question pull-right checklist-question-mark"></span>
-                        </label>
-                        <label>
-                            <input type="checkbox" name="" id="" value="1"> Revisar el tiempo de entrega
-                            <span aria-hidden="true" class="icon-question pull-right checklist-question-mark"></span>
-                        </label>
-                        <label>
-                            <input type="checkbox" name="" id="" value="1"> Revisar las condiciones de entrega
-                            <span aria-hidden="true" class="icon-question pull-right checklist-question-mark"></span>
-                        </label>
-                        <label>
-                            <input type="checkbox" name="" id="" value="1"> Revisar la condición del producto
-                            <span aria-hidden="true" class="icon-question pull-right checklist-question-mark"></span>
-                        </label>
-                        <label>
-                            <input type="checkbox" name="" id="" value="1"> Revisar costos de flete entrada
-                            <span aria-hidden="true" class="icon-question pull-right checklist-question-mark"></span>
-                        </label>
-                        <label>
-                            <input type="checkbox" name="" id="" value="1"> Revisar cálculo del peso
-                            <span aria-hidden="true" class="icon-question pull-right checklist-question-mark"></span>
-                        </label>
-                        <label>
-                            <input type="checkbox" name="" id="" value="1"> Revisar procedencia del material
-                            <span aria-hidden="true" class="icon-question pull-right checklist-question-mark"></span>
-                        </label>
-                        <label>
-                            <input type="checkbox" name="" id="" value="1"> Revisar incoterm
-                            <span aria-hidden="true" class="icon-question pull-right checklist-question-mark"></span>
-                        </label>
-                        <label>
-                            <input type="checkbox" name="" id="" value="1"> Revisar mínimo de compra
-                            <span aria-hidden="true" class="icon-question pull-right checklist-question-mark"></span>
-                        </label>
-                        <label>
-                            <input type="checkbox" name="" id="" value="1"> Revisar gastos extra
-                            <span aria-hidden="true" class="icon-question pull-right checklist-question-mark"></span>
-                        </label>
-                    </div>
-                </div>
-                <div class="checklist-buttons-container">
-                    <button type="submit" class="btn btn-circle btn-sm green-meadow">Aprobar</button>
-                    <button type="button" class="btn btn-circle btn-sm yellow">Rechazar</button>
-                </div>
-            </div>                          
-        </div>
+        {!! Form::open(['route' => ['inbox.update-set-checklist', $set->id], 
+        'method' => 'post', 'id' => 'edit_checklist_form']) !!}
+        <input type="hidden" id="checklist_id" value="{{ $set->id }}">
+        @include('inbox.set_edition_modal_tabs.includes.checklist')
+        {!! Form::close() !!}
     </div>
 </div>

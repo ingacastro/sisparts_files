@@ -192,11 +192,17 @@ class InboxController extends Controller
             $countries = DB::table('countries')->pluck('name', 'id');
             $utility_percentages = DB::table('utility_percentages')->get()->toArray();
             $utility_percentages[] = (object)['id' => 0, 'name' => 'Otro', 'percentage' => 'null'];
-            $checklist = DB::table('checklist')->where('id', $set->id)->first();
+            $checklist = DB::table('checklist')->find($set->id);
+            $set_conditions = DB::table('documents_supplies_conditions')->find($set->id);
+            $conditions = DB::table('conditions')->first();
+
             return response()->json(
                 ['errors' => false,
                 'budget_tab' => \View::make('inbox.set_edition_modal_tabs.budget', compact('set', 'manufacturers', 'currencies', 
                     'measurement', 'countries', 'utility_percentages', 'checklist'))
+                ->render(),
+                'conditions_tab' => \View::make('inbox.set_edition_modal_tabs.conditions', compact('set', 'set_conditions', 
+                    'conditions', 'checklist'))
                 ->render()]);
         }
         
@@ -347,7 +353,7 @@ class InboxController extends Controller
         $request_data = $request->except('_token');
         $checklist = [ 'material_specifications' => '', 'quoted_amounts' => '', 'quotation_currency' => '', 'unit_price' => '', 
           'delivery_time' => '', 'delivery_conditions' => '', 'product_condition' => '', 'entrance_shipment_costs' => '',
-          'weight_calculation' => '', 'material_origin' => '', 'incoterm' => '', 'minimun_purchase' => '',
+          'weight_calculation' => '', 'material_origin' => '', 'incoterm' => '', 'minimum_purchase' => '',
           'extra_charges' => '',
         ];
 
@@ -367,6 +373,34 @@ class InboxController extends Controller
             'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
             ->with('success_message', 'Checklist correctamente actualizado.')->render()
         ]);
+    }
+
+    public function updateConditions(Request $request, $set_id)
+    {
+        if(!$request->ajax())
+            return response()->json([
+                'errors' => true, 
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('Acción no autorizada.')->render()]);
+        try {
+            DB::table('documents_supplies_conditions')->where('id', $set_id)->update($request->except('_token'));            
+        } catch(\Exception $e) {
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($e->getMessage())->render()]);
+        }
+        
+        return response()->json([
+            'errors' => false,
+            'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
+            ->with('success_message', 'Condiciones correctamente actualizadas.')->render()
+        ]);
+    }
+
+    public function getConditionValue($id, $field)
+    {
+        return $item = ((array)DB::table('conditions')->find($id))[$field];
     }
 
     /**

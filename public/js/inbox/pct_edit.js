@@ -18,6 +18,9 @@ $(document).on('click', '.edit-set', function() {
             $('#budget_total_price').html(total_price);
             $('#budget_unit_price').html(unit_price);
             $('#budget_total_profit').html(total_profit);
+            
+            //console.log(response);
+            $('#tab_conditions_content').html(response.conditions_tab);
         }
     });
 
@@ -36,6 +39,7 @@ $(document).on('click', '.edit-set', function() {
     });
 });
 
+/*Budget form*/
 $(document).on('submit', '#edit_budget_form', function(e){
     e.preventDefault();
 
@@ -66,6 +70,14 @@ $(document).on('submit', '#edit_budget_form', function(e){
     }); 
 });
 
+$(document).on('click', '.set-checklist', function(){
+    let checked = $(this).is(':checked');
+    let classes = $(this).attr('class');
+    let item_second_class = classes.split(' ')[1];
+    $('.' + item_second_class).attr('checked', checked);
+});
+
+/*Checklist form*/
 $(document).on('submit', '#edit_checklist_form', function(e){
     e.preventDefault();
 
@@ -89,4 +101,41 @@ $(document).on('submit', '#edit_checklist_form', function(e){
                 $('#success_message').html(response.success_fragment);
         }
     }); 
+});
+
+/*Conditions form*/
+$(document).on('submit', '#edit_conditions_form', function(e){
+    e.preventDefault();
+
+    let token = $('input[name=_token]').val();
+    let conditions_id = $('#conditions_id').val();
+    let serialized_form = $(this).serialize();
+
+    $.ajax({
+        url: '/inbox/update-set-conditions/' + conditions_id,
+        method: 'post',
+        dataType: 'json',
+        data: serialized_form,
+        headers: {'X-CSRF-TOKEN': token},
+        success: function(response) {
+            $('#error_messages').empty();
+            $('#success_message').empty();
+            
+            if(response.errors)
+                $('#error_messages').html(response.errors_fragment);
+            else 
+                $('#success_message').html(response.success_fragment);
+        }
+    }); 
+});
+
+$(document).on('click', '.condition-checkbox', function(){
+    let item = $(this);
+    let id = item.attr('data-id');
+    let field = item.attr('data-field');
+
+    $.get('/inbox/get-condition-value/' + id + '/'+ field, function(value) {
+        $('#' + field + '_input').val(value);
+    });
+    
 });

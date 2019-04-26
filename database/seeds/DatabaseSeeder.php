@@ -18,6 +18,6 @@ class DatabaseSeeder extends Seeder
         $this->call(CurrenciesTableSeeder::class);
         $this->call(ColorSettingsTableSeeder::class);
         $this->call(SyncConnectionsTableSeeder::class);
-        $this->call(UtilityPercentagesTableSeeder::class);
+        $this->call(DocumentsSuppliesTableSeeder::class);
     }
 }

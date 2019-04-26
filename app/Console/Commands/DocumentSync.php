@@ -222,8 +222,9 @@ class DocumentSync extends Command
             $pivot_data['supplies_id'] = $supply_id;
             $document_supply_id = DB::table('documents_supplies')->insertGetId($pivot_data);
 
-            $checklist_id = DB::table('checklist')->insert(['id' => $document_supply_id]);
-            $measurements_id = DB::table('measurements')->insert(['id' => $document_supply_id]);
+            DB::table('checklist')->insert(['id' => $document_supply_id]);
+            DB::table('measurements')->insert(['id' => $document_supply_id]);
+            DB::table('documents_supplies_conditions')->insert(['id' => $document_supply_id]);
         }
     }
 

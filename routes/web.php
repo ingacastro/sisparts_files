@@ -59,5 +59,6 @@ Route::post('inbox/{document}/archive', 'InboxController@archive');
 Route::get('inbox/document-supplies', 'InboxController@getDocumentSupplies');
 Route::get('inbox/get-set-tabs/{set_id}', 'InboxController@getSetTabs');
 Route::post('inbox/update-set-budget/{set_id}', 'InboxController@updateBudget')->name('inbox.update-set-budget');
+Route::post('inbox/update-set-checklist/{checklist_id}', 'InboxController@updateChecklist')->name('inbox.update-set-checklist');
 Route::resource('inbox', 'InboxController');
 

@@ -63,6 +63,30 @@ $(document).on('submit', '#edit_budget_form', function(e){
             else 
                 $('#success_message').html(response.success_fragment);
         }
-    });
-    
+    }); 
+});
+
+$(document).on('submit', '#edit_checklist_form', function(e){
+    e.preventDefault();
+
+    let token = $('input[name=_token]').val();
+    let checklist_id = $('#checklist_id').val();
+    let serialized_form = $(this).serialize();
+
+    $.ajax({
+        url: '/inbox/update-set-checklist/' + checklist_id,
+        method: 'post',
+        dataType: 'json',
+        data: serialized_form,
+        headers: {'X-CSRF-TOKEN': token},
+        success: function(response) {
+            $('#error_messages').empty();
+            $('#success_message').empty();
+            
+            if(response.errors)
+                $('#error_messages').html(response.errors_fragment);
+            else 
+                $('#success_message').html(response.success_fragment);
+        }
+    }); 
 });

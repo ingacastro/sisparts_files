@@ -192,11 +192,11 @@ class InboxController extends Controller
             $countries = DB::table('countries')->pluck('name', 'id');
             $utility_percentages = DB::table('utility_percentages')->get()->toArray();
             $utility_percentages[] = (object)['id' => 0, 'name' => 'Otro', 'percentage' => 'null'];
-
+            $checklist = DB::table('checklist')->where('id', $set->id)->first();
             return response()->json(
                 ['errors' => false,
                 'budget_tab' => \View::make('inbox.set_edition_modal_tabs.budget', compact('set', 'manufacturers', 'currencies', 
-                    'measurement', 'countries', 'utility_percentages'))
+                    'measurement', 'countries', 'utility_percentages', 'checklist'))
                 ->render()]);
         }
         
@@ -263,6 +263,12 @@ class InboxController extends Controller
 
     public function updateBudget(Request $request, $set_id)
     {
+        if(!$request->ajax())
+            return response()->json([
+                'errors' => true, 
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('Acción no autorizada.')->render()]);
+
         $data = $request->all();
         $utility_percent_arr = explode('_', $data['utility_percentage']);
         $data['utility_percentage'] = $utility_percent_arr[1];
@@ -289,7 +295,7 @@ class InboxController extends Controller
             ->where('supplies_id', $set_id[1])->first();
             DB::table('documents_supplies')->where('documents_id', $set_id[0])
             ->where('supplies_id', $set_id[1])->update($data['set']);
-            //Log::notice($document_supply);
+            
             DB::table('measurements')->where('id', $document_supply->id)->update($data['measurement']);
         } catch(\Exception $e) {
             return response()->json(
@@ -328,6 +334,39 @@ class InboxController extends Controller
         ], $messages);
 
         return $validator;
+    }
+
+    public function updateChecklist(Request $request, $set_id)
+    {
+        if(!$request->ajax())
+            return response()->json([
+                'errors' => true, 
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('Acción no autorizada.')->render()]);
+
+        $request_data = $request->except('_token');
+        $checklist = [ 'material_specifications' => '', 'quoted_amounts' => '', 'quotation_currency' => '', 'unit_price' => '', 
+          'delivery_time' => '', 'delivery_conditions' => '', 'product_condition' => '', 'entrance_shipment_costs' => '',
+          'weight_calculation' => '', 'material_origin' => '', 'incoterm' => '', 'minimun_purchase' => '',
+          'extra_charges' => '',
+        ];
+
+        $checklist = array_merge($checklist, $request_data);
+
+        try {
+            DB::table('checklist')->where('id', $set_id)->update($checklist);
+        } catch(\Exception $e) {
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($e->getMessage())->render()]);
+        }
+        
+        return response()->json([
+            'errors' => false,
+            'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
+            ->with('success_message', 'Checklist correctamente actualizado.')->render()
+        ]);
     }
 
     /**

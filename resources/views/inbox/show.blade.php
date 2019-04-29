@@ -3,8 +3,9 @@
 <link href="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/css/plugins.min.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.css" rel="stylesheet" type="text/css" />
-{{-- <link href="/metronic-assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
-<link href="/metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" /> --}}
+<link href="/metronic-assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css" rel="stylesheet" type="text/css" />
+<link href="/metronic-assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
+<link href="/metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
 <style>
 .borderless td, .borderless th {
     border: none;
@@ -48,10 +49,7 @@
 .tab-content {
     border-top: none !important;
 }
-.modal-footer {
-    border-top: none;
-    padding: 20px 0 0 0;
-}
+
 </style>
 @endsection
 @section('content')
@@ -100,7 +98,7 @@
                                                     <a style="text-decoration: none; font-weight: bold; font-size: 20px;">CTZ</a>
                                                 </th>
                                                 <th>
-                                                    <a style="text-decoration: none;">
+                                                    <a style="text-decoration: none;" href="#file_attachment_modal" data-target="#file_attachment_modal" data-toggle="modal" id="file_attachment">
                                                         <span aria-hidden="true" style="font-size: 18px; margin-left: 20px" class="icon-paper-clip">
                                                         </span>
                                                     </a>
@@ -199,42 +197,8 @@
         </div>
     </div>
 </div>
-<!--Edit supplies set-->
-<div class="modal fade bs-modal" id="edit_set_modal" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                <h4 class="modal-title">Editar partida</h4>
-            </div>
-            <div class="modal-body">
-                <div id="error_messages"></div>
-                <div id="success_message"></div>
-                {{-- <input type="hidden" name="document_id" id="document_id"> --}}
-                <div class="tabbable-line boxless tabbable-reversed">
-                    <ul class="nav nav-tabs" id="">
-                        <li class="active">
-                            <a href="#tab_budget_content" id="tab_0" data-toggle="tab"> Presupuesto </a>
-                        </li>
-                        <li>
-                            <a href="#tab_conditions_content" id="tab_1" data-toggle="tab"> Condiciones </a>
-                        </li>
-                        <li>
-                            <a href="#tab_files_content" id="tab_2" data-toggle="tab"> Archivos </a>
-                        </li>
-                    </ul>
-                    <div class="tab-content" style="padding-top: 2px">
-                        <div class="tab-pane active" id="tab_budget_content"></div>
-                        <div class="tab-pane " id="tab_conditions_content"></div>
-                        <div class="tab-pane " id="tab_files_content">
-                            {{-- @include('inbox.set_edition_modal_tabs.files') --}}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+@include('inbox.modals.edit')
+@include('inbox.modals.file_attachment')
 
 @endsection
 @endsection
@@ -243,8 +207,9 @@
 <script src="/metronic-assets/global/plugins/datatables/datatables.min.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.min.js" type="text/javascript"></script>
-{{-- <script src="/metronic-assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
-<script src="/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script> --}}
+<script src="/metronic-assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
+<script src="/metronic-assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
+<script src="/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script>
 <script src="/js/inbox/index.js" type="text/javascript"></script>
 <script src="/js/inbox/pct_edit.js" type="text/javascript"></script>
 <script type="text/javascript">
@@ -273,6 +238,7 @@ $(document).ready(function(){
             "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
         }, 
     });
+
     $('#binnacle_table').DataTable({
 /*        serverSide: true,
         ajax: '/inbox/get-list',
@@ -291,6 +257,30 @@ $(document).ready(function(){
             "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
         }, 
     });
+
+    $('#file_attachment').click(function(){
+
+        $('#sets_select2').select2({
+            width: '100%',
+            placeholder: 'Seleccionar...'
+        });
+
+        $('#file_attachment_table').DataTable({
+            destroy: true,
+    /*      serverSide: true,
+            url: '/inbox/document-sets-files',
+            bSort: true,
+            columns: [
+                { data: "created_at", name: "created_at" },
+                { data: "name", name: "name" },
+                { data: 'actions', name: 'actions', orderable: false, searchable: false }
+            ],*/
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+            },
+        });
+    });
+
 });
 
 </script>

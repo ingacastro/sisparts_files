@@ -175,7 +175,8 @@ class InboxController extends Controller
     public function show($id)
     {
         $document = Document::find($id);
-        return view('inbox.show', compact('document', 'manufacturers'));
+        $document_supplies = $document->supplies->pluck('number', 'pivot.id');
+        return view('inbox.show', compact('document', 'manufacturers', 'document_supplies'));
     }
 
     public function getSetTabs(Request $request, $set_id)
@@ -203,10 +204,36 @@ class InboxController extends Controller
                 ->render(),
                 'conditions_tab' => \View::make('inbox.set_edition_modal_tabs.conditions', compact('set', 'set_conditions', 
                     'conditions', 'checklist'))
+                ->render(),
+                'files_tab' => \View::make('inbox.set_edition_modal_tabs.files', compact('set', 'checklist'))
                 ->render()]);
         }
         
         abort(403, 'Unauthorized action');
+    }
+
+    public function getSetFiles(Request $request, $set_id)
+    {
+        if($request->ajax()):
+
+            $files = DB::table('files')->where('documents_supplies_id', $set_id)->get();
+
+            return Datatables::of($files)
+                  ->editColumn('created_at', function($file) {
+                    return date('d/m/Y', strtotime($file->created_at));
+                  })
+                  ->addColumn('actions', function($file) {
+                    return '<a href="/inbox/' . $file->id . '"class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="" class="btn btn-circle btn-icon-only default change-dealership"><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue"><i class="fa fa-trash"></i></a>';
+                  })
+                  ->rawColumns(['actions' => 'actions'])
+                  ->make(true);
+        endif;
+        abort(403, 'Unauthorized action');
+    }
+
+    public function setsFileAttachment(Request $request)
+    {
+        Log::notice($request);
     }
 
     /*Document supplies sets*/

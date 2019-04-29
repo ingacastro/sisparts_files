@@ -13,7 +13,7 @@ class Document extends Model
    	public function supplies()
    	{
    		return $this->belongsToMany('IParts\Supply', 'documents_supplies', 'documents_id', 'supplies_id')
-   		->withPivot('set', 'product_description', 'products_amount', 'measurement_unit_code', 'sale_unit_cost');
+   		->withPivot('id', 'set', 'product_description', 'products_amount', 'measurement_unit_code', 'sale_unit_cost');
    	}
    	public function dealership()
    	{

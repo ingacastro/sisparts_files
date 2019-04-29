@@ -19,23 +19,28 @@ $(document).on('click', '.edit-set', function() {
             $('#budget_unit_price').html(unit_price);
             $('#budget_total_profit').html(total_profit);
             
-            //console.log(response);
+            
             $('#tab_conditions_content').html(response.conditions_tab);
-        }
-    });
+            $('#tab_files_content').html(response.files_tab);
+            $('#files_table_container').css('display', 'block');
 
-    $('#files_table').DataTable({
-        iDisplayLength: 8,
-        destroy: true,
-        lengthChange: false,
-        columns: [
-            { data: "date", name: "date", searchable: false },
-            { data: "name", name: "name" },
-            { data: 'actions', name: 'actions', orderable: false, searchable: false }
-        ],
-        language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
-        },
+            let set_auto_id = $('#set_auto_id').val();
+            $('#files_table').DataTable({
+/*                serverSide: true,
+                ajax: '/inbox/set-files/' + set_auto_id,
+                iDisplayLength: 6,
+                destroy: true,
+                lengthChange: false,
+                columns: [
+                    { data: "created_at", name: "created_at" },
+                    { data: "name", name: "name" },
+                    { data: 'actions', name: 'actions', orderable: false, searchable: false }
+                ],*/
+                language: {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+                },
+            });
+        }
     });
 });
 

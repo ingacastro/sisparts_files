@@ -64,5 +64,7 @@ Route::post('inbox/update-set-conditions/{set_id}', 'InboxController@updateCondi
 Route::get('inbox/get-condition-value/{condition_id}/{field}', 'InboxController@getConditionValue');
 Route::get('inbox/set-files/{set_id}', 'InboxController@getSetFiles');
 Route::post('inbox/sets-file-attachment', 'InboxController@setsFileAttachment')->name('inbox.sets-file-attachment');
+Route::get('inbox/document-sets-files/{document_id}', 'InboxController@getDocumentSetsFiles');
+Route::delete('inbox/set-file-detach/{set_id}/{file_id}', 'InboxController@setFileDetach');
 Route::resource('inbox', 'InboxController');
 

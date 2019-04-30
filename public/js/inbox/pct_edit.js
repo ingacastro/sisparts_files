@@ -26,16 +26,16 @@ $(document).on('click', '.edit-set', function() {
 
             let set_auto_id = $('#set_auto_id').val();
             $('#files_table').DataTable({
-/*                serverSide: true,
+                serverSide: true,
                 ajax: '/inbox/set-files/' + set_auto_id,
                 iDisplayLength: 6,
                 destroy: true,
                 lengthChange: false,
                 columns: [
                     { data: "created_at", name: "created_at" },
-                    { data: "name", name: "name" },
+                    { data: "manufacturer", name: "manufacturer" },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
-                ],*/
+                ],
                 language: {
                     "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
                 },
@@ -72,7 +72,8 @@ $(document).on('submit', '#edit_budget_form', function(e){
             else 
                 $('#success_message').html(response.success_fragment);
         }
-    }); 
+    });
+    
 });
 
 $(document).on('click', '.set-checklist', function(){

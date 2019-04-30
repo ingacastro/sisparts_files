@@ -6,6 +6,8 @@
 <link href="/metronic-assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
+<meta id="document_id" content="{{ $document->id }}">
+<meta id="meta_token" content="{{ @csrf_token() }}">
 <style>
 .borderless td, .borderless th {
     border: none;
@@ -49,7 +51,10 @@
 .tab-content {
     border-top: none !important;
 }
-
+.sweet-alert {
+  z-index: 100000;
+  background-color: #f1f4f7;
+}
 </style>
 @endsection
 @section('content')
@@ -199,7 +204,6 @@
 </div>
 @include('inbox.modals.edit')
 @include('inbox.modals.file_attachment')
-
 @endsection
 @endsection
 @push('scripts')
@@ -212,6 +216,7 @@
 <script src="/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script>
 <script src="/js/inbox/index.js" type="text/javascript"></script>
 <script src="/js/inbox/pct_edit.js" type="text/javascript"></script>
+<script src="/js/inbox/file_attachment.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function(){
     $('#sidebar_inbox').addClass('active');
@@ -257,30 +262,6 @@ $(document).ready(function(){
             "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
         }, 
     });
-
-    $('#file_attachment').click(function(){
-
-        $('#sets_select2').select2({
-            width: '100%',
-            placeholder: 'Seleccionar...'
-        });
-
-        $('#file_attachment_table').DataTable({
-            destroy: true,
-    /*      serverSide: true,
-            url: '/inbox/document-sets-files',
-            bSort: true,
-            columns: [
-                { data: "created_at", name: "created_at" },
-                { data: "name", name: "name" },
-                { data: 'actions', name: 'actions', orderable: false, searchable: false }
-            ],*/
-            language: {
-                "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
-            },
-        });
-    });
-
 });
 
 </script>

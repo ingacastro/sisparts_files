@@ -9,11 +9,13 @@ use IParts\ColorSetting;
 use IParts\User;
 use IParts\Manufacturer;
 use IParts\Currency;
+use IParts\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Validator;
 use DB;
 use Auth;
+use Storage;
 
 class InboxController extends Controller
 {
@@ -216,14 +218,16 @@ class InboxController extends Controller
     {
         if($request->ajax()):
 
-            $files = DB::table('files')->where('documents_supplies_id', $set_id)->get();
-
+            $files = DB::table('files')
+            ->join('documents_supplies_files', 'documents_supplies_files.files_id', 'files.id')
+            ->join('documents_supplies', 'documents_supplies.id', 'documents_supplies_files.documents_supplies_id')
+            ->where('documents_supplies.id', $set_id)->get();
             return Datatables::of($files)
                   ->editColumn('created_at', function($file) {
                     return date('d/m/Y', strtotime($file->created_at));
                   })
                   ->addColumn('actions', function($file) {
-                    return '<a href="/inbox/' . $file->id . '"class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="" class="btn btn-circle btn-icon-only default change-dealership"><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue"><i class="fa fa-trash"></i></a>';
+                    return '<a href="' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="/' . $file->path . '" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,' . $file->documents_supplies_id .',' . $file->files_id .',2' . ')"><i class="fa fa-trash"></i></a>';
                   })
                   ->rawColumns(['actions' => 'actions'])
                   ->make(true);
@@ -233,7 +237,103 @@ class InboxController extends Controller
 
     public function setsFileAttachment(Request $request)
     {
-        Log::notice($request);
+        if(!$request->ajax())
+            return response()->json([
+                'errorrs' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('Acción no autorizada.')->render()
+            ]);
+
+        if(!$request->has('file') && empty($request->url))
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('Se debe especificar un archivo o una url.')->render()]);
+
+        $data = $request->all();
+
+        $validator = $this->fileAttachmentValidations($data);
+        if($validator->fails())
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($validator)->render()]);
+
+        $file = null;
+        try {
+
+            if($request->has('file')) 
+                $data['path'] = 'storage/supplies_sets_files/' . $request->file->store(null, 'supplies_sets_files');
+            
+            $file = File::create($data);
+            $file->sets()->attach($data['sets']);
+            
+        } catch(\Exception $e) {
+            return response()->json([
+                'errorrs' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($e->getMessage())->render()
+            ]);
+        }
+
+      return response()->json(['errors' => false, 
+        'file' => $file,
+        'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
+        ->with('success_message', 'Archivo guardado correctamente.')->render()
+      ]);
+    }
+
+    private function fileAttachmentValidations($data)
+    {
+        $messages = [
+            'manufacturer.required' => 'El campo proveedor es requerido.',
+            'url.url' => 'La url debe seguir el formato http(s)://dominio.com'
+        ];
+        
+        $validator = Validator::make($data, [
+            'manufacturer' => 'required',
+            'url' => 'nullable|url'
+        ], $messages);
+
+        return $validator;
+    }
+
+    public function getDocumentSetsFiles(Request $request, $document_id)
+    {
+        if($request->ajax()):
+
+            $files = DB::table('files')
+            ->join('documents_supplies_files', 'documents_supplies_files.files_id', 'files.id')
+            ->join('documents_supplies', 'documents_supplies.id', 'documents_supplies_files.documents_supplies_id')
+            ->where('documents_supplies.documents_id', $document_id)->get();
+
+            return Datatables::of($files)
+                  ->editColumn('created_at', function($file) {
+                    return date('d/m/Y', strtotime($file->created_at));
+                  })
+                  ->addColumn('actions', function($file) {
+                    return '<a href="' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="/' . $file->path .'" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,'. $file->documents_supplies_id .',' . $file->files_id .',1' . ')"><i class="fa fa-trash"></i></a>';
+                  })
+                  ->rawColumns(['actions' => 'actions'])
+                  ->make(true);
+        endif;
+        abort(403, 'Unauthorized action');
+    }
+
+    public function setFileDetach($set_id, $file_id)
+    {
+        try {
+            File::find($file_id)->sets()->detach($set_id);
+        } catch(\Exception $e) {
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($e->getMessage())->render()]);
+        }
+      return response()->json(['errors' => false, 
+        'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
+        ->with('success_message', 'Archivo eliminado correctamente.')->render()
+      ]);
     }
 
     /*Document supplies sets*/

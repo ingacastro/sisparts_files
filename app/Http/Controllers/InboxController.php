@@ -8,6 +8,7 @@ use IParts\Document;
 use IParts\ColorSetting;
 use IParts\User;
 use IParts\Manufacturer;
+use IParts\Supplier;
 use IParts\Currency;
 use IParts\File;
 use Illuminate\Support\Facades\Log;
@@ -189,7 +190,7 @@ class InboxController extends Controller
             $set = DB::table('documents_supplies')->where('documents_id', $set_pri_key[0])
             ->where('supplies_id', $set_pri_key[1])->first();
             
-            $manufacturers = Manufacturer::pluck('name', 'id');
+            $suppliers = Supplier::pluck('trade_name', 'id');
             $currencies = Currency::pluck('name', 'id');
             $measurement = DB::table('measurements')->find($set->id);
             $countries = DB::table('countries')->pluck('name', 'id');
@@ -201,7 +202,7 @@ class InboxController extends Controller
 
             return response()->json(
                 ['errors' => false,
-                'budget_tab' => \View::make('inbox.set_edition_modal_tabs.budget', compact('set', 'manufacturers', 'currencies', 
+                'budget_tab' => \View::make('inbox.set_edition_modal_tabs.budget', compact('set', 'suppliers', 'currencies', 
                     'measurement', 'countries', 'utility_percentages', 'checklist'))
                 ->render(),
                 'conditions_tab' => \View::make('inbox.set_edition_modal_tabs.conditions', compact('set', 'set_conditions', 
@@ -286,12 +287,12 @@ class InboxController extends Controller
     private function fileAttachmentValidations($data)
     {
         $messages = [
-            'manufacturer.required' => 'El campo proveedor es requerido.',
+            'supplier.required' => 'El campo proveedor es requerido.',
             'url.url' => 'La url debe seguir el formato http(s)://dominio.com'
         ];
         
         $validator = Validator::make($data, [
-            'manufacturer' => 'required',
+            'supplier' => 'required',
             'url' => 'nullable|url'
         ], $messages);
 
@@ -337,10 +338,10 @@ class InboxController extends Controller
     }
 
     /*Document supplies sets*/
-    public function getDocumentSupplies(Request $request)
+    public function getDocumentSupplySets(Request $request)
     {
         if($request->ajax()) {            
-            $supplies_sets = Document::select('supplies.number', 'manufacturers.name as manufacturer', 
+            $supplies_sets = Document::select('supplies.number', 'suppliers.trade_name as supplier', 
             DB::raw('CAST(documents_supplies.products_amount as UNSIGNED) as products_amount'),
             DB::raw('CASE WHEN documents_supplies.measurement_unit_code = 1 THEN "Pieza" ELSE "Caja" END AS measurement_unit_code'), 
             DB::raw('documents_supplies.sale_unit_cost * documents_supplies.products_amount + documents_supplies.importation_cost
@@ -351,7 +352,7 @@ class InboxController extends Controller
                 ELSE documents_supplies.custom_utility_percentage END AS utility_percentage'))
             ->leftJoin('documents_supplies', 'documents.id', 'documents_supplies.documents_id')
             ->leftJoin('supplies', 'documents_supplies.supplies_id', 'supplies.id')
-            ->leftjoin('manufacturers', 'manufacturers.id', 'documents_supplies.manufacturers_id')
+            ->leftjoin('suppliers', 'suppliers.id', 'documents_supplies.suppliers_id')
             ->leftJoin('currencies', 'currencies.id', 'documents_supplies.currencies_id')
             ->leftJoin('utility_percentages', 'utility_percentages.id', 'documents_supplies.utility_percentages_id')
             ->where('documents.id', $request->document_id)->get();

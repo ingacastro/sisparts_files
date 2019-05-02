@@ -16,7 +16,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            {!! Form::text('manufacturer', null, ['class' => 'form-control', 'placeholder' => 'Nombre proveedor...']) !!}
+                            {!! Form::text('supplier', null, ['class' => 'form-control', 'placeholder' => 'Nombre proveedor...']) !!}
                         </div>
                     </div>
                     <div class="col-md-6">

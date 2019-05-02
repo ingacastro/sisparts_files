@@ -183,10 +183,10 @@ class DocumentSync extends Command
 
         DB::beginTransaction();
         try {    
-            
-            if(isset($siavcom_manufacturer)) $this->insertManufacturer($siavcom_manufacturer);
+            $manufacturer_id = null;
+            if(isset($siavcom_manufacturer)) $manufacturer_id = $this->getManufacturer($siavcom_manufacturer)->id;
 
-            $supply = $this->getSupply($siavcom_supply);
+            $supply = $this->getSupply($siavcom_supply, $manufacturer_id);
             $this->insertDocumentSupply($pivot, $document, $supply);
 
             DB::commit();
@@ -229,13 +229,14 @@ class DocumentSync extends Command
     }
 
     //Find or create a supply
-    private function getSupply(\stdClass $siavcom_supply)
+    private function getSupply(\stdClass $siavcom_supply, $manufacturer_id)
     {
         //Retrieve supply or create it
         $cla_isu = $siavcom_supply->cla_isu;
         $supply = Supply::where('number', $cla_isu)->first();
         $supply_data = [
-            'number' => $cla_isu
+            'number' => $cla_isu,
+            'manufacturers_id' => $manufacturer_id
         ];
 
         $is_new_supply = true;
@@ -248,7 +249,7 @@ class DocumentSync extends Command
     }
 
     //Creates a new manufacturer if it doesn't exist
-    private function insertManufacturer(\stdClass $siavcom_manufacturer)
+    private function getManufacturer(\stdClass $siavcom_manufacturer)
     {
         //Retrieve manufacturer or create it
         $key_xmd = $siavcom_manufacturer->key_xmd;
@@ -262,6 +263,8 @@ class DocumentSync extends Command
             $manufacturer->fill($manufacturer_data)->update();
         else
             $manufacturer = Manufacturer::create($manufacturer_data);
+
+        return $manufacturer;
     }
 
     /*Retrieves created/found customer based on siavcom database customer code*/

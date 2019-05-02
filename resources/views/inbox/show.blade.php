@@ -231,7 +231,7 @@ $(document).ready(function(){
         destroy: true,
         columns: [
             { data: "number", name: "number" },
-            { data: "manufacturer", name: "sync_connection" },
+            { data: "supplier", name: "supplier" },
             { data: "products_amount", name: "products_amount" },
             { data: "measurement_unit_code", name: "measurement_unit_code" },
             { data: "total_cost", name: "total_cost" },

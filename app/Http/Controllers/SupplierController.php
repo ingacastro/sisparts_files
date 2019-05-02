@@ -37,7 +37,7 @@ class SupplierController extends Controller
                 DB::raw("group_concat(manufacturers.name) as brands"))
             ->join('countries', 'countries.id', 'suppliers.countries_id')
             ->leftJoin('suppliers_manufacturers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
-            ->leftJoin('manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
+            ->leftJoin('manufacturers', 'suppliers_manufacturers.suppliers_id', 'manufacturers.id')
             ->groupBy('suppliers.id')
             ->get();
 

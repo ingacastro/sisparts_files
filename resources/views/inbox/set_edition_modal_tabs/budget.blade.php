@@ -8,7 +8,7 @@
                 <div class="row">
                     <div class="col-md-7">
                         <div class="form-group">
-                            {!! Form::select('set[manufacturers_id]', $manufacturers, $set->manufacturers_id, ['class' => 'form-control']) !!}
+                            {!! Form::select('set[suppliers_id]', $suppliers, $set->suppliers_id, ['class' => 'form-control']) !!}
                         </div>
                     </div>
                     <div class="col-md-5">

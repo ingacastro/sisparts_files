@@ -179,6 +179,7 @@ class InboxController extends Controller
     {
         $document = Document::find($id);
         $document_supplies = $document->supplies->pluck('number', 'pivot.id');
+        $document_supplies = $document->supplies->pluck('number', 'pivot.id');
         return view('inbox.show', compact('document', 'manufacturers', 'document_supplies'));
     }
 
@@ -341,7 +342,7 @@ class InboxController extends Controller
     public function getDocumentSupplySets(Request $request)
     {
         if($request->ajax()) {            
-            $supplies_sets = Document::select('supplies.number', 'suppliers.trade_name as supplier', 
+            $supplies_sets = Document::select('supplies.manufacturers_id', 'supplies.number', 'suppliers.trade_name as supplier', 
             DB::raw('CAST(documents_supplies.products_amount as UNSIGNED) as products_amount'),
             DB::raw('CASE WHEN documents_supplies.measurement_unit_code = 1 THEN "Pieza" ELSE "Caja" END AS measurement_unit_code'), 
             DB::raw('documents_supplies.sale_unit_cost * documents_supplies.products_amount + documents_supplies.importation_cost
@@ -370,7 +371,10 @@ class InboxController extends Controller
                     data-total_cost="' . '$ ' . number_format($supplies_set->total_cost, 2, '.', ',') . $currency . '" 
                     data-total_price="' . '$ ' . number_format($total_price, 2, '.', ',') . $currency . '"
                     data-unit_price="' . '$ ' . number_format($unit_price, 2, '.', ',') . $currency . '"
-                    data-total_profit="' . '$ ' . number_format($total_profit, 2, '.', ',') . $currency . '"><i class="fa fa-edit"></i></a>';
+                    data-total_profit="' . '$ ' . number_format($total_profit, 2, '.', ',') . $currency . '"><i class="fa fa-edit"></i></a>
+                    <a data-target="#quotation_request_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default quotation-request"
+                    data-number="' . $supplies_set->number .'"
+                    data-manufacturer_id="' . $supplies_set->manufacturers_id . '"><i class="fa fa-envelope"></i></a>';
                   })
                   ->editColumn('total_cost', function($supplies_set) {
 
@@ -394,6 +398,12 @@ class InboxController extends Controller
         return $total_cost / ((100 - $utility_percentage) / 100);
     }
 
+    public function getManufacturerSuppliers($manufacturer_id)
+    {
+        $suppliers = Manufacturer::find($manufacturer_id)->suppliers;
+        Log::notice($suppliers);
+        return response()->json(Manufacturer::find($manufacturer_id)->suppliers);
+    }
 
     public function updateBudget(Request $request, $set_id)
     {

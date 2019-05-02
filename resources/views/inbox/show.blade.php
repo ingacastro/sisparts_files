@@ -204,6 +204,7 @@
 </div>
 @include('inbox.modals.edit')
 @include('inbox.modals.file_attachment')
+@include('inbox.modals.quotation_request')
 @endsection
 @endsection
 @push('scripts')
@@ -217,6 +218,7 @@
 <script src="/js/inbox/index.js" type="text/javascript"></script>
 <script src="/js/inbox/pct_edit.js" type="text/javascript"></script>
 <script src="/js/inbox/file_attachment.js" type="text/javascript"></script>
+<script src="/js/inbox/quotation_request.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function(){
     $('#sidebar_inbox').addClass('active');

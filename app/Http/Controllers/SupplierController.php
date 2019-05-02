@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use IParts\Supplier;
 use IParts\Http\Requests\SupplierRequest;
 use Illuminate\Support\Facades\Session;
-use IParts\Brand;
+use IParts\Manufacturer;
 use Yajra\Datatables\Datatables;
 use DB;
 use Illuminate\Support\Facades\Log;
@@ -34,10 +34,10 @@ class SupplierController extends Controller
 
             $supps = Supplier::select('suppliers.id', 'trade_name', 'business_name', 
                 'countries.name as country', 'rfc', 'email', 'landline', 'contact_name', 
-                DB::raw("group_concat(brands.name) as brands"))
+                DB::raw("group_concat(manufacturers.name) as brands"))
             ->join('countries', 'countries.id', 'suppliers.countries_id')
-            ->leftJoin('suppliers_brands', 'suppliers.id', 'suppliers_brands.suppliers_id')
-            ->leftJoin('brands', 'suppliers_brands.brands_id', 'brands.id')
+            ->leftJoin('suppliers_manufacturers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
+            ->leftJoin('manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
             ->groupBy('suppliers.id')
             ->get();
 
@@ -142,7 +142,7 @@ class SupplierController extends Controller
 
     public function getBrandsKeyVal(Request $request)
     {
-        $brands = Brand::select('id', 'name as text')
+        $brands = Manufacturer::select('id', 'name as text')
         ->where('name', 'like', '%' . $request->get('term') . '%')->get();
         return response()->json($brands);
     }
@@ -150,9 +150,8 @@ class SupplierController extends Controller
     /*Creates a new brand or simply returns the brand received*/
     public function createBrand(Request $request)
     {
-        $brand = Brand::find($request->get('value'));
-        if(is_null($brand)) $brand = Brand::create(['name' => $request->get('value')]);
-        
+        $brand = Manufacturer::find($request->get('value'));
+        if(is_null($brand)) $brand = Manufacturer::create(['name' => $request->get('value')]);
         return response()->json($brand);
     }
 
@@ -205,7 +204,7 @@ class SupplierController extends Controller
             $supp = Supplier::find($id);
             $supp->brands()->detach();
             $supp->delete();
-            Session::flash('message', 'Proveedor eliminado correctamente');
+            Session::flash('message', 'Proveedor eliminado correctamente.');
         } catch(\Exception $e) {
             back()->withErrors($e->getMessage());
         }

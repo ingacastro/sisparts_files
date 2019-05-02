@@ -179,14 +179,15 @@ class DocumentSync extends Command
         $siavcom_manufacturer = DB::connection($conn->name)->table($manufacturersTable)
         ->where('key_xmd', $siavcom_supply->key_pri)->first();
 
-        if(!isset($siavcom_manufacturer)) return;
+/*        if(!isset($siavcom_manufacturer)) return;*/
 
         DB::beginTransaction();
         try {    
+            
+            if(isset($siavcom_manufacturer)) $this->insertManufacturer($siavcom_manufacturer);
 
-            $manufacturer = $this->getManufacturer($siavcom_manufacturer);
             $supply = $this->getSupply($siavcom_supply);
-            $this->insertDocumentSupply($pivot, $document, $supply, $manufacturer->id);
+            $this->insertDocumentSupply($pivot, $document, $supply);
 
             DB::commit();
         } catch(\Exception $e) {
@@ -196,7 +197,7 @@ class DocumentSync extends Command
     }
 
     //documents-supplies relationship
-    private function insertDocumentSupply(\stdClass $pivot, Document $document, Supply $supply, $manufacturer_id) {
+    private function insertDocumentSupply(\stdClass $pivot, Document $document, Supply $supply) {
 
         $currency = DB::table('currencies')->where('id', $pivot->mon_mov)->first();
 
@@ -207,8 +208,7 @@ class DocumentSync extends Command
             'measurement_unit_code' => $pivot->med_mov,
             'sale_unit_cost' => $pivot->pve_mov,
             'type' => $pivot->tdo_tdo,
-            'currencies_id' => $currency->id ?? null,
-            'manufacturers_id' => $manufacturer_id,
+            'currencies_id' => $currency->id ?? null
         ];
 
         $supply_id = $supply->id;
@@ -247,23 +247,21 @@ class DocumentSync extends Command
         return $supply;
     }
 
-    //Find or create a manufacturer
-    private function getManufacturer(\stdClass $siavcom_manufacturer)
+    //Creates a new manufacturer if it doesn't exist
+    private function insertManufacturer(\stdClass $siavcom_manufacturer)
     {
         //Retrieve manufacturer or create it
         $key_xmd = $siavcom_manufacturer->key_xmd;
-        $manufacturer = Manufacturer::find($key_xmd);
+        $manufacturer = Manufacturer::where('siavcom_key_xmd', $key_xmd)->first();
         $manufacturer_data = [
-            'id' => $key_xmd,
             'name' => simplexml_load_string($siavcom_manufacturer->xml_xmd)->data[0]->attributes()['FABRICANTE'] ?? null,
-            'document_type' => $siavcom_manufacturer->xml_xmd
+            'document_type' => $siavcom_manufacturer->xml_xmd,
+            'siavcom_key_xmd' => $key_xmd
         ];
         if(isset($manufacturer))
             $manufacturer->fill($manufacturer_data)->update();
         else
             $manufacturer = Manufacturer::create($manufacturer_data);
-
-        return $manufacturer;
     }
 
     /*Retrieves created/found customer based on siavcom database customer code*/

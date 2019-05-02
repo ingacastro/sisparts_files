@@ -37,7 +37,6 @@ $('#add_brand').click(function(){
 		data: {value: select2_val},
 		success: function(brand) {
 			let row_query = $('#row_' + brand.id);
-			console.log(row_query);
 			if(row_query.length > 0) return;
 
 			$('#brands_table').DataTable().row.add({

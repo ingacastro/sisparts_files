@@ -10,6 +10,6 @@ class Supplier extends Model
 
     public function brands()
     {
-    	return $this->belongsToMany('IParts\Brand', 'suppliers_brands', 'suppliers_id', 'brands_id');
+    	return $this->belongsToMany('IParts\Manufacturer', 'suppliers_manufacturers', 'suppliers_id', 'manufacturers_id');
     }
 }

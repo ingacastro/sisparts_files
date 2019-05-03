@@ -564,6 +564,40 @@ class InboxController extends Controller
         return redirect()->back();
     }
 
+    public function changeSetStatus(Request $request)
+    {
+        if(!$request->ajax())
+            return response()->json([
+                'errors' => true, 
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('Acción no autorizada.')->render()]);
+
+        $status = $request->status;
+
+        try {
+            DB::table('documents_supplies')->where('id', $request->set_id)->update(['status' => $status]);            
+        } catch(\Exception $e) {
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($e->getMessage())->render()]);
+        }
+
+        $message = 'Estatus actualizado correctamente.';
+        if($status == 6)
+            $message = 'Partida cambiada a en autorización correctamente.';
+        if($status == 7) 
+            $message = 'Partida rechazada correctamente.';
+        if($status == 8)
+            $message = 'Partida autorizada correctamente.';
+
+        return response()->json([
+            'errors' => false,
+            'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
+            ->with('success_message', $message)->render()
+        ]); 
+    }
+
     /**
      * Show the form for editing the specified resource.
      *

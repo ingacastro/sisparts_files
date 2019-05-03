@@ -105,20 +105,16 @@ function checkChecklistItem(checklist_id, field)
         }
     }); 
 }
+$(document).on('click', '.set-status-change', function() {
+    let set_id = $(this).attr('data-set_id');
+    let status = $(this).attr('data-status');
 
-/*Checklist form*/
-/*$(document).on('submit', '#edit_checklist_form', function(e){
-    e.preventDefault();
-
-    let token = $('input[name=_token]').val();
-    let checklist_id = $('#checklist_id').val();
-    let serialized_form = $(this).serialize();
-
+    let token = $('#meta_token').attr('content');
     $.ajax({
-        url: '/inbox/update-set-checklist/' + checklist_id,
+        url: '/inbox/change-set-status',
         method: 'post',
         dataType: 'json',
-        data: serialized_form,
+        data: {'set_id': set_id, 'status': status},
         headers: {'X-CSRF-TOKEN': token},
         success: function(response) {
             $('#error_messages').empty();
@@ -126,11 +122,16 @@ function checkChecklistItem(checklist_id, field)
             
             if(response.errors)
                 $('#error_messages').html(response.errors_fragment);
-            else 
+            else {
                 $('#success_message').html(response.success_fragment);
+                if(status == 6) {
+                    $('#in_authorization_btn').hide();
+                    $('#authorization_btns_container').css('display', 'block');
+                }
+            }
         }
-    }); 
-});*/
+    });
+});
 
 /*Conditions form*/
 $(document).on('submit', '#edit_conditions_form', function(e){

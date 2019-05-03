@@ -3,7 +3,8 @@ $(document).on('click', '.quotation-request', function(){
 	$('#supply_number').html('Número de parte: <strong>' + item.attr('data-number') + '</strong>');
 
 	$.get('/inbox/get-manufacturer-suppliers/' + item.attr('data-manufacturer_id'), function(suppliers){
-		$('#suppliers_checkboxes').html('');
+		$('#left_suppliers').html('');
+		$('#right_suppliers').html('');
 		$.each(suppliers, function(key, supp) {
 			let side = key % 2 == 0 ? 'right_suppliers' : 'left_suppliers';
 			let item = '<label>' +

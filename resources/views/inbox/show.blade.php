@@ -100,7 +100,7 @@
                                         <thead>
                                             <tr>
                                                 <th>
-                                                    <a style="text-decoration: none; font-weight: bold; font-size: 20px;">CTZ</a>
+                                                    <a style="text-decoration: none; font-weight: bold; font-size: 20px;" data-target="#sets_turn_ctz_modal" data-toggle="modal" id="sets_turn_ctz">CTZ</a>
                                                 </th>
                                                 <th>
                                                     <a style="text-decoration: none;" href="#file_attachment_modal" data-target="#file_attachment_modal" data-toggle="modal" id="file_attachment">
@@ -205,6 +205,7 @@
 @include('inbox.modals.edit')
 @include('inbox.modals.file_attachment')
 @include('inbox.modals.quotation_request')
+@include('inbox.modals.sets_turn_ctz')
 @endsection
 @endsection
 @push('scripts')
@@ -219,6 +220,7 @@
 <script src="/js/inbox/pct_edit.js" type="text/javascript"></script>
 <script src="/js/inbox/file_attachment.js" type="text/javascript"></script>
 <script src="/js/inbox/quotation_request.js" type="text/javascript"></script>
+<script src="/js/inbox/sets_turn_ctz.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function(){
     $('#sidebar_inbox').addClass('active');

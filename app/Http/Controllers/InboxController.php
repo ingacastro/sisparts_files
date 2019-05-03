@@ -11,12 +11,14 @@ use IParts\Manufacturer;
 use IParts\Supplier;
 use IParts\Currency;
 use IParts\File;
+use IParts\Message;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Validator;
 use DB;
 use Auth;
 use Storage;
+use Mail;
 
 class InboxController extends Controller
 {
@@ -179,8 +181,13 @@ class InboxController extends Controller
     {
         $document = Document::find($id);
         $document_supplies = $document->supplies->pluck('number', 'pivot.id');
-        $document_supplies = $document->supplies->pluck('number', 'pivot.id');
-        return view('inbox.show', compact('document', 'manufacturers', 'document_supplies'));
+        $messages = DB::table('messages')
+        ->leftJoin('messages_languages', 'messages.id', 'messages_languages.messages_id')
+        ->leftJoin('languages', 'messages_languages.languages_id', 'languages.id')
+        ->where('languages.name', 'Español')
+        ->pluck('messages_languages.title', 'messages.id');
+
+        return view('inbox.show', compact('document', 'manufacturers', 'document_supplies', 'messages'));
     }
 
     public function getSetTabs(Request $request, $set_id)
@@ -401,7 +408,6 @@ class InboxController extends Controller
     public function getManufacturerSuppliers($manufacturer_id)
     {
         $suppliers = Manufacturer::find($manufacturer_id)->suppliers;
-        Log::notice($suppliers);
         return response()->json(Manufacturer::find($manufacturer_id)->suppliers);
     }
 
@@ -539,6 +545,23 @@ class InboxController extends Controller
     public function getConditionValue($id, $field)
     {
         return $item = ((array)DB::table('conditions')->find($id))[$field];
+    }
+
+    public function sendSuppliersQuotation(Request $request)
+    {
+        foreach($request->suppliers_ids as $supplier_id) {
+            $supplier = Supplier::find($supplier_id);
+            $message = DB::table('messages_languages')->where('messages_id', $request->message_id)
+            ->where('languages_id', $supplier->languages_id)->first();
+
+            Mail::send([], [], function($m) use ($supplier, $message) {
+                $m->to($supplier->email);
+                $m->subject($message->subject);
+                $m->setBody($message->body, 'text/html');
+            });
+        }
+        $request->session()->flash('message', 'Cotización enviada correctamente.');
+        return redirect()->back();
     }
 
     /**

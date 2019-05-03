@@ -67,5 +67,6 @@ Route::post('inbox/sets-file-attachment', 'InboxController@setsFileAttachment')-
 Route::get('inbox/document-sets-files/{document_id}', 'InboxController@getDocumentSetsFiles');
 Route::delete('inbox/set-file-detach/{set_id}/{file_id}', 'InboxController@setFileDetach');
 Route::get('inbox/get-manufacturer-suppliers/{manufacturer_id}', 'InboxController@getManufacturerSuppliers');
+Route::post('inbox/send-suppliers-quotation', 'InboxController@sendSuppliersQuotation')->name('inbox.send-suppliers-quotation');
 Route::resource('inbox', 'InboxController');
 

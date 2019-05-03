@@ -19,7 +19,7 @@
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="email">Correo electrónico</label>
+                <label class="control-label" for="email"><span class="required">* </span>Correo electrónico</label>
                 {!! Form::text('email', $model->email, ['class' => 'form-control', 'id' => 'email',
                 'autocomplete' => 'off']) !!}
             </div>
@@ -36,7 +36,7 @@
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="landline">Teléfono fijo</label>
+                <label class="control-label" for="landline"><span class="required">* </span>Teléfono fijo</label>
                 {!! Form::text('landline', $model->landline, ['class' => 'form-control phone-mask', 'id' => 'landline',
                 'autocomplete' => 'off']) !!}
             </div>

@@ -181,10 +181,6 @@
         {!! Form::close() !!}
     </div>
     <div class="col-md-4">
-        {!! Form::open(['route' => ['inbox.update-set-checklist', $set->id], 
-        'method' => 'post', 'id' => 'edit_checklist_form']) !!}
-        <input type="hidden" id="checklist_id" value="{{ $set->id }}">
         @include('inbox.set_edition_modal_tabs.includes.checklist')
-        {!! Form::close() !!}
     </div>
 </div>

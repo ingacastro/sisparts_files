@@ -208,7 +208,8 @@ class DocumentSync extends Command
             'measurement_unit_code' => $pivot->med_mov,
             'sale_unit_cost' => $pivot->pve_mov,
             'type' => $pivot->tdo_tdo,
-            'currencies_id' => $currency->id ?? null
+            'currencies_id' => $currency->id ?? null,
+            'status' => 1
         ];
 
         $supply_id = $supply->id;

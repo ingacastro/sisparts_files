@@ -59,7 +59,7 @@ Route::post('inbox/{document}/archive', 'InboxController@archive');
 Route::get('inbox/document-supplies', 'InboxController@getDocumentSupplySets');
 Route::get('inbox/get-set-tabs/{set_id}', 'InboxController@getSetTabs');
 Route::post('inbox/update-set-budget/{set_id}', 'InboxController@updateBudget')->name('inbox.update-set-budget');
-Route::post('inbox/update-set-checklist/{checklist_id}', 'InboxController@updateChecklist')->name('inbox.update-set-checklist');
+Route::post('inbox/check-checklist-item', 'InboxController@checkChecklistItem');
 Route::post('inbox/update-set-conditions/{set_id}', 'InboxController@updateConditions')->name('inbox.update-set-conditions');
 Route::get('inbox/get-condition-value/{condition_id}/{field}', 'InboxController@getConditionValue');
 Route::get('inbox/set-files/{set_id}', 'InboxController@getSetFiles');
@@ -68,5 +68,7 @@ Route::get('inbox/document-sets-files/{document_id}', 'InboxController@getDocume
 Route::delete('inbox/set-file-detach/{set_id}/{file_id}', 'InboxController@setFileDetach');
 Route::get('inbox/get-manufacturer-suppliers/{manufacturer_id}', 'InboxController@getManufacturerSuppliers');
 Route::post('inbox/send-suppliers-quotation', 'InboxController@sendSuppliersQuotation')->name('inbox.send-suppliers-quotation');
+
+/*Route::post('inbox/set-ctz-status', 'InboxController@setCTZStatus');*/
 Route::resource('inbox', 'InboxController');
 

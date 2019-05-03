@@ -354,8 +354,18 @@ class InboxController extends Controller
             DB::raw('CASE WHEN documents_supplies.measurement_unit_code = 1 THEN "Pieza" ELSE "Caja" END AS measurement_unit_code'), 
             DB::raw('documents_supplies.sale_unit_cost * documents_supplies.products_amount + documents_supplies.importation_cost
             + documents_supplies.warehouse_shipment_cost + documents_supplies.customer_shipment_cost + documents_supplies.extra_charges as total_cost'), 
-            'currencies.name as currency', 'documents_supplies.type as status', 'documents_supplies.documents_id', 
-            'documents_supplies.supplies_id',
+            'currencies.name as currency', 
+            DB::raw('CASE WHEN documents_supplies.status = 1 THEN "No solicitado"
+                WHEN documents_supplies.status = 2 THEN "Solicitado automáticamente"
+                WHEN documents_supplies.status = 3 THEN "Solicitado manualmente"
+                WHEN documents_supplies.status = 4 THEN "Confirmado por el proveedor"
+                WHEN documents_supplies.status = 5 THEN "Presupuesto capturado"
+                WHEN documents_supplies.status = 6 THEN "En autorización"
+                WHEN documents_supplies.status = 7 THEN "Rechazado"
+                WHEN documents_supplies.status = 8 THEN "Autorizado"
+                WHEN documents_supplies.status = 9 THEN "Convertido a CTZ"
+                ELSE "INDEFINIDO" END as status'), 
+            'documents_supplies.documents_id', 'documents_supplies.supplies_id',
             DB::raw('CASE WHEN documents_supplies.utility_percentages_id IS NOT null THEN utility_percentages.percentage
                 ELSE documents_supplies.custom_utility_percentage END AS utility_percentage'))
             ->leftJoin('documents_supplies', 'documents.id', 'documents_supplies.documents_id')
@@ -486,7 +496,7 @@ class InboxController extends Controller
         return $validator;
     }
 
-    public function updateChecklist(Request $request, $set_id)
+    public function checkChecklistItem(Request $request)
     {
         if(!$request->ajax())
             return response()->json([
@@ -494,17 +504,8 @@ class InboxController extends Controller
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
                 ->withErrors('Acción no autorizada.')->render()]);
 
-        $request_data = $request->except('_token');
-        $checklist = [ 'material_specifications' => '', 'quoted_amounts' => '', 'quotation_currency' => '', 'unit_price' => '', 
-          'delivery_time' => '', 'delivery_conditions' => '', 'product_condition' => '', 'entrance_shipment_costs' => '',
-          'weight_calculation' => '', 'material_origin' => '', 'incoterm' => '', 'minimum_purchase' => '',
-          'extra_charges' => '',
-        ];
-
-        $checklist = array_merge($checklist, $request_data);
-
         try {
-            DB::table('checklist')->where('id', $set_id)->update($checklist);
+            $obj = DB::table('checklist')->where('id', $request->checklist_id)->update(['material_specifications' => 'checked']);
         } catch(\Exception $e) {
             return response()->json(
                 ['errors' => true,
@@ -512,11 +513,7 @@ class InboxController extends Controller
                 ->withErrors($e->getMessage())->render()]);
         }
         
-        return response()->json([
-            'errors' => false,
-            'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
-            ->with('success_message', 'Checklist correctamente actualizado.')->render()
-        ]);
+        return response()->json(['errors' => false]);
     }
 
     public function updateConditions(Request $request, $set_id)
@@ -553,12 +550,15 @@ class InboxController extends Controller
             $supplier = Supplier::find($supplier_id);
             $message = DB::table('messages_languages')->where('messages_id', $request->message_id)
             ->where('languages_id', $supplier->languages_id)->first();
-
-            Mail::send([], [], function($m) use ($supplier, $message) {
-                $m->to($supplier->email);
-                $m->subject($message->subject);
-                $m->setBody($message->body, 'text/html');
-            });
+            try {                
+                Mail::send([], [], function($m) use ($supplier, $message) {
+                    $m->to($supplier->email);
+                    $m->subject($message->subject);
+                    $m->setBody($message->body, 'text/html');
+                });
+            } catch(\Exception $e) {
+                return redirect()->back()->withErrors($e->getMessage());
+            }
         }
         $request->session()->flash('message', 'Cotización enviada correctamente.');
         return redirect()->back();

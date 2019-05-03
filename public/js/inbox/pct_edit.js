@@ -81,10 +81,33 @@ $(document).on('click', '.set-checklist', function(){
     let classes = $(this).attr('class');
     let item_second_class = classes.split(' ')[1];
     $('.' + item_second_class).attr('checked', checked);
+
+    let set_id = $(this).attr('data-set_id');
+    let field = $(this).attr('data-field');
+    checkChecklistItem(set_id, field);
 });
 
+function checkChecklistItem(checklist_id, field)
+{
+    let token = $('#meta_token').attr('content');
+    $.ajax({
+        url: '/inbox/check-checklist-item',
+        method: 'post',
+        dataType: 'json',
+        data: {'checklist_id': checklist_id, 'field': field},
+        headers: {'X-CSRF-TOKEN': token},
+        success: function(response) {
+            $('#error_messages').empty();
+            
+            if(response.errors)
+                $('#error_messages').html(response.errors_fragment);
+
+        }
+    }); 
+}
+
 /*Checklist form*/
-$(document).on('submit', '#edit_checklist_form', function(e){
+/*$(document).on('submit', '#edit_checklist_form', function(e){
     e.preventDefault();
 
     let token = $('input[name=_token]').val();
@@ -107,7 +130,7 @@ $(document).on('submit', '#edit_checklist_form', function(e){
                 $('#success_message').html(response.success_fragment);
         }
     }); 
-});
+});*/
 
 /*Conditions form*/
 $(document).on('submit', '#edit_conditions_form', function(e){

@@ -7,10 +7,10 @@
                 Selecciona las partidas que deseas convertir a CTZ (solo se podrán convertir las partidas que estén autorizadas y no hayan sido convertidas antes)
             </div>
             <div class="modal-body">
-                {!! Form::open(['route' => 'inbox.sets-file-attachment', 'method' => 'post', 'class' => 'horizontal-form',
-                'id' => 'file_attachment_form']) !!}
-                <div id="file_attachment_error_messages"></div>
-                <div id="file_attachment_success_message"></div>
+                {!! Form::open(['route' => 'inbox.sets-turn-ctz', 'method' => 'post', 'class' => 'horizontal-form',
+                'id' => 'sets_turn_ctz_form']) !!}
+                <div id="sets_turn_ctz_error_messages"></div>
+                <div id="sets_turn_ctz_success_message"></div>
                 <div class="row" style="padding: 0 10px 0 10px">
                     <div class="table-toolbar">
                         <div class="row">
@@ -20,7 +20,8 @@
                     </div>
                     <table class="table table-striped table-hover table-bordered" id="sets_turn_ctz_table">
                         <thead>
-                            <tr>
+                            <tr role="row" class="heading">
+                                <th></th>
                                 <th>Número parte</th>
                                 <th>Proveedor</th>
                                 <th>Cant</th>
@@ -28,11 +29,14 @@
                                 <th>Costo total</th>
                                 <th>Precio total</th>
                                 <th>Estatus</th>
-                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
+                </div>
+                <div class="modal-footer" style="text-align: center;">
+                    <button type="button" class="btn btn-circle default" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-circle blue">Convertir</button>
                 </div>
                 {!! Form::close() !!}
             </div>

@@ -345,11 +345,12 @@ class InboxController extends Controller
       ]);
     }
 
-    /*Document supplies sets*/
+    /*Document supplies sets and only authorized sets*/
     public function getDocumentSupplySets(Request $request)
     {
-        if($request->ajax()) {            
-            $supplies_sets = Document::select('supplies.manufacturers_id', 'supplies.number', 'suppliers.trade_name as supplier', 
+        if($request->ajax()) {          
+
+            $query = Document::select('documents_supplies.id', 'supplies.manufacturers_id', 'supplies.number', 'suppliers.trade_name as supplier', 
             DB::raw('CAST(documents_supplies.products_amount as UNSIGNED) as products_amount'),
             DB::raw('CASE WHEN documents_supplies.measurement_unit_code = 1 THEN "Pieza" ELSE "Caja" END AS measurement_unit_code'), 
             DB::raw('documents_supplies.sale_unit_cost * documents_supplies.products_amount + documents_supplies.importation_cost
@@ -373,7 +374,12 @@ class InboxController extends Controller
             ->leftjoin('suppliers', 'suppliers.id', 'documents_supplies.suppliers_id')
             ->leftJoin('currencies', 'currencies.id', 'documents_supplies.currencies_id')
             ->leftJoin('utility_percentages', 'utility_percentages.id', 'documents_supplies.utility_percentages_id')
-            ->where('documents.id', $request->document_id)->get();
+            ->where('documents.id', $request->document_id);
+
+            if($request->has('status'))
+                $query->where('documents_supplies.status', $request->status);
+
+            $supplies_sets = $query->get();
 
             return Datatables::of($supplies_sets)
                   ->addColumn('actions', function($supplies_set) {
@@ -393,6 +399,9 @@ class InboxController extends Controller
                     data-number="' . $supplies_set->number .'"
                     data-manufacturer_id="' . $supplies_set->manufacturers_id . '"><i class="fa fa-envelope"></i></a>';
                   })
+                  ->addColumn('checkbox', function($supplies_set){
+                    return '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input type="checkbox" class="checkboxes" value="' . $supplies_set->id . '"><span></span></label>';
+                  })
                   ->editColumn('total_cost', function($supplies_set) {
 
                     return '$ ' . number_format($supplies_set->total_cost, 2, '.', ',') . ' ' . $supplies_set->currency;
@@ -404,7 +413,8 @@ class InboxController extends Controller
                     return '$ ' .  number_format($total_price, 2, '.', ',') . ' ' . $supplies_set->currency;
 
                   })
-                  ->rawColumns(['actions' => 'actions', 'total_cost' => 'total_cost', 'total_price' => 'total_price'])
+                  ->rawColumns(['actions' => 'actions', 'total_cost' => 'total_cost', 
+                    'total_price' => 'total_price', 'checkbox' => 'checkbox'])
                   ->make(true);
         }
         abort(403, 'Unauthorized action');
@@ -595,6 +605,30 @@ class InboxController extends Controller
             'errors' => false,
             'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
             ->with('success_message', $message)->render()
+        ]); 
+    }
+
+    public function setsTurnCTZ(Request $request)
+    {
+        if(!$request->ajax())
+            return response()->json([
+                'errors' => true, 
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('Acción no autorizada.')->render()]);
+
+        try {
+            DB::table('documents_supplies')->whereIn('id', $request->sets)->update(['status' => 9]);            
+        } catch(\Exception $e) {
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($e->getMessage())->render()]);
+        }
+
+        return response()->json([
+            'errors' => false,
+            'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
+            ->with('success_message', 'Partidas convertidas a CTZ correctamente.')->render()
         ]); 
     }
 

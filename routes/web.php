@@ -55,9 +55,14 @@ Route::group(['middleware' => ['role:Administrador']], function(){
 	//Alerts
 	Route::get('alert/get-list', 'AlertController@getList');
 	Route::resource('alert', 'AlertController');
+	
 	//Messages
 	Route::get('message/get-list', 'MessageController@getList');
 	Route::resource('message', 'MessageController');
+
+	//Report
+	Route::get('report/get-list', 'ReportController@getList')->name('report.get-list');
+	Route::get('report', 'ReportController@index')->name('report.index');
 });
 
 //Inbox

@@ -82,6 +82,8 @@ class InboxController extends Controller
                 $query->where('documents.status', $status);
             if($dealer_ship > 0)
                 $query->where('documents.employees_users_id', $dealer_ship);
+            if($route == 'archive')
+                $query->where('documents.status', 4);
 
              $documents = $query->get($fields);
              return $this->buildInboxDataTable($documents, $route);

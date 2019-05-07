@@ -66,6 +66,13 @@
                 <span class="selected"></span>
             </a>
         </li>
+        <li id="sidebar_report" class="nav-item">
+            <a href="{{ route('report.index') }}" class="nav-link nav-toggle">
+                <i class="fa fa-file-excel-o"></i>
+                <span class="title">Reporte</span>
+                <span class="selected"></span>
+            </a>
+        </li>
         <li id="sidebar_configuration" class="nav-item">
             <a href="{{ route('configuration.index') }}" class="nav-link nav-toggle">
                 <i class="icon-settings"></i>

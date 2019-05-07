@@ -65,7 +65,7 @@
         <i class="fa fa-circle"></i>
     </li>
     <li>
-        <a href="{{ route('inbox.index') }}">Bandeja de entrada</a>
+        <a href="{{ route('archive.index') }}">Archivo</a>
         <i class="fa fa-circle"></i>
     </li>
     <li>

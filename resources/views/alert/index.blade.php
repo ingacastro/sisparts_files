@@ -42,7 +42,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="btn-group pull-right">
-                                <a href="{{ route('alert.create') }}" class="btn btn-circle green"> Nuevo
+                                <a href="{{ route('alert.create') }}" class="btn btn-circle green"> Nueva
                                     <i class="fa fa-plus"></i>
                                 </a>
                             </div>

@@ -53,6 +53,7 @@ Route::group(['middleware' => ['role:Administrador']], function(){
 	Route::post('color-settings', 'ColorSettingController@store')->name('settings.store');
 
 	//Alerts
+	Route::get('alert/get-list', 'AlertController@getList');
 	Route::resource('alert', 'AlertController');
 	//Messages
 	Route::get('message/get-list', 'MessageController@getList');

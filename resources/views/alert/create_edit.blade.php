@@ -44,7 +44,7 @@
                 @if(!$is_edit)
                 {!! Form::open(['route' => 'alert.store', 'class' => 'horizontal-form', 'id' => 'alert_form']) !!}
                 @else
-                {!! Form::model($model, ['route' => ['alert.update', $alert->id], 'class' => 'horizontal-form', 'method' => 'put',
+                {!! Form::model($model, ['route' => ['alert.update', $model->id], 'class' => 'horizontal-form', 'method' => 'put',
                 'id' => 'alert_form']) !!}
                 @endif
                 @include('alert.base_form')
@@ -65,10 +65,15 @@
 $(document).ready(function(){
     $('#sidebar_configuration').addClass('active');
     applyFieldsMasks();
+
+    displayConditionTypeDynamicField();
+
 });
 
-$('#type').change(function() {
-    let val = $(this).val();
+$('#type').change(function() { displayConditionTypeDynamicField(); });
+
+function displayConditionTypeDynamicField() {
+    let val = $('#type').val();
     
     $('#condition_type_elapsed_days').hide();
     $('#condition_type_status_change').hide();
@@ -77,15 +82,16 @@ $('#type').change(function() {
         $('#condition_type_elapsed_days').show();
     else if(val == 2)
         $('#condition_type_status_change').show();
-});
+}
 
 $('#alert_form').submit(function(e){
     e.preventDefault();
     let token = $('input[name=_token]').val();
     let serialized_form = $(this).serialize();
+    let action = $(this).attr('action');
     
     $.ajax({
-        url: '/alert',
+        url: action,
         type: 'post',
         dataType: 'json',
         data: serialized_form,
@@ -94,7 +100,7 @@ $('#alert_form').submit(function(e){
             if(response.errors)
                 $('#error_messages').html(response.errors_fragment);
             else
-                location.reload();
+                location.href = '/alert';
         }
     });
 });

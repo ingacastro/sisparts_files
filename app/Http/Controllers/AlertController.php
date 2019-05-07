@@ -7,9 +7,15 @@ use IParts\Alert;
 use DB;
 use Validator;
 use Illuminate\Support\Facades\Log;
+use Yajra\Datatables\Datatables;
+use Illuminate\Support\Facades\Session;
 
 class AlertController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -19,6 +25,24 @@ class AlertController extends Controller
     {
         return view('alert.index');
     }
+
+    public function getList(Request $request)
+    {
+        if($request->ajax()) {
+
+            $alerts = Alert::all();
+            return Datatables::of($alerts)
+                  ->addColumn('actions', function($alert) {
+                    return '<a href="/alert/'. $alert->id . '/edit" class="btn btn-circle btn-icon-only default"><i class="fa fa-edit"></i></a>
+                            <button class="btn btn-circle btn-icon-only red"
+                            onclick="deleteModel(event, ' . $alert->id . ')"><i class="fa fa-times"></i></a>';
+                  })
+                  ->rawColumns(['actions' => 'actions'])
+                  ->make(true);
+        }
+        abort(403, 'Unauthorized action');
+    }
+      
 
     /**
      * Show the form for creating a new resource.
@@ -44,6 +68,13 @@ class AlertController extends Controller
      */
     public function store(Request $request)
     {
+        if(!$request->ajax())
+            return response()->json([
+                'errorrs' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('Acción no autorizada.')->render()
+            ]);
+
         $data = $request->all();
         $validator = $this->formValidations($data);
 
@@ -118,7 +149,13 @@ class AlertController extends Controller
      */
     public function edit($id)
     {
-        //
+        $model = Alert::find($id);
+        $types = [
+            1 => 'Cantidad de días desde solicitud PCT',
+            2 => 'Una partida cambia de estatus a:'
+        ];
+        $set_status = DB::table('supplies_sets_status')->pluck('name', 'id');
+        return view('alert.create_edit', compact('model', 'types', 'set_status'));
     }
 
     /**
@@ -130,7 +167,32 @@ class AlertController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        if(!$request->ajax())
+            return response()->json([
+                'errorrs' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('Acción no autorizada.')->render()
+            ]);
+
+        $data = $request->all();
+        $validator = $this->formValidations($data);
+
+        if($validator->fails())
+            return response()->json(
+                        ['errors' => true,
+                        'errors_fragment' => \View::make('color_settings.error_messages')
+                        ->withErrors($validator)->render()]);
+        try {
+            Alert::find($id)->fill($data)->update();
+            $request->session()->flash('message', 'Alerta actualizada correctamente.');
+        }catch(\Exception $e) {
+            return response()->json(
+                        ['errors' => true,
+                        'errors_fragment' => \View::make('color_settings.error_messages')
+                        ->withErrors($e->getMessage())->render()]);
+        }
+
+        return response()->json(['errors' => false]);
     }
 
     /**
@@ -141,6 +203,11 @@ class AlertController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            Alert::destroy($id);
+            Session::flash('message', 'Alerta eliminada correctamente.');
+        }catch(\Exception $e) {
+            back()->withErrors($e->getMessage());
+        }
     }
 }

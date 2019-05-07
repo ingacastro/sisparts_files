@@ -76,15 +76,15 @@
         $('#sidebar_configuration').addClass('active');
 
         $('#alerts_table').DataTable({
-/*            serverSide: true,
-            ajax: '/user/get-list',
+            serverSide: true,
+            ajax: '/alert/get-list',
             bSort: true,
             columns: [
                 { data: "title", name: "title" },
                 { data: "subject", name: "subject" },
                 { data: "recipients", name: "recipients" },
                 { data: 'actions', name: 'actions', orderable: false, searchable: false }
-            ],*/
+            ],
             language: {
                 "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
             }, 
@@ -92,11 +92,11 @@
     });
 
     /*Supplier delete*/
-/*    function deleteModel(e, id) {
+    function deleteModel(e, id) {
         e.preventDefault();
         swal({
-          title: "Eliminar usuario",
-          text: "¿Seguro que deseas eliminar este usuario?",
+          title: "Eliminar alerta",
+          text: "¿Seguro que deseas eliminar esta alerta?",
           type: "warning",
           showCancelButton: true,
           confirmButtonClass: "btn-danger",
@@ -112,13 +112,13 @@
     function deleteRequest(id) {
         let token = $('meta[name=_token]').attr('content');
         $.ajax({
-            url: '/user/' + id,
+            url: '/alert/' + id,
             method: 'delete',
             headers: {'X-CSRF-TOKEN': token},
             success: function() {
                 document.location.reload();
             }
         });
-    }*/
+    }
 </script>
 @endpush

@@ -19,5 +19,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ColorSettingsTableSeeder::class);
         $this->call(SyncConnectionsTableSeeder::class);
         $this->call(DocumentsSuppliesTableSeeder::class);
+        $this->call(SuppliesSetsStatusTableSeeder::class);
     }
 }

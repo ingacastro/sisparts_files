@@ -43,10 +43,17 @@ Route::group(['middleware' => ['role:Administrador']], function(){
 	Route::get('user/get-list', 'UserController@getList');
 	Route::resource('user', 'UserController');
 
+	//Configuration
+	Route::get('configuration', function(){
+		return view('configuration.index');
+	})->name('configuration.index');
+
 	//ColorSettings
 	Route::get('color-settings/edit', 'ColorSettingController@edit')->name('settings.edit');
 	Route::post('color-settings', 'ColorSettingController@store')->name('settings.store');
 
+	//Alerts
+	Route::resource('alert', 'AlertController');
 	//Messages
 	Route::get('message/get-list', 'MessageController@getList');
 	Route::resource('message', 'MessageController');

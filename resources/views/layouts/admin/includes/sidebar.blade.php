@@ -59,8 +59,8 @@
                 <span class="selected"></span>
             </a>
         </li>
-        <li id="sidebar_color_settings" class="nav-item">
-            <a href="{{ route('settings.edit') }}" class="nav-link nav-toggle">
+        <li id="sidebar_configuration" class="nav-item">
+            <a href="{{ route('configuration.index') }}" class="nav-link nav-toggle">
                 <i class="icon-settings"></i>
                 <span class="title">Configuración</span>
                 <span class="selected"></span>

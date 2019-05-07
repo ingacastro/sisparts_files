@@ -15,12 +15,12 @@
         <i class="fa fa-circle"></i>
     </li>
     <li>
-        <span>Bandeja de entrada</span>
+        <span>Archivo</span>
     </li>
 </ul>
 @endsection
 @section('page-title')
-<h1 class="page-title"> Bandeja de entrada
+<h1 class="page-title"> Archivo
     <small></small>
 </h1>
 {{-- @include('layouts.admin.includes.error_messages') --}}
@@ -78,7 +78,6 @@
                             <th>Folio</th>
                             <th>Asignado</th>
                             @if($logged_user_role == 'Administrador')<th>Cliente</th>@endif
-                            <th>Edad</th>
                             <th>Estatus</th>
                             <th>Acciones</th>
                         </tr>
@@ -132,13 +131,13 @@
 <script src="/js/inbox/index.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function(){
-    $('#sidebar_inbox').addClass('active');
+    $('#sidebar_archive').addClass('active');
 
     $('#inbox_table').DataTable({
         serverSide: true,
-        ajax: {
+        ajax: { 
             url: '/inbox/get-list',
-            data: {'route': 'inbox'}
+            data: {'route': 'archive'}
         },
         bSort: true,
         destroy: true,
@@ -148,7 +147,6 @@ $(document).ready(function(){
             { data: "number", name: "number" },
             { data: "buyer", name: "buyer" },
             @if($logged_user_role == 'Administrador'){ data: "customer", name: "customer" },@endif
-            { data: "semaphore", name: "semaphore" },
             { data: "status", name: "status" },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }
         ],
@@ -172,7 +170,7 @@ $('#filters_form').submit(function(e){
         ajax: {
             url: '/inbox/get-list',
             data: {'sync_connection': sync_connection, 'status': status, 
-            'dealer_ship': dealer_ship, 'route': 'inbox'}
+            'dealer_ship': dealer_ship, 'route': 'archive'}
         },
         bSort: true,
         columns: [
@@ -181,7 +179,6 @@ $('#filters_form').submit(function(e){
             { data: "number", name: "number" },
             { data: "buyer", name: "buyer" },
             @if($logged_user_role == 'Administrador'){ data: "customer", name: "customer" },@endif
-            { data: "semaphore", name: "semaphore" },
             { data: "status", name: "status" },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }
         ],

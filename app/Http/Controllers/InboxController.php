@@ -44,6 +44,7 @@ class InboxController extends Controller
     {
         if($request->ajax()) {
 
+            $route = $request->route;
             $sync_connection = $request->get('sync_connection') ?? 0;
             $status = $request->get('status') ?? 0;
             $dealer_ship = $request->get('dealer_ship') ?? 0;
@@ -83,12 +84,12 @@ class InboxController extends Controller
                 $query->where('documents.employees_users_id', $dealer_ship);
 
              $documents = $query->get($fields);
-             return $this->buildInboxDataTable($documents);
+             return $this->buildInboxDataTable($documents, $route);
         }
         abort(403, 'Unauthorized action');
     }
 
-    private function buildInboxDataTable($documents)
+    private function buildInboxDataTable($documents, $route)
     {
         return Datatables::of($documents)
               ->editColumn('semaphore', function($document) {
@@ -99,8 +100,11 @@ class InboxController extends Controller
               ->editColumn('created_at', function($document) {
                 return date_format(new \DateTime($document->created_at), 'd/m/Y');
               })
-              ->addColumn('actions', function($document) {
-                return '<a href="/inbox/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a><a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '"><i class="fa fa-user"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="archiveDocument(event, ' . $document->id . ')"><i class="fa fa-archive"></i></a>';
+              ->addColumn('actions', function($document) use ($route) {
+                $actions = ($route == 'inbox') 
+                ? '<a href="/inbox/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a><a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '"><i class="fa fa-user"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="archiveDocument(event, ' . $document->id . ')"><i class="fa fa-archive"></i></a>'
+                : '<a href="/archive/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';
+                return $actions;
               })
               ->rawColumns(['semaphore' => 'semaphore', 'actions' => 'actions'])
               ->make(true);
@@ -382,14 +386,15 @@ class InboxController extends Controller
             $supplies_sets = $query->get();
 
             return Datatables::of($supplies_sets)
-                  ->addColumn('actions', function($supplies_set) {
+                  ->addColumn('actions', function($supplies_set) use ($request) {
 
                     $total_price = $this->calculateTotalPrice($supplies_set->total_cost, $supplies_set->utility_percentage);
                     $unit_price = $total_price / $supplies_set->products_amount;
                     $total_profit = $total_price - $supplies_set->total_cost;
                     $currency = ' ' . $supplies_set->currency;
 
-                    return '<a data-target="#edit_set_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default edit-set" 
+                    return ($request->route == 'inbox') 
+                    ? '<a data-target="#edit_set_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default edit-set" 
                     data-id="' . $supplies_set->documents_id . '_' . $supplies_set->supplies_id . '"
                     data-total_cost="' . '$ ' . number_format($supplies_set->total_cost, 2, '.', ',') . $currency . '" 
                     data-total_price="' . '$ ' . number_format($total_price, 2, '.', ',') . $currency . '"
@@ -397,7 +402,8 @@ class InboxController extends Controller
                     data-total_profit="' . '$ ' . number_format($total_profit, 2, '.', ',') . $currency . '"><i class="fa fa-edit"></i></a>
                     <a data-target="#quotation_request_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default quotation-request"
                     data-number="' . $supplies_set->number .'"
-                    data-manufacturer_id="' . $supplies_set->manufacturers_id . '"><i class="fa fa-envelope"></i></a>';
+                    data-manufacturer_id="' . $supplies_set->manufacturers_id . '"><i class="fa fa-envelope"></i></a>'
+                    : null;
                   })
                   ->addColumn('checkbox', function($supplies_set){
                     return '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input type="checkbox" class="checkboxes" value="' . $supplies_set->id . '"><span></span></label>';

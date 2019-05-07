@@ -80,3 +80,5 @@ Route::post('inbox/change-set-status', 'InboxController@changeSetStatus');
 Route::post('inbox/sets-turn-ctz', 'InboxController@setsTurnCTZ')->name('inbox.sets-turn-ctz');
 Route::resource('inbox', 'InboxController');
 
+//Archive
+Route::resource('archive', 'ArchiveController');

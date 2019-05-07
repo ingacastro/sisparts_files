@@ -43,6 +43,13 @@
                 <span class="selected"></span>
             </a>
         </li>
+        <li id="sidebar_archive" class="nav-item ">
+            <a href="{{ route('archive.index') }}" class="nav-link nav-toggle">
+                <i class="fa fa-archive"></i>
+                <span class="title">Archivo</span>
+                <span class="selected"></span>
+            </a>
+        </li>
         @endif
         @role('Administrador')
         <li id="sidebar_user" class="nav-item">

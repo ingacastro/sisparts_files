@@ -96,21 +96,7 @@
                                 <th width="45%"></th>
                                 <th width="45%"></th>
                                 <th width="10%">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    <a style="text-decoration: none; font-weight: bold; font-size: 20px;" data-target="#sets_turn_ctz_modal" data-toggle="modal" id="sets_turn_ctz">CTZ</a>
-                                                </th>
-                                                <th>
-                                                    <a style="text-decoration: none;" href="#file_attachment_modal" data-target="#file_attachment_modal" data-toggle="modal" id="file_attachment">
-                                                        <span aria-hidden="true" style="font-size: 18px; margin-left: 20px" class="icon-paper-clip">
-                                                        </span>
-                                                    </a>
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                    </table>
+                                    <table><thead></thead></table>
                                 </th>
                             </tr>
                         </thead>
@@ -174,7 +160,6 @@
                             <th>Costo total</th>
                             <th>Precio total</th>
                             <th>Estatus</th>
-                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -231,7 +216,7 @@ $(document).ready(function(){
             url: '/inbox/document-supplies',
             data: {
                 'document_id': '{{ $document->id }}',
-                'route': 'inbox'
+                'route': 'archive'
             }
         },
         bSort: true,
@@ -243,8 +228,7 @@ $(document).ready(function(){
             { data: "measurement_unit_code", name: "measurement_unit_code" },
             { data: "total_cost", name: "total_cost" },
             { data: "total_price", name: "total_price" },
-            { data: "status", name: "status" },
-            { data: 'actions', name: 'actions', orderable: false, searchable: false }
+            { data: "status", name: "status" }
         ],
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"

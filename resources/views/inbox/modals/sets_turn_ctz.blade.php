@@ -9,6 +9,7 @@
             <div class="modal-body">
                 {!! Form::open(['route' => 'inbox.sets-turn-ctz', 'method' => 'post', 'class' => 'horizontal-form',
                 'id' => 'sets_turn_ctz_form']) !!}
+                <input type="hidden" name="document_id" value="{{ $document->id }}">
                 <div id="sets_turn_ctz_error_messages"></div>
                 <div id="sets_turn_ctz_success_message"></div>
                 <div class="row" style="padding: 0 10px 0 10px">

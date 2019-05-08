@@ -202,7 +202,8 @@ class InboxController extends Controller
         if($request->ajax()) {
 
             $set_pri_key = explode('_', $set_id);
-            $set = DB::table('documents_supplies')->where('documents_id', $set_pri_key[0])
+            $doc_id = $set_pri_key[0];
+            $set = DB::table('documents_supplies')->where('documents_id', $doc_id)
             ->where('supplies_id', $set_pri_key[1])->first();
             
             $suppliers = Supplier::pluck('trade_name', 'id');
@@ -218,12 +219,12 @@ class InboxController extends Controller
             return response()->json(
                 ['errors' => false,
                 'budget_tab' => \View::make('inbox.set_edition_modal_tabs.budget', compact('set', 'suppliers', 'currencies', 
-                    'measurement', 'countries', 'utility_percentages', 'checklist'))
+                    'measurement', 'countries', 'utility_percentages', 'checklist', 'doc_id'))
                 ->render(),
                 'conditions_tab' => \View::make('inbox.set_edition_modal_tabs.conditions', compact('set', 'set_conditions', 
-                    'conditions', 'checklist'))
+                    'conditions', 'checklist', 'doc_id'))
                 ->render(),
-                'files_tab' => \View::make('inbox.set_edition_modal_tabs.files', compact('set', 'checklist'))
+                'files_tab' => \View::make('inbox.set_edition_modal_tabs.files', compact('set', 'checklist', 'doc_id'))
                 ->render()]);
         }
         
@@ -441,6 +442,9 @@ class InboxController extends Controller
                 ->where('binnacles.documents_id', $documents_id)->get();
                 Log::notice($binnacles);
             return Datatables::of($binnacles)
+                  ->editColumn('created_at', function($binnacle){
+                    return date('d/m/Y h:i', strtotime($binnacle->created_at));
+                  })
                   ->make(true);
 
         endif;
@@ -542,7 +546,8 @@ class InboxController extends Controller
                 ->withErrors('Acción no autorizada.')->render()]);
 
         try {
-            $obj = DB::table('checklist')->where('id', $request->checklist_id)->update(['material_specifications' => 'checked']);
+            $obj = DB::table('checklist')->where('id', $request->checklist_id)
+            ->update([$request->field => 'checked']);
         } catch(\Exception $e) {
             return response()->json(
                 ['errors' => true,
@@ -583,7 +588,6 @@ class InboxController extends Controller
 
     public function sendSuppliersQuotation(Request $request)
     {
-        Log::notice($request);
         foreach($request->suppliers_ids as $supplier_id) {
             $supplier = Supplier::find($supplier_id);
             $message = DB::table('messages_languages')->where('messages_id', $request->message_id)
@@ -599,16 +603,22 @@ class InboxController extends Controller
             }
         }
 
+        $doc = Document::find($request->documents_id);
+        $doc->fill(['status' => 2])->update();
+        $doc_supply_id = $request->documents_supplies_id;
+
         $binnacle_data = [
             'entity' => 2,
+            'pct_status' => $doc->status, //In progress
             'comments' => 'Solicitud de cotización enviada',
             'employees_users_id' => Auth::user()->id,
             'type' => 2, //Just a silly number tha means nothing
-            'documents_id' => $request->documents_id,
-            'documents_supplies_id' => $request->documents_supplies_id
+            'documents_id' => $doc->id,
+            'documents_supplies_id' => $doc_supply_id
         ];
 
         try {
+            DB::table('documents_supplies')->where('id', $doc_supply_id)->update(['status' => 2]);
             Binnacle::create($binnacle_data);
         }catch(\Exception $e) {
             Log::notice($e);
@@ -646,6 +656,25 @@ class InboxController extends Controller
         if($status == 8)
             $message = 'Partida autorizada correctamente.';
 
+        $document_id = $request->document_id;
+        $set_binnacle_data = [
+            'entity' => 2,
+            'comments' => $message,
+            'pct_status' => 2,
+            'employees_users_id' => Auth::user()->id,
+            'type' => 2, //Just a silly number tha means nothing
+            'documents_id' => $document_id,
+            'documents_supplies_id' => $request->set_id
+        ];
+
+        try {
+            Binnacle::create($set_binnacle_data);
+        }catch(\Exception $e) {
+            Log::notice($e);
+            return redirect()->back()->withErrors($e->getMessage());
+        }
+
+
         return response()->json([
             'errors' => false,
             'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
@@ -661,9 +690,40 @@ class InboxController extends Controller
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
                 ->withErrors('Acción no autorizada.')->render()]);
 
+        $document_id = $request->document_id;
+
         try {
-            DB::table('documents_supplies')->whereIn('id', $request->sets)->update(['status' => 9]);            
+            DB::table('documents_supplies')->whereIn('id', $request->sets)->update(['status' => 9]);
+            foreach($request->sets as $set_id) {
+                $set_binnacle_data = [
+                    'entity' => 2,
+                    'comments' => 'Partida convertida a CTZ',
+                    'pct_status' => 2,
+                    'employees_users_id' => Auth::user()->id,
+                    'type' => 2, //Just a silly number tha means nothing
+                    'documents_id' => $document_id,
+                ];
+                Binnacle::create($set_binnacle_data);
+            }
+           //PCT Binnacle 
+            $pct = Document::find($document_id);
+
+            $pct_supplies_count = $pct->supplies->count();
+            $pct_ctz_supplies_count = $pct->supplies()->wherePivot('status', '=', 9)->count();
+
+            if($pct_supplies_count == $pct_ctz_supplies_count) {
+                $pct_binnacle_data = [
+                    'entity' => 1,
+                    'comments' => 'PCT convertida a CTZ',
+                    'pct_status' => 3,
+                    'employees_users_id' => Auth::user()->id,
+                    'type' => 2, //Just a silly number tha means nothing
+                    'documents_id' => $document_id,
+                ];
+                Binnacle::create($pct_binnacle_data);
+            }
         } catch(\Exception $e) {
+            Log::notice($e);
             return response()->json(
                 ['errors' => true,
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')

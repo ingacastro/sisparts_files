@@ -60,14 +60,14 @@
         <div class="checklist-buttons-container">
 
             <button type="submit" class="btn btn-circle btn-sm green-meadow set-status-change"
-            data-set_id="{{$set->id}}" data-status="6" id="in_authorization_btn"
+            data-set_id="{{$set->id}}" data-document_id="{{ $doc_id }}" data-status="6" id="in_authorization_btn"
             style="display: {{ $set->status == 5 ? 'inline-block' : 'none' }}">En autorización</button>
             
             <div id="authorization_btns_container" style="display: {{ $set->status == 6 ? 'block' : 'none' }}">
                 <button type="submit" class="btn btn-circle btn-sm green-meadow set-status-change" data-set_id="{{$set->id}}" 
-                    data-status="8">Autorizar</button>
+                    data-status="8" data-document_id="{{ $doc_id }}">Autorizar</button>
                 <button type="button" class="btn btn-circle btn-sm yellow set-status-change" data-set_id="{{$set->id}}" 
-                    data-status="7">Rechazar</button>
+                    data-status="7" data-document_id="{{ $doc_id }}">Rechazar</button>
             </div>
             
         </div>

@@ -106,6 +106,7 @@ function checkChecklistItem(checklist_id, field)
     }); 
 }
 $(document).on('click', '.set-status-change', function() {
+    let doc_id = $(this).attr('data-document_id');
     let set_id = $(this).attr('data-set_id');
     let status = $(this).attr('data-status');
 
@@ -114,7 +115,7 @@ $(document).on('click', '.set-status-change', function() {
         url: '/inbox/change-set-status',
         method: 'post',
         dataType: 'json',
-        data: {'set_id': set_id, 'status': status},
+        data: {'document_id': doc_id, 'set_id': set_id, 'status': status},
         headers: {'X-CSRF-TOKEN': token},
         success: function(response) {
             $('#error_messages').empty();

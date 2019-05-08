@@ -12,6 +12,7 @@ use IParts\Supplier;
 use IParts\Currency;
 use IParts\File;
 use IParts\Message;
+use IParts\Binnacle;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Validator;
@@ -354,7 +355,7 @@ class InboxController extends Controller
     /*Document supplies sets and only authorized sets*/
     public function getDocumentSupplySets(Request $request)
     {
-        if($request->ajax()) {          
+        if($request->ajax()):          
 
             $query = Document::select('documents_supplies.id', 'supplies.manufacturers_id', 'supplies.number', 'suppliers.trade_name as supplier', 
             DB::raw('CAST(documents_supplies.products_amount as UNSIGNED) as products_amount'),
@@ -404,7 +405,8 @@ class InboxController extends Controller
                     data-total_profit="' . '$ ' . number_format($total_profit, 2, '.', ',') . $currency . '"><i class="fa fa-edit"></i></a>
                     <a data-target="#quotation_request_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default quotation-request"
                     data-number="' . $supplies_set->number .'"
-                    data-manufacturer_id="' . $supplies_set->manufacturers_id . '"><i class="fa fa-envelope"></i></a>'
+                    data-manufacturer_id="' . $supplies_set->manufacturers_id . '"
+                    data-id="' . $supplies_set->id . '"><i class="fa fa-envelope"></i></a>'
                     : null;
                   })
                   ->addColumn('checkbox', function($supplies_set){
@@ -424,7 +426,24 @@ class InboxController extends Controller
                   ->rawColumns(['actions' => 'actions', 'total_cost' => 'total_cost', 
                     'total_price' => 'total_price', 'checkbox' => 'checkbox'])
                   ->make(true);
-        }
+        endif;
+        abort(403, 'Unauthorized action');
+    }
+
+    public function getDocumentBinnacle(Request $request, $documents_id)
+    {
+        if($request->ajax()):
+
+            $binnacles = Binnacle::select('binnacles.created_at', 
+                DB::raw('CASE WHEN binnacles.entity = 1 THEN "PCT" ELSE "ITEM" END as entity'),
+                'binnacles.type', 'users.name as user', 'binnacles.comments')
+                ->join('users', 'binnacles.employees_users_id', 'users.id')
+                ->where('binnacles.documents_id', $documents_id)->get();
+                Log::notice($binnacles);
+            return Datatables::of($binnacles)
+                  ->make(true);
+
+        endif;
         abort(403, 'Unauthorized action');
     }
 
@@ -564,6 +583,7 @@ class InboxController extends Controller
 
     public function sendSuppliersQuotation(Request $request)
     {
+        Log::notice($request);
         foreach($request->suppliers_ids as $supplier_id) {
             $supplier = Supplier::find($supplier_id);
             $message = DB::table('messages_languages')->where('messages_id', $request->message_id)
@@ -578,6 +598,23 @@ class InboxController extends Controller
                 return redirect()->back()->withErrors($e->getMessage());
             }
         }
+
+        $binnacle_data = [
+            'entity' => 2,
+            'comments' => 'Solicitud de cotización enviada',
+            'employees_users_id' => Auth::user()->id,
+            'type' => 2, //Just a silly number tha means nothing
+            'documents_id' => $request->documents_id,
+            'documents_supplies_id' => $request->documents_supplies_id
+        ];
+
+        try {
+            Binnacle::create($binnacle_data);
+        }catch(\Exception $e) {
+            Log::notice($e);
+            return redirect()->back()->withErrors($e->getMessage());
+        }
+
         $request->session()->flash('message', 'Cotización enviada correctamente.');
         return redirect()->back();
     }

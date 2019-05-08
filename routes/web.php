@@ -70,6 +70,7 @@ Route::get('inbox/get-list', 'InboxController@getList')->name('inbox.get-list');
 Route::post('inbox/change-dealership', 'InboxController@changeDealerShip')->name('inbox.change-dealership');
 Route::post('inbox/{document}/archive', 'InboxController@archive');
 Route::get('inbox/document-supplies', 'InboxController@getDocumentSupplySets');
+Route::get('inbox/document-binnacle/{documents_id}', 'InboxController@getDocumentBinnacle');
 Route::get('inbox/get-set-tabs/{set_id}', 'InboxController@getSetTabs');
 Route::post('inbox/update-set-budget/{set_id}', 'InboxController@updateBudget')->name('inbox.update-set-budget');
 Route::post('inbox/check-checklist-item', 'InboxController@checkChecklistItem');

@@ -1,6 +1,8 @@
 $(document).on('click', '.quotation-request', function(){
 	let item = $(this);
+	
 	$('#supply_number').html('Número de parte: <strong>' + item.attr('data-number') + '</strong>');
+	$('#documents_supplies_id').val(item.attr('data-id'));
 
 	$.get('/inbox/get-manufacturer-suppliers/' + item.attr('data-manufacturer_id'), function(suppliers){
 		$('#left_suppliers').html('');

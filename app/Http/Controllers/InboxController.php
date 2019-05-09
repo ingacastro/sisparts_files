@@ -436,11 +436,14 @@ class InboxController extends Controller
         if($request->ajax()):
 
             $binnacles = Binnacle::select('binnacles.created_at', 
-                DB::raw('CASE WHEN binnacles.entity = 1 THEN "PCT" ELSE "ITEM" END as entity'),
-                'binnacles.type', 'users.name as user', 'binnacles.comments')
+                DB::raw('CASE WHEN binnacles.entity = 1 THEN "PCT" ELSE supplies.number END as entity'),
+                DB::raw('CASE 
+                    WHEN binnacles.type = 1 THEN "Llamada" ELSE "" END as type'), 
+                'users.name as user', 'binnacles.comments')
                 ->join('users', 'binnacles.employees_users_id', 'users.id')
+                ->leftJoin('supplies', 'binnacles.documents_supplies_id', 'supplies.id')
                 ->where('binnacles.documents_id', $documents_id)->get();
-                Log::notice($binnacles);
+               
             return Datatables::of($binnacles)
                   ->editColumn('created_at', function($binnacle){
                     return date('d/m/Y h:i', strtotime($binnacle->created_at));
@@ -697,6 +700,7 @@ class InboxController extends Controller
             foreach($request->sets as $set_id) {
                 $set_binnacle_data = [
                     'entity' => 2,
+                    'documents_supplies_id' => $set_id,
                     'comments' => 'Partida convertida a CTZ',
                     'pct_status' => 2,
                     'employees_users_id' => Auth::user()->id,
@@ -707,7 +711,7 @@ class InboxController extends Controller
             }
            //PCT Binnacle 
             $pct = Document::find($document_id);
-
+            $pct->fill(['status' => 3])->update();
             $pct_supplies_count = $pct->supplies->count();
             $pct_ctz_supplies_count = $pct->supplies()->wherePivot('status', '=', 9)->count();
 
@@ -723,7 +727,6 @@ class InboxController extends Controller
                 Binnacle::create($pct_binnacle_data);
             }
         } catch(\Exception $e) {
-            Log::notice($e);
             return response()->json(
                 ['errors' => true,
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
@@ -735,6 +738,76 @@ class InboxController extends Controller
             'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
             ->with('success_message', 'Partidas convertidas a CTZ correctamente.')->render()
         ]); 
+    }
+
+    public function binnacleEntry(Request $request)
+    {
+        if(!$request->ajax())
+            return response()->json([
+                'errors' => true, 
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('Acción no autorizada.')->render()]);
+
+        $data = $request->all();
+        $validator = $this->binnacleEntryValidations($data);
+
+        if($validator->fails())
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($validator)->render()]);
+
+        $entity = $request->entity;
+        $data['employees_users_id'] = Auth::user()->id;
+        $document = Document::find($request->documents_id);
+        $data['pct_status'] = $document->status;
+        try {
+            if($entity == 1)
+                Binnacle::create($data);
+            else {
+                $supplies = $data['supplies'];
+                unset($data['supplies']);
+                foreach($supplies as $supply_id) {
+                    $data['documents_supplies_id'] = $supply_id;
+                    Binnacle::create($data);
+                }
+            }
+
+        }catch(\Exception $e) {
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($e->getMessage())->render()]);
+        }
+
+        return response()->json([
+            'errors' => false,
+            'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
+            ->with('success_message', 'Entrada agregada correctamente.')->render()
+        ]); 
+
+    }
+
+    private function binnacleEntryValidations($data)
+    {
+        $messages = [
+            'entity.required' => 'El campo Item o PCT es requerido.',
+            'type.required' => 'El campo tipo es requerido.',
+            'comments.required' => 'El campo comentarios es requerido.',
+            'supplies.required' => 'Se debe especificar al menos un número de parte.'
+        ];
+        
+        $validator = Validator::make($data, [
+            'entity' => 'required',
+            'type' => 'required',
+            'comments' => 'required'
+        ], $messages);
+
+        $validator->sometimes('supplies', 'required', function($data){
+            return $data['entity'] == 2;
+        });
+
+        return $validator;
     }
 
     /**

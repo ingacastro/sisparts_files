@@ -182,8 +182,17 @@
                 <h3 class="form-section">Bitácora</h3>
                 <div class="table-toolbar">
                     <div class="row">
-                        <div class="col-md-6"></div>
-                        <div class="col-md-6"></div>
+                        <div class="col-md-6">
+                            <div class="btn-group">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="btn-group pull-right">
+                                <a data-target="#custom_binnacle_entry_modal" data-toggle="modal" id="custom_binnacle_entry" class="btn btn-circle green"> Nueva entrada
+                                    <i class="fa fa-plus"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <table class="table table-striped table-hover table-bordered" id="binnacle_table">
@@ -206,6 +215,7 @@
 @include('inbox.modals.file_attachment')
 @include('inbox.modals.quotation_request')
 @include('inbox.modals.sets_turn_ctz')
+@include('inbox.modals.custom_binnacle_entry')
 @endsection
 @endsection
 @push('scripts')
@@ -221,6 +231,7 @@
 <script src="/js/inbox/file_attachment.js" type="text/javascript"></script>
 <script src="/js/inbox/quotation_request.js" type="text/javascript"></script>
 <script src="/js/inbox/sets_turn_ctz.js" type="text/javascript"></script>
+<script src="/js/inbox/binnacle_entry.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function(){
     $('#sidebar_inbox').addClass('active');

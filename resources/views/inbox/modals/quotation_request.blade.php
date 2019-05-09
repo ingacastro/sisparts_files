@@ -8,7 +8,6 @@
             <div class="modal-body">
                 {!! Form::open(['route' => 'inbox.send-suppliers-quotation', 'method' => 'post', 'class' => 'horizontal-form',
                 'id' => 'file_attachment_form']) !!}
-                <input type="hidden" name="documents_id" value="{{ $document->id }}">
                 <input type="hidden" name="documents_supplies_id" id="documents_supplies_id">
                 <div id="file_attachment_error_messages"></div>
                 <div id="file_attachment_success_message"></div>

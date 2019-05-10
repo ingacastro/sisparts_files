@@ -697,7 +697,7 @@ class InboxController extends Controller
         $document_id = $request->document_id;
 
         try {
-            DB::table('documents_supplies')->whereIn('id', $request->sets)->update(['status' => 9]);
+            DB::table('documents_supplies')->whereIn('id', $request->sets)->update(['status' => 9, 'completed_date' => Carbon::now()->toDateTimeString()]);
             foreach($request->sets as $set_id) {
                 $set_binnacle_data = [
                     'entity' => 2,

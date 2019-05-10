@@ -3,9 +3,14 @@
 namespace IParts\Http\Controllers;
 
 use Illuminate\Http\Request;
+use IParts\Document;
+use IParts\SupplySet;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
+
     /**
      * Create a new controller instance.
      *
@@ -14,6 +19,10 @@ class DashboardController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->daily_pcts = 5;
+        $this->daily_items = 20;
+        $this->monthly_pcts = 15;
+        $this->monthly_items  = 65;
     }
 
     /**
@@ -23,26 +32,42 @@ class DashboardController extends Controller
      */
     public function index()
     {
+        $now = Carbon::now();
+
+        $daily_ctz_pcts = Document::where('status', 3)
+        ->whereDate('completed_date', '=', $now->toDateString())->count();
+
+        $daily_ctz_items = SupplySet::where('status', 9)
+        ->whereDate('completed_date', '=', $now->toDateString())->count();
+
+        $monthly_ctz_pcts = Document::where('status', 3)
+        ->whereMonth('completed_date', '=', $now->month)->count();
+
+        $monthly_ctz_items = SupplySet::where('status', 9)
+        ->whereMonth('completed_date', '=', $now->month)->count();
+        
+        Log::notice($now->month);
+
     	$dashboard_stats = [
     		'daily_pcts' => [
-    			'amount' => 4,
-    			'expected' => 5,
-    			'percentage' => 83,
+    			'amount' => $daily_ctz_pcts,
+    			'expected' => $this->daily_pcts,
+    			'percentage' => number_format(($daily_ctz_pcts / 5) * 100, 2),
     		],
     		'daily_items' => [
-    			'amount' => 12,
-    			'expected' => 20,
-    			'percentage' => 54,
+    			'amount' => $daily_ctz_items,
+    			'expected' => $this->daily_items,
+    			'percentage' => number_format(($daily_ctz_items / 20) * 100, 2),
     		],
     		'monthly_pcts' => [
-    			'amount' => 10,
-    			'expected' => 15,
-    			'percentage' => 83,
+    			'amount' => $monthly_ctz_pcts,
+    			'expected' => $this->monthly_pcts,
+    			'percentage' => number_format(($monthly_ctz_pcts / 15) * 100, 2),
     		],
     		'monthly_items' => [
-    			'amount' => 38,
-    			'expected' => 65,
-    			'percentage' => 54,
+    			'amount' => $monthly_ctz_items,
+    			'expected' => $this->monthly_items,
+    			'percentage' => number_format(($monthly_ctz_items / 65) * 100, 2),
     		],
     		'pending_ppas' => 8,
     		'rejected_ppas' => 4,

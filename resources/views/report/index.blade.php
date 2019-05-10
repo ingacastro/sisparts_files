@@ -5,6 +5,11 @@
 <link href="/metronic-assets/global/css/plugins.min.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" rel="stylesheet" type="text/css" />
+<style>
+    .icon-buttons {
+        font-size: 20px;
+    }
+</style>
 @endsection
 @section('content')
 @section('breadcumb')
@@ -71,7 +76,7 @@
                             </div>
                         </div>
                         <div class="col-md-1">
-                            <div class="form-group">
+                            <div class="pull-right">
                                 <button type="submit" class="btn btn-circle blue">Generar</button>
                             </div>
                         </div>
@@ -80,10 +85,22 @@
                 <div class="table-toolbar">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="btn-group">
+                            <div class="btn-group"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="pull-right" id="print_buttons" style="display: none">
+                                {!!Form::open(['route'=>'report.download-pcts-pdf', 'style' => 'display: inline' ])!!}
+                                    <input type="hidden" id="pdf_data" name="data">
+                                    <button type="submit" class="btn btn-circle red-mint" id="download_pdf" style="margin-right: 10px">
+                                    <i class="fa fa-file-pdf-o icon-buttons"></i></button>
+                                {!! Form::close() !!}
+                                {!!Form::open(['route'=>'report.download-pcts-excel', 'style' => 'display: inline' ])!!}
+                                    <input type="hidden" id="excel_data" name="data">
+                                    <button type="submit" class="btn btn-circle green-meadow" id="download_excel">
+                                    <i class="fa fa-file-excel-o icon-buttons"></i></button>
+                                {!! Form::close() !!}
                             </div>
                         </div>
-                        <div class="col-md-6"></div>
                     </div>
                 </div>
                 <table class="table table-striped table-hover table-bordered" id="report_table" style="display: none">
@@ -115,6 +132,8 @@
 <script src="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.min.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
+<script src="https://cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js" type="text/javascript"></script>
+<script src="https://cdn.datatables.net/buttons/1.2.4/js/buttons.html5.min.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(document).ready(function(){
         $('#sidebar_report').addClass('active');
@@ -122,30 +141,44 @@
         $('.input-daterange').datepicker();
     });
 
-$('#filters_form').submit(function(e){
-    e.preventDefault();
-    $('#report_table').show();
-    $('#report_table').DataTable({
-        searching: false,
-/*        serverSide: true,
-        ajax: '/report/get-list',
-        bSort: true,
-        columns: [
-            { data: "sync_date", name: "sync_date" },
-            { data: "send_date", name: "send_date" },
-            { data: "elapsed_days", name: "elapsed_days" }, //Till quotation was turned into ctz
-            { data: "company", name: "company" },
-            { data: "folio", name: "folio" },
-            { data: "reference", name: "reference" },
-            { data: 'dealership', name: 'dealership' },
-            { data: 'customer', name: 'customer' },
-            { data: 'supplies', name: 'supplies' },
-            { data: 'status', name: 'status' },
-        ],*/
-        language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
-        }, 
+    $('#filters_form').submit(function(e){
+        e.preventDefault();
+
+        $('#report_table').show();
+
+        let report_table = $('#report_table').DataTable({
+            searching: false,
+            destroy: true,
+            //serverSide: true,
+            ajax: '/report/get-list',
+            bSort: true,
+            columns: [
+                { data: "sync_date", name: "sync_date" },
+                { data: "send_date", name: "send_date" },
+                { data: "elapsed_days", name: "elapsed_days" }, //Till quotation was turned into ctz
+                { data: "company", name: "company" },
+                { data: "number", name: "number" },
+                { data: "reference", name: "reference" },
+                { data: 'dealership', name: 'dealership' },
+                { data: 'customer', name: 'customer' },
+                { data: 'ctz_supplies', name: 'ctz_supplies' },
+                { data: 'status', name: 'status' },
+            ],
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+            }, 
+        });
+        $('#print_buttons').show();
     });
-});
+
+    $('#download_pdf').click(function(){
+        var rows = JSON.stringify($('#report_table').DataTable().rows().data().toArray());
+        $('#pdf_data').val(rows);
+    });
+    $('#download_excel').click(function(){
+        var rows = JSON.stringify($('#report_table').DataTable().rows().data().toArray());
+        $('#excel_data').val(rows);
+    });
+
 </script>
 @endpush

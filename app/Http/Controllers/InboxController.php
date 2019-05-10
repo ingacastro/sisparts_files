@@ -20,6 +20,7 @@ use DB;
 use Auth;
 use Storage;
 use Mail;
+use Carbon\Carbon;
 
 class InboxController extends Controller
 {
@@ -711,7 +712,7 @@ class InboxController extends Controller
             }
            //PCT Binnacle 
             $pct = Document::find($document_id);
-            $pct->fill(['status' => 3])->update();
+            $pct->fill(['status' => 3, 'completed_date' => Carbon::now()->toDateTimeString()])->update();
             $pct_supplies_count = $pct->supplies->count();
             $pct_ctz_supplies_count = $pct->supplies()->wherePivot('status', '=', 9)->count();
 
@@ -722,7 +723,7 @@ class InboxController extends Controller
                     'pct_status' => 3,
                     'employees_users_id' => Auth::user()->id,
                     'type' => 2, //Just a silly number tha means nothing
-                    'documents_id' => $document_id,
+                    'documents_id' => $document_id
                 ];
                 Binnacle::create($pct_binnacle_data);
             }

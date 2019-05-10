@@ -61,6 +61,8 @@ Route::group(['middleware' => ['role:Administrador']], function(){
 	Route::resource('message', 'MessageController');
 
 	//Report
+	Route::post('report/download-pcts-pdf', 'ReportController@downloadPCTSPDF')->name('report.download-pcts-pdf');
+	Route::post('report/download-pcts-excel', 'ReportController@downloadPCTSExcel')->name('report.download-pcts-excel');
 	Route::get('report/get-list', 'ReportController@getList')->name('report.get-list');
 	Route::get('report', 'ReportController@index')->name('report.index');
 });

@@ -656,7 +656,7 @@ class InboxController extends Controller
         if($status == 6)
             $message = 'Partida cambiada a en autorización correctamente.';
         if($status == 7) {
-            DB::table('documents_supplies')->where('id', $request->set_id)->update(['rejected_date' => date('Y-m-d h:i:s')]);
+            DB::table('documents_supplies')->where('id', $request->set_id)->update(['rejected_date' => date('Y-m-d H:i:s')]);
             $message = 'Partida rechazada correctamente.';
         }
         if($status == 8)

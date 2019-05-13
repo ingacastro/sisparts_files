@@ -44,10 +44,10 @@
                     <div class="row">
                         <div class="col-md-3">
                           <div class="form-group">
-                                <div class="input-group input-large date-picker input-daterange" data-date="10/11/2012" data-date-format="mm/dd/yyyy">
-                                    <input type="text" class="form-control" name="from">
+                                <div class="input-group input-large date-picker input-daterange" id="report_date_ranges" data-date="" data-date-format="mm/dd/yyyy">
+                                    <input type="text" class="form-control" name="from" id="start_date" autocomplete="off">
                                     <span class="input-group-addon"> Fechas </span>
-                                    <input type="text" class="form-control" name="to"> 
+                                    <input type="text" class="form-control" name="to" id="end_date" autocomplete="off"> 
                                 </div>
                             </div>
                         </div>
@@ -137,12 +137,18 @@
 <script type="text/javascript">
     $(document).ready(function(){
         $('#sidebar_report').addClass('active');
-
-        $('.input-daterange').datepicker();
+        $('#report_date_ranges').datepicker();
     });
 
     $('#filters_form').submit(function(e){
         e.preventDefault();
+
+        let start_date = $('#start_date').val();
+        let end_date = $('#end_date').val();
+        let sync_connection = $('#filters_sync_connection').val();
+        let status = $('#filters_status').val();
+        let dealer_ship = $('#filters_dealer_ship').val();
+        let customer = $('#filters_customer').val();
 
         $('#report_table').show();
 
@@ -150,7 +156,11 @@
             searching: false,
             destroy: true,
             //serverSide: true,
-            ajax: '/report/get-list',
+            ajax: {
+                url: '/report/get-list',
+                data: {'start_date': start_date, 'end_date': end_date, 'sync_connection': sync_connection, 
+                'status': status, 'dealer_ship': dealer_ship, 'customer': customer}
+            },
             bSort: true,
             columns: [
                 { data: "sync_date", name: "sync_date" },

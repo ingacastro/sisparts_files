@@ -179,7 +179,7 @@
                     <h3 class="font-green-sharp">
                         <span>{{ $dashboard_stats['quotation_average_time'] }} días</span>
                     </h3>
-                    <small>Timpo promedio</small>
+                    <small>Tiempo promedio</small>
                 </div>
                 <div class="icon">
                 </div>

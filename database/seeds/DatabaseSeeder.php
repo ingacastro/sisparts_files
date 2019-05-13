@@ -11,7 +11,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-/*        $this->call(PermissionsTableSeeder::class);
+        $this->call(PermissionsTableSeeder::class);
         $this->call(UsersTableSeeder::class);
         $this->call(CountriesTableSeeder::class);
         $this->call(LanguagesTableSeeder::class);
@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ColorSettingsTableSeeder::class);
         $this->call(SyncConnectionsTableSeeder::class);
         $this->call(DocumentsSuppliesTableSeeder::class);
-        $this->call(SuppliesSetsStatusTableSeeder::class);*/
+        $this->call(SuppliesSetsStatusTableSeeder::class);
         $this->call(BusinessDaysTableSeeder::class);
     }
 }

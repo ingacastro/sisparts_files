@@ -161,7 +161,6 @@ $(document).ready(function(){
 
 $('#filters_form').submit(function(e){
     e.preventDefault();
-    let serialized_form = $(this).serialize();
     let sync_connection = $('#filters_sync_connection').val();
     let status = $('#filters_status').val();
     let dealer_ship = $('#filters_dealer_ship').val();

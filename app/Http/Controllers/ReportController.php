@@ -34,7 +34,9 @@ class ReportController extends Controller
 
     public function getList(Request $request)
     {
-        $documents = Document::select('documents.created_at as sync_date', 'documents.completed_date as send_date', 
+        Log::notice($request);
+
+        $query = Document::select('documents.created_at as sync_date', 'documents.completed_date as send_date', 
             DB::raw('(CASE 
                 WHEN documents.completed_date <> "" THEN DATEDIFF(documents.completed_date, documents.created_at)
                 ELSE null END) as elapsed_days'),
@@ -52,13 +54,22 @@ class ReportController extends Controller
             ->join('users', 'users.id', 'employees.users_id')
             ->join('customers', 'customers.id', 'documents.customers_id')
             ->leftJoin('documents_supplies', 'documents_supplies.documents_id', 'documents.id')
-            ->groupBy('documents.id', 'customers.trade_name')
-            //->where('documents.id', 1008000)
-            ->get();
+            ->groupBy('documents.id', 'customers.trade_name');
+            
+            if(isset($request->start_date))
+                $query->where('documents.created_at', '>=', date('Y-m-d H:i:s', strtotime($request->start_date . ' 00:00:00')));
+            if(isset($request->end_date))
+                $query->where('documents.created_at', '<=', date('Y-m-d H:i:s', strtotime($request->end_date . ' 23:59:59')));
+            if(isset($request->sync_connection))
+                $query->where('documents.sync_connections_id', $request->sync_connection);
+            if(isset($request->status))
+                $query->where('documents.status', $request->status);
+            if(isset($request->dealer_ship))
+                $query->where('documents.employees_users_id', $request->dealer_ship);
+            if(isset($request->customer))
+                $query->where('documents.customers_id', $request->customer);
 
-        Log::notice($documents);
-
-        $datatable = DataTables::of($documents)
+        $datatable = DataTables::of($query->get())
               ->editColumn('sync_date', function($document){
                 return date('d/m/Y', strtotime($document->sync_date));
               })
@@ -83,7 +94,6 @@ class ReportController extends Controller
     }
     public function downloadPCTSPDF(Request $request)
     {
-        //Log::notice($request);
         //return (new InvoicesExport)->download('invoices.pdf', \Maatwebsite\Excel\Excel::TCPDF);
         $pcts = $request->get('data');
         try {

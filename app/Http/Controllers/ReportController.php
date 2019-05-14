@@ -12,6 +12,7 @@ use IParts\Datatables\ReportDataTable;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use IParts\Exports\PCTSExport;
+use PDF;
 
 class ReportController extends Controller
 {
@@ -34,7 +35,7 @@ class ReportController extends Controller
 
     public function getList(Request $request)
     {
-        Log::notice($request);
+        //Log::notice($request);
 
         $query = Document::select('documents.created_at as sync_date', 'documents.completed_date as send_date', 
             DB::raw('(CASE 
@@ -42,8 +43,8 @@ class ReportController extends Controller
                 ELSE null END) as elapsed_days'),
             'sync_connections.name as company', 'documents.number','documents.reference', 
             'users.name as dealership', 'customers.trade_name as customer', 
-            DB::raw('SUM(CASE WHEN documents_supplies.status = 9 THEN 1 ELSE 0 END) as ctz_supplies'),
-            DB::raw('COUNT(documents_supplies.id) as supplies'),
+            DB::raw('CONCAT(SUM(CASE WHEN documents_supplies.status = 9 THEN 1 ELSE 0 END), "/", COUNT(documents_supplies.id)) as ctz_supplies'),
+            //DB::raw('COUNT(documents_supplies.id) as supplies'),
             DB::raw('(CASE WHEN documents.status = 1 THEN "Nueva"
                       WHEN documents.status = 2 THEN "En proceso"
                       WHEN documents.status = 3 THEN "Terminada"
@@ -75,10 +76,10 @@ class ReportController extends Controller
               })
               ->editColumn('send_date', function($document){
                 return isset($document->send_date) ? date('d/m/Y', strtotime($document->send_date)) : null;
-              })
-              ->editColumn('ctz_supplies', function($document){
-                return $document->ctz_supplies . '/' . $document->supplies;
               })->make(true);
+              /*->editColumn('ctz_supplies', function($document){
+                return $document->ctz_supplies . '/' . $document->supplies;
+              })*/
               
         return $datatable;
     }
@@ -94,10 +95,11 @@ class ReportController extends Controller
     }
     public function downloadPCTSPDF(Request $request)
     {
-        //return (new InvoicesExport)->download('invoices.pdf', \Maatwebsite\Excel\Excel::TCPDF);
-        $pcts = $request->get('data');
+
+        $pcts = json_decode($request->get('data'));
         try {
-            return Excel::export(new PCTSExport(json_decode($pcts)), 'reporte_pcts.pdf', \Maatwebsite\Excel\Excel::TCPDF);
+            $pdf = PDF::loadView('report.exports.pdf', compact('pcts'))->setPaper('a4', 'landscape');
+            return $pdf->download('reporte_pcts.pdf');
         }catch(\Exception $e) {
             return redirect()->back()->withErrors($e->getMessage());
         }

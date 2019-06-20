@@ -359,7 +359,7 @@ class InboxController extends Controller
     {
         if($request->ajax()):          
 
-            $query = Document::select('documents_supplies.id', 'supplies.manufacturers_id', 'supplies.number', 'suppliers.trade_name as supplier', 
+            $query = Document::select('documents_supplies.id', 'documents_supplies.set', 'supplies.manufacturers_id', 'supplies.number', 'suppliers.trade_name as supplier', 
             DB::raw('CAST(documents_supplies.products_amount as UNSIGNED) as products_amount'),
             DB::raw('CASE WHEN documents_supplies.measurement_unit_code = 1 THEN "Pieza" ELSE "Caja" END AS measurement_unit_code'), 
             DB::raw('documents_supplies.sale_unit_cost * documents_supplies.products_amount + documents_supplies.importation_cost
@@ -379,7 +379,7 @@ class InboxController extends Controller
             DB::raw('CASE WHEN documents_supplies.utility_percentages_id IS NOT null THEN utility_percentages.percentage
                 ELSE documents_supplies.custom_utility_percentage END AS utility_percentage'))
             ->leftJoin('documents_supplies', 'documents.id', 'documents_supplies.documents_id')
-            ->leftJoin('supplies', 'documents_supplies.supplies_id', 'supplies.id')
+            ->join('supplies', 'documents_supplies.supplies_id', 'supplies.id')
             ->leftjoin('suppliers', 'suppliers.id', 'documents_supplies.suppliers_id')
             ->leftJoin('currencies', 'currencies.id', 'documents_supplies.currencies_id')
             ->leftJoin('utility_percentages', 'utility_percentages.id', 'documents_supplies.utility_percentages_id')
@@ -389,6 +389,8 @@ class InboxController extends Controller
                 $query->where('documents_supplies.status', $request->status);
 
             $supplies_sets = $query->get();
+
+            Log::notice($supplies_sets);
 
             return Datatables::of($supplies_sets)
                   ->addColumn('actions', function($supplies_set) use ($request) {
@@ -404,9 +406,11 @@ class InboxController extends Controller
                     data-total_cost="' . '$ ' . number_format($supplies_set->total_cost, 2, '.', ',') . $currency . '" 
                     data-total_price="' . '$ ' . number_format($total_price, 2, '.', ',') . $currency . '"
                     data-unit_price="' . '$ ' . number_format($unit_price, 2, '.', ',') . $currency . '"
-                    data-total_profit="' . '$ ' . number_format($total_profit, 2, '.', ',') . $currency . '"><i class="fa fa-edit"></i></a>
+                    data-total_profit="' . '$ ' . number_format($total_profit, 2, '.', ',') . $currency . '"
+                    data-set_number=" ' . $supplies_set->set . '"
+                    data-supply_number=" ' . $supplies_set->number . '"><i class="fa fa-edit"></i></a>
                     <a data-target="#quotation_request_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default quotation-request"
-                    data-number="' . $supplies_set->number .'"
+                    data-number="' . $supplies_set->number . '"
                     data-manufacturer_id="' . $supplies_set->manufacturers_id . '"
                     data-id="' . $supplies_set->id . '"><i class="fa fa-envelope"></i></a>'
                     : null;

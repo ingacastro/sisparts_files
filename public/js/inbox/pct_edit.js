@@ -5,6 +5,12 @@ $(document).on('click', '.edit-set', function() {
     let total_price = $(this).attr('data-total_price');
     let unit_price = $(this).attr('data-unit_price');
     let total_profit = $(this).attr('data-total_profit');
+    let set_number = $(this).attr('data-set_number');
+    let supply_number = $(this).attr('data-supply_number');
+
+    $('#edit_set_modal_title').html(
+        '<div style="font-size: 15px"> Editar&nbsp;&nbsp;<strong>Número de partida:</strong>' + set_number + 
+        '&nbsp;&nbsp;<strong>Número de parte:</strong> ' + supply_number + '</div>' );
     
     //Set tabs
     $.ajax({
@@ -18,7 +24,6 @@ $(document).on('click', '.edit-set', function() {
             $('#budget_total_price').html(total_price);
             $('#budget_unit_price').html(unit_price);
             $('#budget_total_profit').html(total_profit);
-            
             
             $('#tab_conditions_content').html(response.conditions_tab);
             $('#tab_files_content').html(response.files_tab);

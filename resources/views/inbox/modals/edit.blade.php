@@ -6,8 +6,8 @@
                 <h4 class="modal-title" id="edit_set_modal_title"></h4>
             </div>
             <div class="modal-body">
-                <div id="error_messages"></div>
-                <div id="success_message"></div>
+                <div id="pct_edit_modal_error_messages"></div>
+                <div id="pct_edit_modal_success_message"></div>
                 {{-- <input type="hidden" name="document_id" id="document_id"> --}}
                 <div class="tabbable-line boxless tabbable-reversed">
                     <ul class="nav nav-tabs" id="">

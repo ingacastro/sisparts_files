@@ -88,6 +88,7 @@ Route::delete('inbox/set-file-detach/{set_id}/{file_id}', 'InboxController@setFi
 Route::get('inbox/get-manufacturer-suppliers/{manufacturer_id}', 'InboxController@getManufacturerSuppliers');
 Route::post('inbox/send-suppliers-quotation', 'InboxController@sendSuppliersQuotation')->name('inbox.send-suppliers-quotation');
 Route::post('inbox/change-set-status', 'InboxController@changeSetStatus');
+Route::post('inbox/reject-set', 'InboxController@rejectSet')->name('inbox.reject-set');
 Route::post('inbox/sets-turn-ctz', 'InboxController@setsTurnCTZ')->name('inbox.sets-turn-ctz');
 Route::post('inbox/binnacle-entry', 'InboxController@binnacleEntry')->name('inbox.binnacle-entry');
 Route::resource('inbox', 'InboxController');

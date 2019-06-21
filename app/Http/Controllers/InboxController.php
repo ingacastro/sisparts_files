@@ -14,6 +14,7 @@ use IParts\File;
 use IParts\Message;
 use IParts\Binnacle;
 use IParts\SupplySet;
+use IParts\Rejection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Validator;
@@ -196,7 +197,10 @@ class InboxController extends Controller
         ->where('languages.name', 'Español')
         ->pluck('messages_languages.title', 'messages.id');
 
-        return view('inbox.show', compact('document', 'manufacturers', 'document_supplies', 'messages'));
+        $rejection_reasons = DB::table('rejection_reasons')->pluck('title', 'id');
+
+        return view('inbox.show', compact('document', 'manufacturers', 'document_supplies', 'messages', 
+            'rejection_reasons'));
     }
 
     public function getSetTabs(Request $request, $set_id)
@@ -710,6 +714,73 @@ class InboxController extends Controller
             'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
             ->with('success_message', $message)->render()
         ]); 
+    }
+
+    public function rejectSet(Request $request)
+    {
+        if(!$request->ajax())
+            return response()->json([
+                'errors' => true, 
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('Acción no autorizada.')->render()]);
+
+        $data = $request->all();
+        $validator = $this->setRejectionValidations($data);
+        
+        if($validator->fails())
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($validator)->render()]);
+
+        $set_id = $request->documents_supplies_id;
+
+        $supply_set = SupplySet::find($set_id);
+
+        $binnacle_data = [
+            'entity' => 2, //item (supply set)
+            'comments' => $request->comments,
+            'pct_status' => $supply_set->document->status,
+            'employees_users_id' => Auth::user()->id,
+            'type' => 2, //Just a silly number tha means nothing
+            'documents_id' => $supply_set->document->id,
+            'documents_supplies_id' => $set_id
+        ];
+        try {            
+            DB::transaction(function() use($data, $supply_set, $binnacle_data) {
+
+                Rejection::create($data);
+
+                Binnacle::create($binnacle_data);
+
+                $supply_set->update(['status' => 7, 'rejected_date' => Carbon::now()]);
+            });
+        } catch(\Exception $e) {
+            Log::notice($e);
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($e->getMessage())->render()]);
+        }
+
+        return response()->json([
+            'errors' => false,
+            'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
+            ->with('success_message', 'Partida rechazada correctamente.')->render()
+        ]); 
+    }
+
+    private function setRejectionValidations($data)
+    {
+        $messages = [
+            'rejection_reasons_id.required' => 'El campo motivo es requerido.',
+        ];
+        
+        $validator = Validator::make($data, [
+            'rejection_reasons_id' => 'required',
+        ], $messages);
+
+        return $validator;
     }
 
     public function setsTurnCTZ(Request $request)

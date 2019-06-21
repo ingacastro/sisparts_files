@@ -41,7 +41,7 @@
                         </div>
                     </div>
                 </div>
-                <div style="text-align: right; padding: 10px">
+                <div style="text-align: right;">
                     <button type="button" class="btn btn-circle default" data-dismiss="modal">Cerrar</button>
                     <button type="submit" class="btn btn-circle blue">Enviar</button>
                 </div>

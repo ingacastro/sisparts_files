@@ -65,8 +65,8 @@
             <div id="authorization_btns_container" style="display: {{ $set->status == 6 ? 'block' : 'none' }}">
                 <button type="submit" class="btn btn-circle btn-sm green-meadow set-status-change" data-set_id="{{$set->id}}" 
                     data-status="8" data-document_id="{{ $doc_id }}">Autorizar</button>
-                <button type="button" class="btn btn-circle btn-sm yellow set-status-change" data-set_id="{{$set->id}}" 
-                    data-status="7" data-document_id="{{ $doc_id }}">Rechazar</button>
+                <button type="button" class="btn btn-circle btn-sm yellow set-rejection" data-set_id="{{$set->id}}" 
+                    data-status="7" data-document_id="{{ $doc_id }}" data-target="#set_rejection_modal" data-toggle="modal">Rechazar</button>
             </div>
         </div>
     </div>                          

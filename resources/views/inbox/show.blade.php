@@ -217,6 +217,7 @@
 @include('inbox.modals.quotation_request')
 @include('inbox.modals.sets_turn_ctz')
 @include('inbox.modals.custom_binnacle_entry')
+@include('inbox.modals.set_rejection')
 @endsection
 @endsection
 @push('scripts')
@@ -232,6 +233,7 @@
 <script src="/js/inbox/file_attachment.js" type="text/javascript"></script>
 <script src="/js/inbox/quotation_request.js" type="text/javascript"></script>
 <script src="/js/inbox/sets_turn_ctz.js" type="text/javascript"></script>
+<script src="/js/inbox/set_rejection.js" type="text/javascript"></script>
 <script src="/js/inbox/binnacle_entry.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function(){

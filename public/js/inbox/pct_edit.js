@@ -69,13 +69,13 @@ $(document).on('submit', '#edit_budget_form', function(e){
         data: serialized_form,
         headers: {'X-CSRF-TOKEN': token},
         success: function(response) {
-            $('#error_messages').empty();
-            $('#success_message').empty();
+            $('#pct_edit_modal_error_messages').empty();
+            $('#pct_edit_modal_success_message').empty();
             
             if(response.errors)
-                $('#error_messages').html(response.errors_fragment);
+                $('#pct_edit_modal_error_messages').html(response.errors_fragment);
             else 
-                $('#success_message').html(response.success_fragment);
+                $('#pct_edit_modal_success_message').html(response.success_fragment);
         }
     });
     
@@ -102,10 +102,10 @@ function checkChecklistItem(checklist_id, field)
         data: {'checklist_id': checklist_id, 'field': field},
         headers: {'X-CSRF-TOKEN': token},
         success: function(response) {
-            $('#error_messages').empty();
+            $('#pct_edit_modal_error_messages').empty();
             
             if(response.errors)
-                $('#error_messages').html(response.errors_fragment);
+                $('#pct_edit_modal_error_messages').html(response.errors_fragment);
 
         }
     }); 
@@ -123,13 +123,13 @@ $(document).on('click', '.set-status-change', function() {
         data: {'document_id': doc_id, 'set_id': set_id, 'status': status},
         headers: {'X-CSRF-TOKEN': token},
         success: function(response) {
-            $('#error_messages').empty();
-            $('#success_message').empty();
+            $('#pct_edit_modal_error_messages').empty();
+            $('#pct_edit_modal_success_message').empty();
             
             if(response.errors)
-                $('#error_messages').html(response.errors_fragment);
+                $('#pct_edit_modal_error_messages').html(response.errors_fragment);
             else {
-                $('#success_message').html(response.success_fragment);
+                $('#pct_edit_modal_success_message').html(response.success_fragment);
                 if(status == 6) {
                     $('#in_authorization_btn').hide();
                     $('#authorization_btns_container').css('display', 'block');
@@ -154,13 +154,13 @@ $(document).on('submit', '#edit_conditions_form', function(e){
         data: serialized_form,
         headers: {'X-CSRF-TOKEN': token},
         success: function(response) {
-            $('#error_messages').empty();
-            $('#success_message').empty();
+            $('#pct_edit_modal_error_messages').empty();
+            $('#pct_edit_modal_success_message').empty();
             
             if(response.errors)
-                $('#error_messages').html(response.errors_fragment);
+                $('#pct_edit_modal_error_messages').html(response.errors_fragment);
             else 
-                $('#success_message').html(response.success_fragment);
+                $('#pct_edit_modal_success_message').html(response.success_fragment);
         }
     }); 
 });

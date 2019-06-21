@@ -1,4 +1,4 @@
-<div class="modal fade bs-modal" id="file_attachment_modal" role="dialog" aria-hidden="true">
+<div class="modal fade bs-modal" id="set_file_attachment_modal" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -7,9 +7,10 @@
             </div>
             <div class="modal-body">
                 {!! Form::open(['route' => 'inbox.sets-file-attachment', 'method' => 'post', 'class' => 'horizontal-form',
-                'id' => 'file_attachment_form']) !!}
-                <div id="file_attachment_error_messages"></div>
-                <div id="file_attachment_success_message"></div>
+                'id' => 'set_file_attachment_form']) !!}
+                <input type="hidden" name="sets[]" id="set_file_attachment_modal_set_id" value="">
+                <div id="set_file_attachment_error_messages"></div>
+                <div id="set_file_attachment_success_message"></div>
                 <div class="form-group">
                     <label class="control-label" id="current_dealership"></label>
                 </div>
@@ -38,17 +39,9 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                        {!! Form::text('url', null, ['class' => 'form-control', 'placeholder' => 'URL...']) !!}
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
                     <div class="col-md-10">
                         <div class="form-group">
-                            {!! Form::select('sets[]', $document_supplies, null, 
-                            ['class' => 'form-control select2-multiple', 'id' => "sets_select2", 'multiple']) !!}
+                        {!! Form::text('url', null, ['class' => 'form-control', 'placeholder' => 'URL...']) !!}
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -58,24 +51,6 @@
                     </div>
                 </div>
                 {!! Form::close() !!}
-                <div class="row" style="padding: 0 10px 0 10px">
-                    <div class="table-toolbar">
-                        <div class="row">
-                            <div class="col-md-6"></div>
-                            <div class="col-md-6"></div>
-                        </div>
-                    </div>
-                    <table class="table table-striped table-hover table-bordered" id="file_attachment_table">
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Nombre</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
             </div>
         </div>
     </div>

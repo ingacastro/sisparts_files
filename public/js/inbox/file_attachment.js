@@ -9,6 +9,11 @@ $('#file_attachment').click(function(){
 
 });
 
+$(document).on('click', '.set-file-attachment', function() {
+    let set_id = $(this).attr('data-set_id');
+    $('#set_file_attachment_modal_set_id').val(set_id);
+});
+
 function initDocAttachmentsTable()
 {
     let doc_id = $('#document_id').attr('content');
@@ -21,7 +26,7 @@ function initDocAttachmentsTable()
         lengthChange: false,
         columns: [
             { data: "created_at", name: "created_at" },
-            { data: "manufacturer", name: "manufacturer" },
+            { data: "supplier", name: "supplier" },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }
         ],
         language: {
@@ -41,7 +46,7 @@ function initSetAttachmentsTable()
         lengthChange: false,
         columns: [
             { data: "created_at", name: "created_at" },
-            { data: "manufacturer", name: "manufacturer" },
+            { data: "supplier", name: "supplier" },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }
         ],
         language: {
@@ -50,11 +55,11 @@ function initSetAttachmentsTable()
     });
 }
 
-$('#file_attachment_form').submit(function(e){
+$('#set_file_attachment_from_pct_form').submit(function(e){
     e.preventDefault();
-    let token = $('#file_attachment_form > input[name=_token]').val();
+    let token = $('#set_file_attachment_from_pct_form > input[name=_token]').val();
 
-    let form = document.getElementById('file_attachment_form');
+    let form = document.getElementById('set_file_attachment_from_pct_form');
     let formData = new FormData(form);
 
     $.ajax({
@@ -69,16 +74,15 @@ $('#file_attachment_form').submit(function(e){
         contentType: false,
         success: function(response) {
             if(response.errors) {
-                $('#file_attachment_error_messages').html(response.errors_fragment);
+                $('#set_file_attachment_from_pct_error_messages').html(response.errors_fragment);
                 return;
             }
-
             let file_obj = response.file;
 
-            $('#error_messages').css('display', 'none');
+            $('#set_file_attachment_from_pct_error_messages').css('display', 'none');
             $('#file_attachment_table').DataTable().row.add({
                 'created_at': file_obj.created_at,
-                'manufacturer': file_obj.manufacturer, 
+                'supplier': file_obj.supplier, 
                 'actions': '<a href="/' + file_obj.path + '"' +
                                 'class="btn btn-accent m-btn m-btn--icon btn-sm m-btn--icon-only  m-btn--pill m-btn--air" download>' +
                                 '<i class="fa fa-download"></i></a> ' +
@@ -87,8 +91,37 @@ $('#file_attachment_form').submit(function(e){
                                 '<i class="fa fa-times"></i></button>'
             });
             $('#file_attachment_table').DataTable().draw(false);
-            $('#file_attachment_success_message').html(response.success_fragment);
-            $('#file_attachment_success_message').fadeIn('fast').delay(2000).fadeOut('fast');
+            $('#set_file_attachment_from_pct_success_message').html(response.success_fragment);
+            $('#set_file_attachment_from_pct_success_message').fadeIn('fast').delay(2000).fadeOut('fast');
+        }
+    });
+});
+
+$('#set_file_attachment_form').submit(function(e){
+    e.preventDefault();
+    let token = $('#set_file_attachment_form > input[name=_token]').val();
+
+    let form = document.getElementById('set_file_attachment_form');
+    let formData = new FormData(form);
+
+    $.ajax({
+        url: '/inbox/sets-file-attachment',
+        method: 'post',
+        dataType: 'json',
+        headers: {'X-CSRF-TOKEN': token},
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            if(response.errors) {
+                $('#set_file_attachment_error_messages').html(response.errors_fragment);
+                return;
+            }
+
+            $('#set_file_attachment_error_messages').css('display', 'none');
+
+            $('#set_file_attachment_success_message').html(response.success_fragment);
+            $('#set_file_attachment_success_message').fadeIn('fast').delay(2000).fadeOut('fast');
         }
     });
 });

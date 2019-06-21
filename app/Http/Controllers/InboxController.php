@@ -13,6 +13,7 @@ use IParts\Currency;
 use IParts\File;
 use IParts\Message;
 use IParts\Binnacle;
+use IParts\SupplySet;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Validator;
@@ -240,6 +241,7 @@ class InboxController extends Controller
             ->join('documents_supplies_files', 'documents_supplies_files.files_id', 'files.id')
             ->join('documents_supplies', 'documents_supplies.id', 'documents_supplies_files.documents_supplies_id')
             ->where('documents_supplies.id', $set_id)->get();
+
             return Datatables::of($files)
                   ->editColumn('created_at', function($file) {
                     return date('d/m/Y', strtotime($file->created_at));
@@ -255,6 +257,7 @@ class InboxController extends Controller
 
     public function setsFileAttachment(Request $request)
     {
+
         if(!$request->ajax())
             return response()->json([
                 'errorrs' => true,
@@ -278,23 +281,29 @@ class InboxController extends Controller
                 ->withErrors($validator)->render()]);
 
         $file = null;
+        $file_name = null;
         try {
-
-            if($request->has('file')) 
-                $data['path'] = 'storage/supplies_sets_files/' . $request->file->store(null, 'supplies_sets_files');
-            
-            $file = File::create($data);
-            $file->sets()->attach($data['sets']);
+            DB::transaction(function() use($request, $data, &$file, &$file_name) {            
+                if($request->has('file')) {
+                    $file_name = $request->file->store(null, 'supplies_sets_files');
+                    $data['path'] = 'storage/supplies_sets_files/' . $file_name;
+                }
+                
+                $file = File::create($data);
+                $file->sets()->attach($data['sets']);
+            });
             
         } catch(\Exception $e) {
+            Storage::disk('supplies_sets_files')->delete($file_name);
             return response()->json([
-                'errorrs' => true,
+                'errors' => true,
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
-                ->withErrors($e->getMessage())->render()
+                ->withErrors($e->getMessage())->render() 
             ]);
         }
 
-      return response()->json(['errors' => false, 
+      return response()->json([
+        'errors' => false, 
         'file' => $file,
         'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
         ->with('success_message', 'Archivo guardado correctamente.')->render()
@@ -320,11 +329,11 @@ class InboxController extends Controller
     {
         if($request->ajax()):
 
-            $files = DB::table('files')
+            $files = DB::table('files')->select('files.id', 'files.created_at', 'files.supplier', 'files.url', 'files.path',
+            'documents_supplies_files.documents_supplies_id', 'documents_supplies_files.files_id')
             ->join('documents_supplies_files', 'documents_supplies_files.files_id', 'files.id')
             ->join('documents_supplies', 'documents_supplies.id', 'documents_supplies_files.documents_supplies_id')
             ->where('documents_supplies.documents_id', $document_id)->get();
-
             return Datatables::of($files)
                   ->editColumn('created_at', function($file) {
                     return date('d/m/Y', strtotime($file->created_at));
@@ -390,8 +399,6 @@ class InboxController extends Controller
 
             $supplies_sets = $query->get();
 
-            Log::notice($supplies_sets);
-
             return Datatables::of($supplies_sets)
                   ->addColumn('actions', function($supplies_set) use ($request) {
 
@@ -409,25 +416,23 @@ class InboxController extends Controller
                     data-total_profit="' . '$ ' . number_format($total_profit, 2, '.', ',') . $currency . '"
                     data-set_number=" ' . $supplies_set->set . '"
                     data-supply_number=" ' . $supplies_set->number . '"><i class="fa fa-edit"></i></a>
-                    <a data-target="#quotation_request_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default quotation-request"
+                    <a data-target="#quotation_request_modal" data-toggle="modal" class="btn btn-circle yellow-crusta btn-icon-only default quotation-request"
                     data-number="' . $supplies_set->number . '"
                     data-manufacturer_id="' . $supplies_set->manufacturers_id . '"
-                    data-id="' . $supplies_set->id . '"><i class="fa fa-envelope"></i></a>'
+                    data-id="' . $supplies_set->id . '"><i class="fa fa-envelope"></i></a>
+                    <a class="btn btn-circle btn-icon-only default blue set-file-attachment" href="#set_file_attachment_modal" data-target="#set_file_attachment_modal" data-toggle="modal"
+                    data-set_id="' . $supplies_set->id . '"><i class="fa fa-paperclip"></i></a>'
                     : null;
                   })
                   ->addColumn('checkbox', function($supplies_set){
                     return '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input type="checkbox" class="checkboxes" value="' . $supplies_set->id . '"><span></span></label>';
                   })
                   ->editColumn('total_cost', function($supplies_set) {
-
                     return '$ ' . number_format($supplies_set->total_cost, 2, '.', ',') . ' ' . $supplies_set->currency;
-
                   })
                   ->addColumn('total_price', function($supplies_set) {
-
                     $total_price = $this->calculateTotalPrice($supplies_set->total_cost, $supplies_set->utility_percentage);
                     return '$ ' .  number_format($total_price, 2, '.', ',') . ' ' . $supplies_set->currency;
-
                   })
                   ->rawColumns(['actions' => 'actions', 'total_cost' => 'total_cost', 
                     'total_price' => 'total_price', 'checkbox' => 'checkbox'])
@@ -611,18 +616,19 @@ class InboxController extends Controller
             }
         }
 
-        $doc = Document::find($request->documents_id);
+        $set = SupplySet::find($request->documents_supplies_id);
+        $set->fill(['status' => 2])->update();
+        $doc = Document::find($set->documents_id);
         $doc->fill(['status' => 2])->update();
-        $doc_supply_id = $request->documents_supplies_id;
 
         $binnacle_data = [
             'entity' => 2,
-            'pct_status' => $doc->status, //In progress
+            'pct_status' => $doc->status, //In process
             'comments' => 'Solicitud de cotización enviada',
             'employees_users_id' => Auth::user()->id,
-            'type' => 2, //Just a silly number tha means nothing
+            'type' => 2, //Just a silly number that means nothing
             'documents_id' => $doc->id,
-            'documents_supplies_id' => $doc_supply_id
+            'documents_supplies_id' => $set->id
         ];
 
         try {
@@ -841,7 +847,7 @@ class InboxController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from  .
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response

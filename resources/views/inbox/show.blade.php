@@ -103,7 +103,7 @@
                                                     <a style="text-decoration: none; font-weight: bold; font-size: 20px;" data-target="#sets_turn_ctz_modal" data-toggle="modal" id="sets_turn_ctz">CTZ</a>
                                                 </th>
                                                 <th>
-                                                    <a style="text-decoration: none;" href="#file_attachment_modal" data-target="#file_attachment_modal" data-toggle="modal" id="file_attachment">
+                                                    <a style="text-decoration: none;" href="#set_file_attachment_from_pct_modal" data-target="#set_file_attachment_from_pct_modal" data-toggle="modal" id="file_attachment">
                                                         <span aria-hidden="true" style="font-size: 18px; margin-left: 20px" class="icon-paper-clip">
                                                         </span>
                                                     </a>
@@ -212,7 +212,8 @@
     </div>
 </div>
 @include('inbox.modals.edit')
-@include('inbox.modals.file_attachment')
+@include('inbox.modals.set_file_attachment_from_pct')
+@include('inbox.modals.set_file_attachment')
 @include('inbox.modals.quotation_request')
 @include('inbox.modals.sets_turn_ctz')
 @include('inbox.modals.custom_binnacle_entry')

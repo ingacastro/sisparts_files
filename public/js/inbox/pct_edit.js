@@ -38,7 +38,7 @@ $(document).on('click', '.edit-set', function() {
                 lengthChange: false,
                 columns: [
                     { data: "created_at", name: "created_at" },
-                    { data: "manufacturer", name: "manufacturer" },
+                    { data: "supplier", name: "supplier" },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
                 language: {

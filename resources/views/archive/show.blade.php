@@ -188,7 +188,7 @@
     </div>
 </div>
 @include('inbox.modals.edit')
-@include('inbox.modals.file_attachment')
+@include('inbox.modals.set_file_attachment_from_pct')
 @include('inbox.modals.quotation_request')
 @include('inbox.modals.sets_turn_ctz')
 @endsection

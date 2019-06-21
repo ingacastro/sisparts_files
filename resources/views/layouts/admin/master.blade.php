@@ -51,10 +51,15 @@ License: You must have a valid license purchased only from themeforest(the above
                                 <a id="user_data">
                                     {{-- <i class="icon-bell"></i> --}}
                                     <?php $user = Auth::user() ?>
+                                    @role('Administrador')
                                     <span class="badge"><strong>{{ $user->roles->first()->name }}</strong></span>
+                                    @endrole
                                     @if(isset($user->employee))
                                     <span class="badge">
-                                        <strong>Número: {{ $user->employee->number}}</strong>
+                                        <strong>No. de empleado: {{ $user->employee->number }}</strong>
+                                    </span>
+                                    <span class="badge">
+                                        <strong>No. de cotizador: {{ $user->employee->buyer_number }}</strong>
                                     </span>
                                     @endif
                                 </a>

@@ -77,6 +77,7 @@ class InboxController extends Controller
             //Dealership won't see customer
             if($logged_user->roles()->first()->name == "Cotizador") {
                 $query->where('employees_users_id', $logged_user->id);
+                $query->orWhereRaw('DATEDIFF(now(), documents.created_at) > 5');
                 unset($fields[5]);
             }
 

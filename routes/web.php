@@ -95,3 +95,7 @@ Route::resource('inbox', 'InboxController');
 
 //Archive
 Route::resource('archive', 'ArchiveController');
+
+//Supply set rejection
+Route::get('rejection-reason/get-list', 'RejectionReasonController@getList');
+Route::resource('rejection-reason', 'RejectionReasonController');

@@ -80,6 +80,13 @@
                 <span class="selected"></span>
             </a>
         </li>
+        <li id="sidebar_rejection_reason" class="nav-item">
+            <a href="{{ route('rejection-reason.index') }}" class="nav-link nav-toggle">
+                <i class="fa fa-ban"></i>
+                <span class="title">Motivos de rechazo</span>
+                <span class="selected"></span>
+            </a>
+        </li>
         @endrole
     </ul>
     <!-- END SIDEBAR MENU -->

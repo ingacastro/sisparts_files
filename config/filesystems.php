@@ -64,10 +64,10 @@ return [
             'url' => env('AWS_URL'),
         ],
 
-        'supplies_sets_files' => [
+        'supplies_files' => [
             'driver' => 'local',
-            'root' => storage_path('app/public/supplies_sets_files'),
-            'url' => env('APP_URL').'/storage/supplies_sets_files',
+            'root' => storage_path('app/public/supplies_files'),
+            'url' => env('APP_URL').'/storage/supplies_files',
             'visibility' => 'public',
         ],
     ],

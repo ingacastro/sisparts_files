@@ -8,7 +8,7 @@
             <div class="modal-body">
                 {!! Form::open(['route' => 'inbox.sets-file-attachment', 'method' => 'post', 'class' => 'horizontal-form',
                 'id' => 'set_file_attachment_form']) !!}
-                <input type="hidden" name="sets[]" id="set_file_attachment_modal_set_id" value="">
+                <input type="hidden" name="supplies[]" id="set_file_attachment_modal_supply_id" value="">
                 <div id="set_file_attachment_error_messages"></div>
                 <div id="set_file_attachment_success_message"></div>
                 <div class="form-group">
@@ -35,6 +35,13 @@
                                     <a href="javascript:;" class="input-group-addon btn red fileinput-exists" data-dismiss="fileinput"> Quitar </a>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            {!! Form::select('type', [1 => 'Cotización', 2 => 'Ficha técnica'], null, ['class' => 'form-control', 'placeholder' => 'Tipo...']) !!}
                         </div>
                     </div>
                 </div>

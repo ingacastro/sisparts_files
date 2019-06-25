@@ -2,7 +2,7 @@ $('#file_attachment').click(function(){
 
     $('#sets_select2').select2({
         width: '100%',
-        placeholder: 'Seleccionar...'
+        placeholder: 'Partes...'
     });
 
     initDocAttachmentsTable();
@@ -10,8 +10,8 @@ $('#file_attachment').click(function(){
 });
 
 $(document).on('click', '.set-file-attachment', function() {
-    let set_id = $(this).attr('data-set_id');
-    $('#set_file_attachment_modal_set_id').val(set_id);
+    let supply_id = $(this).attr('data-supply_id');
+    $('#set_file_attachment_modal_supply_id').val(supply_id);
 });
 
 function initDocAttachmentsTable()
@@ -126,7 +126,7 @@ $('#set_file_attachment_form').submit(function(e){
     });
 });
 
-function detachFile(e, documents_supplies_id, files_id, type)
+function detachFile(e, files_id, type)
 {
     e.preventDefault();
     swal({
@@ -140,27 +140,29 @@ function detachFile(e, documents_supplies_id, files_id, type)
       closeOnConfirm: true,
     },
     function(isConfirm) {
-      if (isConfirm) { deleteRequest(documents_supplies_id, files_id, type); }
+      if (isConfirm) { deleteRequest(files_id, type); }
     });
 }
 
-function deleteRequest(documents_supplies_id, files_id, type) {
+function deleteRequest(files_id, type) {
     let token = $('#meta_token').attr('content');
     $.ajax({
-        url: '/inbox/set-file-detach/' + documents_supplies_id + '/' + files_id,
+        url: '/inbox/supply-file-delete/' + files_id,
         method: 'delete',
         headers: {'X-CSRF-TOKEN': token},
         success: function(response) {
             if(response.errors) {
-                $('#file_attachment_error_messages').html(response.errors_fragment);
+                $('#set_file_attachment_from_pct_error_messages').html(response.errors_fragment);
                 return;
             }
+            
             if(type == 1)
                 initDocAttachmentsTable();
             else
                 initSetAttachmentsTable();
-            $('#file_attachment_success_message').html(response.success_fragment);
-            $('#file_attachment_success_message').fadeIn('fast').delay(2000).fadeOut('fast');
+
+            $('#set_file_attachment_from_pct_success_message').html(response.success_fragment);
+            $('#set_file_attachment_from_pct_success_message').fadeIn('fast').delay(2000).fadeOut('fast');
         }
     });
 }

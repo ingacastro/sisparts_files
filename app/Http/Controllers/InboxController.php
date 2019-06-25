@@ -22,6 +22,7 @@ use DB;
 use Auth;
 use Storage;
 use Mail;
+use File as LaravelFile;
 use Carbon\Carbon;
 
 class InboxController extends Controller
@@ -191,7 +192,8 @@ class InboxController extends Controller
     public function show($id)
     {
         $document = Document::find($id);
-        $document_supplies = $document->supplies->pluck('number', 'pivot.id');
+        $document_supplies = $document->supplies->pluck('number', 'id');
+
         $messages = DB::table('messages')
         ->leftJoin('messages_languages', 'messages.id', 'messages_languages.messages_id')
         ->leftJoin('languages', 'messages_languages.languages_id', 'languages.id')
@@ -262,7 +264,6 @@ class InboxController extends Controller
 
     public function setsFileAttachment(Request $request)
     {
-
         if(!$request->ajax())
             return response()->json([
                 'errorrs' => true,
@@ -290,16 +291,16 @@ class InboxController extends Controller
         try {
             DB::transaction(function() use($request, $data, &$file, &$file_name) {            
                 if($request->has('file')) {
-                    $file_name = $request->file->store(null, 'supplies_sets_files');
-                    $data['path'] = 'storage/supplies_sets_files/' . $file_name;
+                    $file_name = $request->file->store(null, 'supplies_files');
+                    $data['path'] = 'storage/supplies_files/' . $file_name;
                 }
                 
                 $file = File::create($data);
-                $file->sets()->attach($data['sets']);
+                $file->supplies()->attach($data['supplies']);
             });
             
         } catch(\Exception $e) {
-            Storage::disk('supplies_sets_files')->delete($file_name);
+            Storage::disk('supplies_files')->delete($file_name);
             return response()->json([
                 'errors' => true,
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
@@ -319,12 +320,16 @@ class InboxController extends Controller
     {
         $messages = [
             'supplier.required' => 'El campo proveedor es requerido.',
-            'url.url' => 'La url debe seguir el formato http(s)://dominio.com'
+            'url.url' => 'La url debe seguir el formato http(s)://dominio.com',
+            'type.required' => 'El campo tipo es requerido.',
+            'supplies.required' => 'El campo partes es requerido.'
         ];
         
         $validator = Validator::make($data, [
             'supplier' => 'required',
-            'url' => 'nullable|url'
+            'url' => 'nullable|url',
+            'type' => 'required',
+            'supplies' => 'required'
         ], $messages);
 
         return $validator;
@@ -335,16 +340,18 @@ class InboxController extends Controller
         if($request->ajax()):
 
             $files = DB::table('files')->select('files.id', 'files.created_at', 'files.supplier', 'files.url', 'files.path',
-            'documents_supplies_files.documents_supplies_id', 'documents_supplies_files.files_id')
-            ->join('documents_supplies_files', 'documents_supplies_files.files_id', 'files.id')
-            ->join('documents_supplies', 'documents_supplies.id', 'documents_supplies_files.documents_supplies_id')
+            'supplies_files.supplies_id', 'supplies_files.files_id')
+            ->join('supplies_files', 'supplies_files.files_id', 'files.id')
+            ->join('supplies', 'supplies.id', 'supplies_files.supplies_id')
+            ->join('documents_supplies', 'documents_supplies.supplies_id', 'supplies.id')
             ->where('documents_supplies.documents_id', $document_id)->get();
+            
             return Datatables::of($files)
                   ->editColumn('created_at', function($file) {
                     return date('d/m/Y', strtotime($file->created_at));
                   })
                   ->addColumn('actions', function($file) {
-                    return '<a href="' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="/' . $file->path .'" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,'. $file->documents_supplies_id .',' . $file->files_id .',1' . ')"><i class="fa fa-trash"></i></a>';
+                    return '<a href="' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="/' . $file->path .'" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,'. $file->files_id .',1' . ')"><i class="fa fa-trash"></i></a>';
                   })
                   ->rawColumns(['actions' => 'actions'])
                   ->make(true);
@@ -352,17 +359,20 @@ class InboxController extends Controller
         abort(403, 'Unauthorized action');
     }
 
-    public function setFileDetach($set_id, $file_id)
+    public function supplyFileDelete($file_id)
     {
         try {
-            File::find($file_id)->sets()->detach($set_id);
+            $file = File::find($file_id);
+            $file_path = $file->path;
+            $file->delete();
+            LaravelFile::delete($file->path);
         } catch(\Exception $e) {
             return response()->json(
                 ['errors' => true,
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
                 ->withErrors($e->getMessage())->render()]);
         }
-      return response()->json(['errors' => false, 
+      return response()->json(['errors' => false,
         'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
         ->with('success_message', 'Archivo eliminado correctamente.')->render()
       ]);
@@ -426,7 +436,7 @@ class InboxController extends Controller
                     data-manufacturer_id="' . $supplies_set->manufacturers_id . '"
                     data-id="' . $supplies_set->id . '"><i class="fa fa-envelope"></i></a>
                     <a class="btn btn-circle btn-icon-only default blue set-file-attachment" href="#set_file_attachment_modal" data-target="#set_file_attachment_modal" data-toggle="modal"
-                    data-set_id="' . $supplies_set->id . '"><i class="fa fa-paperclip"></i></a>'
+                    data-supply_id="' . $supplies_set->supplies_id . '"><i class="fa fa-paperclip"></i></a>'
                     : null;
                   })
                   ->addColumn('checkbox', function($supplies_set){

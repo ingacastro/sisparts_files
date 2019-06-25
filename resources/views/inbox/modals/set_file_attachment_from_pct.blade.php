@@ -45,9 +45,16 @@
                     </div>
                 </div>
                 <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            {!! Form::select('type', [1 => 'Cotización', 2 => 'Ficha técnica'], null, ['class' => 'form-control', 'placeholder' => 'Tipo...']) !!}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-md-10">
                         <div class="form-group">
-                            {!! Form::select('sets[]', $document_supplies, null, 
+                            {!! Form::select('supplies[]', $document_supplies, null, 
                             ['class' => 'form-control select2-multiple', 'id' => "sets_select2", 'multiple']) !!}
                         </div>
                     </div>

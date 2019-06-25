@@ -8,8 +8,8 @@ class File extends Model
 {
 	protected $fillable = ['path', 'supplier', 'url'];
 
-   	public function sets()
+   	public function supplies()
    	{
-   		return $this->belongsToMany('IParts\SupplySet', 'documents_supplies_files', 'files_id', 'documents_supplies_id');
+   		return $this->belongsToMany('IParts\Supply', 'supplies_files', 'files_id', 'supplies_id');
    	}
 }

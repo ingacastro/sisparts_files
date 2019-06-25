@@ -47,7 +47,7 @@
                 <div class="row">
                     <div class="col-md-10">
                         <div class="form-group">
-                            {!! Form::select('sets[]', $document_supplies, null, 
+                            {!! Form::select('supplies[]', $document_supplies, null, 
                             ['class' => 'form-control select2-multiple', 'id' => "sets_select2", 'multiple']) !!}
                         </div>
                     </div>

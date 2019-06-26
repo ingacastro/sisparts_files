@@ -9,8 +9,8 @@
                 {!! Form::open(['route' => 'inbox.send-suppliers-quotation', 'method' => 'post', 'class' => 'horizontal-form',
                 'id' => 'file_attachment_form']) !!}
                 <input type="hidden" name="documents_supplies_id" id="documents_supplies_id">
-                <div id="file_attachment_error_messages"></div>
-                <div id="file_attachment_success_message"></div>
+                <div id="quotation_request_error_messages"></div>
+                <div id="quotation_request_success_message"></div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
@@ -21,7 +21,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label class="control-label" id="supply_number">Proveedores: </label>
+                            <label class="control-label" id="supply_number" style="font-weight: bold">Proveedores: </label>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="radio-list" id="left_suppliers"></div>
@@ -36,8 +36,31 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
+                            <label class="control-label" id="supply_number" style="font-weight: bold">Partes: </label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="radio-list" id="left_supplies"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="radio-list" id="right_supplies"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="other_emails" class="control-label">Otros proveedores</label>
+                            <select multiple name="custom_emails[]" class="form-control input-large" data-role="tagsinput" id="other_emails"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
                             {!! Form::select('message_id', $messages, null, 
-                            ['class' => 'form-control', 'placeholder' => 'Seleccionar...', 'id' => "quotation_request_messages_select"]) !!}
+                            ['class' => 'form-control', 'placeholder' => 'Mensaje...', 'id' => "quotation_request_messages_select"]) !!}
                         </div>
                     </div>
                 </div>

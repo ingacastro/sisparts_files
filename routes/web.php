@@ -85,7 +85,7 @@ Route::get('inbox/set-files/{set_id}', 'InboxController@getSetFiles');
 Route::post('inbox/sets-file-attachment', 'InboxController@setsFileAttachment')->name('inbox.sets-file-attachment');
 Route::get('inbox/document-sets-files/{document_id}', 'InboxController@getDocumentSetsFiles');
 Route::delete('inbox/supply-file-delete/{file_id}', 'InboxController@supplyFileDelete');
-Route::get('inbox/get-manufacturer-suppliers/{manufacturer_id}', 'InboxController@getManufacturerSuppliers');
+Route::get('inbox/get-manufacturer-suppliers-and-supplies/{manufacturer_id}', 'InboxController@getManufacturerSuppliersAndSupplies');
 Route::post('inbox/send-suppliers-quotation', 'InboxController@sendSuppliersQuotation')->name('inbox.send-suppliers-quotation');
 Route::post('inbox/change-set-status', 'InboxController@changeSetStatus');
 Route::post('inbox/reject-set', 'InboxController@rejectSet')->name('inbox.reject-set');

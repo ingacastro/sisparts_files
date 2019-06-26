@@ -6,6 +6,7 @@
 <link href="/metronic-assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="/metronic-assets/global/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet" type="text/css" />
 <meta id="document_id" content="{{ $document->id }}">
 <meta id="meta_token" content="{{ @csrf_token() }}">
 <style>
@@ -55,6 +56,7 @@
   z-index: 100000;
   background-color: #f1f4f7;
 }
+    .bootstrap-tagsinput { width: 100%; }
 </style>
 @endsection
 @section('content')
@@ -228,6 +230,7 @@
 <script src="/metronic-assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
 <script src="/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script>
+<script src="/metronic-assets/global/plugins/bootstrap-tagsinput/bootstrap-tagsinput.min.js" type="text/javascript"></script>
 <script src="/js/inbox/index.js" type="text/javascript"></script>
 <script src="/js/inbox/pct_edit.js" type="text/javascript"></script>
 <script src="/js/inbox/file_attachment.js" type="text/javascript"></script>

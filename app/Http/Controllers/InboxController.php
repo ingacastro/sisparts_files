@@ -388,7 +388,7 @@ class InboxController extends Controller
             DB::raw('CASE WHEN documents_supplies.measurement_unit_code = 1 THEN "Pieza" ELSE "Caja" END AS measurement_unit_code'), 
             DB::raw('documents_supplies.sale_unit_cost * documents_supplies.products_amount + documents_supplies.importation_cost
             + documents_supplies.warehouse_shipment_cost + documents_supplies.customer_shipment_cost + documents_supplies.extra_charges as total_cost'), 
-            'currencies.name as currency', 
+            'currencies.name as currency',
             DB::raw('CASE WHEN documents_supplies.status = 1 THEN "No solicitado"
                 WHEN documents_supplies.status = 2 THEN "Solicitado automáticamente"
                 WHEN documents_supplies.status = 3 THEN "Solicitado manualmente"
@@ -401,9 +401,10 @@ class InboxController extends Controller
                 ELSE "INDEFINIDO" END as status'), 
             'documents_supplies.documents_id', 'documents_supplies.supplies_id',
             DB::raw('CASE WHEN documents_supplies.utility_percentages_id IS NOT null THEN utility_percentages.percentage
-                ELSE documents_supplies.custom_utility_percentage END AS utility_percentage'))
+                ELSE documents_supplies.custom_utility_percentage END AS utility_percentage'), 'manufacturers.name as manufacturer')
             ->leftJoin('documents_supplies', 'documents.id', 'documents_supplies.documents_id')
-            ->join('supplies', 'documents_supplies.supplies_id', 'supplies.id')
+            ->leftJoin('supplies', 'documents_supplies.supplies_id', 'supplies.id')
+            ->leftJoin('manufacturers', 'manufacturers.id', 'supplies.manufacturers_id')
             ->leftjoin('suppliers', 'suppliers.id', 'documents_supplies.suppliers_id')
             ->leftJoin('currencies', 'currencies.id', 'documents_supplies.currencies_id')
             ->leftJoin('utility_percentages', 'utility_percentages.id', 'documents_supplies.utility_percentages_id')
@@ -432,7 +433,7 @@ class InboxController extends Controller
                     data-set_number=" ' . $supplies_set->set . '"
                     data-supply_number=" ' . $supplies_set->number . '"><i class="fa fa-edit"></i></a>
                     <a data-target="#quotation_request_modal" data-toggle="modal" class="btn btn-circle yellow-crusta btn-icon-only default quotation-request"
-                    data-number="' . $supplies_set->number . '"
+                    data-manufacturer="' . $supplies_set->manufacturer . '"
                     data-manufacturer_id="' . $supplies_set->manufacturers_id . '"
                     data-id="' . $supplies_set->id . '"><i class="fa fa-envelope"></i></a>
                     <a class="btn btn-circle btn-icon-only default blue set-file-attachment" href="#set_file_attachment_modal" data-target="#set_file_attachment_modal" data-toggle="modal"
@@ -484,10 +485,13 @@ class InboxController extends Controller
         return $total_cost / ((100 - $utility_percentage) / 100);
     }
 
-    public function getManufacturerSuppliers($manufacturer_id)
+    public function getManufacturerSuppliersAndSupplies($manufacturer_id)
     {
-        $suppliers = Manufacturer::find($manufacturer_id)->suppliers;
-        return response()->json(Manufacturer::find($manufacturer_id)->suppliers);
+        $manufacturer = Manufacturer::find($manufacturer_id);
+        return response()->json([
+            'suppliers' => $manufacturer->suppliers,
+            'supplies' => $manufacturer->supplies
+        ]);
     }
 
     public function updateBudget(Request $request, $set_id)
@@ -616,7 +620,21 @@ class InboxController extends Controller
 
     public function sendSuppliersQuotation(Request $request)
     {
-        foreach($request->suppliers_ids as $supplier_id) {
+        Log::notice($request);
+
+        if(!$request->has('suppliers_emails') && !$request->has('custom_emails')) 
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('No se ha especificado ninguna dirección de correo de proveedor.')->render()]);
+
+        if(!$request->has('supplies_ids')) 
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('No se ha seleccionado ninguna de las partes')->render()]);
+
+/*        foreach($request->suppliers_ids as $supplier_id) {
             $supplier = Supplier::find($supplier_id);
             $message = DB::table('messages_languages')->where('messages_id', $request->message_id)
             ->where('languages_id', $supplier->languages_id)->first();
@@ -655,7 +673,20 @@ class InboxController extends Controller
         }
 
         $request->session()->flash('message', 'Cotización enviada correctamente.');
-        return redirect()->back();
+        return redirect()->back();*/
+    }
+
+    private function sendsendSuppliersQuotationValidations($data)
+    {
+        $messages = [
+            'rejection_reasons_id.required' => 'El campo motivo es requerido.',
+        ];
+        
+        $validator = Validator::make($data, [
+            'rejection_reasons_id' => 'required',
+        ], $messages);
+
+        return $validator;
     }
 
     public function changeSetStatus(Request $request)

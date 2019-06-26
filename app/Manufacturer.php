@@ -12,4 +12,9 @@ class Manufacturer extends Model
     {
     	return $this->belongsToMany('IParts\Supplier', 'suppliers_manufacturers', 'manufacturers_id', 'suppliers_id');
     }
+
+    public function supplies()
+    {
+    	return $this->hasMany('IParts\Supply', 'manufacturers_id');
+    }
 }

@@ -36,6 +36,8 @@ class DashboardController extends Controller
     public function index()
     {
         $stats = $this->getStats();
+        $supply_sets_amount = SupplySet::count();
+        $rejected_ppas_percentage = ($supply_sets_amount > 0) ? $stats['rejected_ppas'] / $supply_sets_amount : $stats['rejected_ppas'];
 
     	$dashboard_stats = [
     		'daily_pcts' => [
@@ -61,7 +63,7 @@ class DashboardController extends Controller
     		'pending_ppas' => $stats['pending_ppas'],
     		'rejected_ppas' => $stats['rejected_ppas'],
     		'monthly_rejected_ppas' => $stats['monthly_rejected_ppas'],
-    		'rejected_ppas_percentage' => number_format(($stats['rejected_ppas'] / SupplySet::count()) * 100, 2),
+    		'rejected_ppas_percentage' => number_format($rejected_ppas_percentage * 100, 2),
     		'quotation_average_time' => $stats['ctz_pcts_average_time']
     	];
 

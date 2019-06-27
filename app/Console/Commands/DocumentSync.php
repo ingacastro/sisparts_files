@@ -9,7 +9,9 @@ use IParts\Customer;
 use IParts\Supply;
 use IParts\Manufacturer;
 use IParts\Employee;
+use IParts\Binnacle;
 use DB;
+use Mail;
 
 class DocumentSync extends Command
 {
@@ -59,8 +61,8 @@ class DocumentSync extends Command
     /*Syncs all of the documents(type pct) from mxmro, pavan and zukaely postgres databases*/
 /*    private function connectAndSync(String $conn_name)
     {
-        $documentsTable = env('SIAVCOM_DOCUMENTS');
-        $quotation_acronym = env('ACR_QUOTATION');
+        $documentsTable = config('siavcom_sync.siavcom_documents');
+        $quotation_acronym = config('siavcom_sync.acr_quotation');
 
         DB::connection($conn_name)->table($documentsTable)
         ->where('tdo_tdo', $quotation_acronym)
@@ -75,9 +77,9 @@ class DocumentSync extends Command
     //TEST, ONLY 1 DB CONNECTION  
     private function connectAndSync(\stdClass $conn)
     {
-        $documentsTable = env('SIAVCOM_DOCUMENTS');
-        $quotation_acronym = env('ACR_QUOTATION');
-
+        $documentsTable = config('siavcom_sync.siavcom_documents');
+        $quotation_acronym = config('siavcom_sync.acr_quotation');
+        //Log::notice($conn->name . '  ' . $documentsTable);
         $siavcomDocuments = DB::connection($conn->name)->table($documentsTable)
         ->where('tdo_tdo', $quotation_acronym)
         ->whereIn('ndo_doc', [201,1068,1082,2096,5233,2468,3370,3389,2865,5399])
@@ -96,7 +98,7 @@ class DocumentSync extends Command
 
         //Default quoter
         if($quoter == null)
-            $quoter = Employee::where('buyer_number', env('GENERIC_QUOTER_BUYER_NUM'))->first();
+            $quoter = Employee::where('buyer_number', config('siavcom_sync.generic_quoter_buyer_num'))->first();
          
         $data = [
             'type' => $siavcomDocument->tdo_tdo,
@@ -149,11 +151,11 @@ class DocumentSync extends Command
         $documentId = $document->id;
         $documentNumber = $document->number;
 
-        $documentSuppliesTable = env('SIAVCOM_DOCUMENTS_SUPPLIES');
+        $documentSuppliesTable = config('siavcom_sync.siavcom_documents_supplies');
 
         $siavcomDocumentSupplies = DB::connection($conn->name)->table($documentSuppliesTable)
         ->where('ndo_doc', $documentNumber)->get();
-        //->where('tdo_tdo', env('ACR_QUOTATION'))->get();
+        //->where('tdo_tdo', config('siavcom_sync.acr_quotation'))->get();
 
         //Document has no supplies
         if(empty($siavcomDocumentSupplies)) return;
@@ -166,8 +168,8 @@ class DocumentSync extends Command
     //Inserts on document_supplies table
     private function attachDocumentSupply(\stdClass $pivot, \stdClass $conn, $document)
     {
-        $suppliesTable = env('SIAVCOM_SUPPLIES');
-        $manufacturersTable = env('SIAVCOM_MANUFACTURERS');
+        $suppliesTable = config('siavcom_sync.siavcom_supplies');
+        $manufacturersTable = config('siavcom_sync.siavcom_manufacturers');
 
         //Supply
         $siavcom_supply = DB::connection($conn->name)->table($suppliesTable)
@@ -184,7 +186,7 @@ class DocumentSync extends Command
         DB::beginTransaction();
         try {    
             $manufacturer_id = null;
-            if(isset($siavcom_manufacturer)) $manufacturer_id = $this->getManufacturer($siavcom_manufacturer)->id;
+            if(isset($siavcom_manufacturer)) $manufacturer_id = $this->getManufacturer($siavcom_manufacturer, $document)->id;
 
             $supply = $this->getSupply($siavcom_supply, $manufacturer_id);
             $this->insertDocumentSupply($pivot, $document, $supply);
@@ -250,9 +252,8 @@ class DocumentSync extends Command
     }
 
     //Creates a new manufacturer if it doesn't exist
-    private function getManufacturer(\stdClass $siavcom_manufacturer)
+    private function getManufacturer(\stdClass $siavcom_manufacturer, Document $document)
     {
-        //Retrieve manufacturer or create it
         $key_xmd = $siavcom_manufacturer->key_xmd;
         $manufacturer = Manufacturer::where('siavcom_key_xmd', $key_xmd)->first();
         $manufacturer_data = [
@@ -265,13 +266,80 @@ class DocumentSync extends Command
         else
             $manufacturer = Manufacturer::create($manufacturer_data);
 
+        $this->sendSuppliersQuotations($manufacturer, $document);
+
         return $manufacturer;
+    }
+
+    //Send quotation email to every supplier selling the brand/manufacturer specified
+    private function sendSuppliersQuotations(Manufacturer $manufacturer, Document $document)
+    {
+        $suppliers = $manufacturer->suppliers;
+        $supplies = $manufacturer->supplies;
+
+        if($suppliers->count() == 0 || $supplies->count() == 0) return;
+
+        $supplies = implode(', ', $supplies->pluck('number')->toArray());
+
+        try {        
+            foreach($suppliers as $supplier) {
+                $this->sendQuotationEmail($supplier->email, $manufacturer->name, $supplies, $document);
+            }
+        } catch(\Exception $e) {
+            Log::notice($e->getMessage());
+        }
+    }
+
+    private function sendQuotationEmail($email, $manufacturer, $supplies, Document $document)
+    {
+        //Spanish as default, cause we have custom emails in addition to registered suppliers
+        $message = DB::table('messages_languages')
+        ->join('languages', 'languages.id', 'messages_languages.languages_id')
+        ->where('languages.name', 'Español')->first();
+
+        $subject = $message->subject;
+        $body = $message->body . '<div>Fabricante: <strong>' . $manufacturer . '</strong></div>' .
+        '<div>Partes: ' . $supplies . '</div>';
+
+        try {            
+            Mail::send([], [], function($m) use ($email, $subject, $body) {
+                $m->to($email);
+                $m->subject($subject);
+                $m->setBody($body, 'text/html');
+            });
+        } catch(\Exception $e) {
+            throw new \Exception("Error al enviar el correo.", 1);
+        }
+
+        $this->registerQuotationEmailBinnacle($email, $document);
+    }
+
+    private function registerQuotationEmailBinnacle($email, Document $doc)
+    {
+        try {        
+            
+            $doc->fill(['status' => 2])->update();
+
+            $binnacle_data = [
+                'entity' => 1, //Document
+                'pct_status' => $doc->status, //In process
+                'comments' => 'Solicitud de cotización enviada al proveedor ' . $email,
+                'employees_users_id' => null,
+                'type' => 2, //Just a silly number that means nothing
+                'documents_id' => $doc->id,
+                'documents_supplies_id' => null
+            ];
+
+            Binnacle::create($binnacle_data);
+        } catch(\Exception $e) {
+            throw new \Exception("Error al registrat la bitácora.", 1);
+        }
     }
 
     /*Retrieves created/found customer based on siavcom database customer code*/
     private function getCustomer($code, \stdClass $conn)
     {
-        $customersTable = env('SIAVCOM_CUSTOMERS');
+        $customersTable = config('siavcom_sync.siavcom_customers');
         $siavcom_customer = DB::connection($conn->name)->table($customersTable)
         ->where('cod_nom', $code)
         ->where('cop_nom', 'C')

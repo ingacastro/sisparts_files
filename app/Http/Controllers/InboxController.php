@@ -620,70 +620,107 @@ class InboxController extends Controller
 
     public function sendSuppliersQuotation(Request $request)
     {
-        Log::notice($request);
+        $data = $request->all();
 
-        if(!$request->has('suppliers_emails') && !$request->has('custom_emails')) 
+        $data['emails'] = [];
+
+        if(isset($data['suppliers_ids']))
+            $data['emails'] = $data['suppliers_ids'];
+        if(isset($data['custom_emails']))
+            $data['emails'] = array_merge($data['emails'], $data['custom_emails']);
+
+        $validator = $this->sendSuppliersQuotationValidations($data);
+
+        if($validator->fails())
             return response()->json(
                 ['errors' => true,
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
-                ->withErrors('No se ha especificado ninguna dirección de correo de proveedor.')->render()]);
-
-        if(!$request->has('supplies_ids')) 
-            return response()->json(
-                ['errors' => true,
-                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
-                ->withErrors('No se ha seleccionado ninguna de las partes')->render()]);
-
-/*        foreach($request->suppliers_ids as $supplier_id) {
-            $supplier = Supplier::find($supplier_id);
-            $message = DB::table('messages_languages')->where('messages_id', $request->message_id)
-            ->where('languages_id', $supplier->languages_id)->first();
-            try {                
-                Mail::send([], [], function($m) use ($supplier, $message) {
-                    $m->to($supplier->email);
-                    $m->subject($message->subject);
-                    $m->setBody($message->body, 'text/html');
-                });
-            } catch(\Exception $e) {
-                return redirect()->back()->withErrors($e->getMessage());
-            }
-        }
-
-        $set = SupplySet::find($request->documents_supplies_id);
-        $set->fill(['status' => 2])->update();
-        $doc = Document::find($set->documents_id);
-        $doc->fill(['status' => 2])->update();
-
-        $binnacle_data = [
-            'entity' => 2,
-            'pct_status' => $doc->status, //In process
-            'comments' => 'Solicitud de cotización enviada',
-            'employees_users_id' => Auth::user()->id,
-            'type' => 2, //Just a silly number that means nothing
-            'documents_id' => $doc->id,
-            'documents_supplies_id' => $set->id
-        ];
+                ->withErrors($validator)->render()]);
 
         try {
-            DB::table('documents_supplies')->where('id', $doc_supply_id)->update(['status' => 2]);
-            Binnacle::create($binnacle_data);
-        }catch(\Exception $e) {
-            Log::notice($e);
-            return redirect()->back()->withErrors($e->getMessage());
+            foreach($data['emails'] as $email) {
+                $this->sendSupplierQuotationEmail($email, $data);
+            }
+        } catch(\Exception $e) {
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($e->getMessage())->render()]);
         }
 
         $request->session()->flash('message', 'Cotización enviada correctamente.');
-        return redirect()->back();*/
+        return response()->json(['errors' => false]);
     }
 
-    private function sendsendSuppliersQuotationValidations($data)
+    private function sendSupplierQuotationEmail($email, $data)
+    {   
+            //Spanish as default, cause we have custom emails in addition to registered suppliers
+            $message = DB::table('messages_languages')
+            ->join('languages', 'languages.id', 'messages_languages.languages_id')
+            ->where('languages.name', 'Español')->first();
+
+            if(is_numeric($email)) {
+                $supplier = Supplier::find($email);
+                $email = $supplier->email;
+
+                $message = DB::table('messages_languages')->where('messages_id', $data['message_id'])
+                ->where('languages_id', $supplier->languages_id)->first();
+            }
+            $subject = $message->subject;
+            $body = $message->body . '<div>' . $data['manufacturer'] . '</div>' .
+            '<div>Partes: ' . implode(', ', $data['supplies_names']) . '</div>';
+            try {            
+                Mail::send([], [], function($m) use ($email, $subject, $body) {
+                    $m->to($email);
+                    $m->subject($subject);
+                    $m->setBody($body, 'text/html');
+                });
+            } catch(\Exception $e) {
+                throw new \Exception("Error al enviar el correo.", 1);
+            }
+
+            $this->registerQuotationEmailBinnacle($data, $email);
+    }
+
+    private function registerQuotationEmailBinnacle($data, $email)
+    {
+        try {        
+            //Binnacle
+            $set = SupplySet::find($data['documents_supplies_id']);
+            $set->fill(['status' => 2])->update();
+            $doc = Document::find($set->documents_id);
+            $doc->fill(['status' => 2])->update();
+
+            $binnacle_data = [
+                'entity' => 2, //SupplySet
+                'pct_status' => $doc->status, //In process
+                'comments' => 'Solicitud de cotización enviada al proveedor ' . $email,
+                'employees_users_id' => Auth::user()->id,
+                'type' => 2, //Just a silly number that means nothing
+                'documents_id' => $doc->id,
+                'documents_supplies_id' => $set->id
+            ];
+
+            Binnacle::create($binnacle_data);
+        } catch(\Exception $e) {
+            throw new \Exception("Error al registrat la bitácora.", 1);
+        }
+    }
+
+    private function sendSuppliersQuotationValidations($data)
     {
         $messages = [
-            'rejection_reasons_id.required' => 'El campo motivo es requerido.',
+            'emails.required' => 'No se ha especificado ninguna dirección de correo de proveedor.',
+            'custom_emails.*.email' => 'El formato en una o más direcciones de correo es incorrecto.',
+            'supplies_names.required' => 'No se ha seleccionado ninguna de las partes.',
+            'message_id.required' => 'No se ha especificado un mensaje.'
         ];
         
         $validator = Validator::make($data, [
-            'rejection_reasons_id' => 'required',
+            'emails' => 'required',
+            'custom_emails.*' => 'nullable|email',
+            'supplies_names' => 'required',
+            'message_id' => 'required'
         ], $messages);
 
         return $validator;

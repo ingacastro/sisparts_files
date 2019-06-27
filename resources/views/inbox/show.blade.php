@@ -56,7 +56,8 @@
   z-index: 100000;
   background-color: #f1f4f7;
 }
-    .bootstrap-tagsinput { width: 100%; }
+.bootstrap-tagsinput { width: 100%; }
+
 </style>
 @endsection
 @section('content')

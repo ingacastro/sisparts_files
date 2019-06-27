@@ -1,7 +1,11 @@
 $(document).on('click', '.quotation-request', function(){
+
+	cleanQuotationRequestMessages();
 	let item = $(this);
 	
-	$('#supply_number').html('Fabricante: <strong>' + item.attr('data-manufacturer') + '</strong>');
+	let manufacturer_title = 'Fabricante: <strong>' + item.attr('data-manufacturer') + '</strong>';
+	$('#quotation_request_manufacturer').html(manufacturer_title);
+	$('#quotation_request_manufacturer_hidden').val(manufacturer_title);
 	$('#documents_supplies_id').val(item.attr('data-id'));
 
 	$.get('/inbox/get-manufacturer-suppliers-and-supplies/' + item.attr('data-manufacturer_id'), function(response){
@@ -12,7 +16,7 @@ $(document).on('click', '.quotation-request', function(){
 		$.each(response.suppliers, function(key, supp) {
 			let side = (key != 0 && key % 2 != 0) ? 'right_suppliers' : 'left_suppliers';
 			let item = '<label>' +
-			'<input class="material-specifications" style="margin-right: 5px" type="checkbox" name="suppliers_emails[]" value="' + supp.email + '">' +
+			'<input class="material-specifications" style="margin-right: 5px" type="checkbox" name="suppliers_ids[]" value="' + supp.id + '">' +
 			supp.trade_name +
 			'</label>';
 			$('#' + side).append(item);
@@ -20,7 +24,7 @@ $(document).on('click', '.quotation-request', function(){
 		$.each(response.supplies, function(key, supp) {
 			let side = (key != 0 && key % 2 != 0) ? 'right_supplies' : 'left_supplies';
 			let item = '<label>' +
-			'<input class="material-specifications" style="margin-right: 5px" type="checkbox" name="supplies_ids[]" value="' + supp.id + '">' +
+			'<input class="material-specifications" style="margin-right: 5px" type="checkbox" name="supplies_names[]" value="' + supp.number + '">' +
 			supp.number +
 			'</label>';
 			$('#' + side).append(item);
@@ -28,13 +32,13 @@ $(document).on('click', '.quotation-request', function(){
 	});
 });
 
-$('#file_attachment_form').submit(function(e){
+$('#quotation_request_form').submit(function(e){
 	e.preventDefault();
+	cleanQuotationRequestMessages();
 
 	let token = $('input[name=_token]').val();
 	let serialized_form = $(this).serialize();
 	
-
     $.ajax({
         url: '/inbox/send-suppliers-quotation',
         type: 'post',
@@ -42,13 +46,18 @@ $('#file_attachment_form').submit(function(e){
         headers: {'X-CSRF-TOKEN': token},
         data: serialized_form,
         success: function(response) {
-
             if(response.errors) {
                 $('#quotation_request_error_messages').html(response.errors_fragment);
                 return;
             }
             
-            $('#quotation_request_success_message').html(response.success_fragment);
+            location.reload();
         }
     });
 });
+
+function cleanQuotationRequestMessages()
+{
+	$('#quotation_request_error_messages').html('');
+	$('#quotation_request_success_message').html('');
+}

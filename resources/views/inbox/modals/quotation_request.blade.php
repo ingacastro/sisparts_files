@@ -7,14 +7,14 @@
             </div>
             <div class="modal-body">
                 {!! Form::open(['route' => 'inbox.send-suppliers-quotation', 'method' => 'post', 'class' => 'horizontal-form',
-                'id' => 'file_attachment_form']) !!}
+                'id' => 'quotation_request_form']) !!}
                 <input type="hidden" name="documents_supplies_id" id="documents_supplies_id">
                 <div id="quotation_request_error_messages"></div>
-                <div id="quotation_request_success_message"></div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label class="control-label" id="supply_number"></label>
+                            <label class="control-label" id="quotation_request_manufacturer"></label>
+                            <input type="hidden" id="quotation_request_manufacturer_hidden" name="manufacturer" value="">
                         </div>
                     </div>
                 </div>

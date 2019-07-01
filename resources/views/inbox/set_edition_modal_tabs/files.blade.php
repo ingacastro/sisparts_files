@@ -2,7 +2,7 @@
     <div class="col-md-8">
         <div class="row modal-content-border">
             <div id="files_table_container" style="display: none; margin: 0 10px">
-                <input type="hidden" id="set_auto_id" value="{{ $set->id }}">
+                <input type="hidden" id="set_supplies_id" value="{{ $set->supplies_id }}">
                 <div class="table-toolbar">
                     <div class="row">
                         <div class="col-md-6"></div>

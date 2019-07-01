@@ -6,12 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Supply extends Model
 {
-    protected $fillable = ['number', 'manufacturers_id'];
+    protected $fillable = ['number', 'manufacturers_id', 'short_description', 'large_description'];
 
     public function manufacturer()
     {
     	return $this->hasOne('Iparts\Manufacturer', 'manufacturers_id');
     }
+/*    public function files()
+    {
+		return $this->belongsToMany('IParts\File', 'supplies_files', 'supplies_id', 'files_id');
+    }*/
 
 /*    public function documents()
     {

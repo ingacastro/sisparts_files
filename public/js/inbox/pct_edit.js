@@ -29,10 +29,11 @@ $(document).on('click', '.edit-set', function() {
             $('#tab_files_content').html(response.files_tab);
             $('#files_table_container').css('display', 'block');
 
-            let set_auto_id = $('#set_auto_id').val();
+            let set_supplies_id = $('#set_supplies_id').val();
+
             $('#files_table').DataTable({
                 serverSide: true,
-                ajax: '/inbox/set-files/' + set_auto_id,
+                ajax: '/inbox/set-files/' + set_supplies_id,
                 iDisplayLength: 6,
                 destroy: true,
                 lengthChange: false,

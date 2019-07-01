@@ -73,7 +73,8 @@ Route::group(['middleware' => ['role:Administrador']], function(){
 //Inbox
 Route::get('inbox/get-list', 'InboxController@getList')->name('inbox.get-list');
 Route::post('inbox/change-dealership', 'InboxController@changeDealerShip')->name('inbox.change-dealership');
-Route::post('inbox/{document}/archive', 'InboxController@archive');
+Route::post('inbox/{document}/archive-lock/{action}', 'InboxController@archiveOrLock');
+Route::post('inbox/{document}/unlock', 'InboxController@unlock');
 Route::get('inbox/document-supplies', 'InboxController@getDocumentSupplySets');
 Route::get('inbox/document-binnacle/{documents_id}', 'InboxController@getDocumentBinnacle');
 Route::get('inbox/get-set-tabs/{set_id}', 'InboxController@getSetTabs');
@@ -99,3 +100,7 @@ Route::resource('archive', 'ArchiveController');
 //Supply set rejection
 Route::get('rejection-reason/get-list', 'RejectionReasonController@getList');
 Route::resource('rejection-reason', 'RejectionReasonController');
+
+//Supplies/products
+Route::get('supply/get-list', 'SupplyController@getList');
+Route::get('supply', 'SupplyController@index')->name('supply.index');

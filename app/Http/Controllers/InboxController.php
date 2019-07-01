@@ -56,7 +56,7 @@ class InboxController extends Controller
 
             $first_color_setting = DB::table('color_settings')->orderBy('days', 'asc')->first();
 
-            $fields = ['documents.id', 'documents.created_at', 'sync_connections.display_name as sync_connection',
+            $fields = ['documents.id', 'documents.is_canceled', 'documents.created_at', 'sync_connections.display_name as sync_connection',
             'users.name as buyer', 'documents.number', 'customers.trade_name as customer', 
              DB::raw('DATEDIFF(NOW(), documents.created_at) as semaphore_days'), 
              DB::raw('(CASE WHEN documents.status = 1 THEN "Nueva"
@@ -76,10 +76,10 @@ class InboxController extends Controller
 
             $logged_user = Auth::user();
             //Dealership won't see customer
-            if($logged_user->roles()->first()->name == "Cotizador") {
+            if($logged_user->hasRole("Cotizador")) {
                 $query->where('employees_users_id', $logged_user->id);
                 $query->orWhereRaw('DATEDIFF(now(), documents.created_at) > 5');
-                unset($fields[5]);
+                unset($fields[6]); //customer removed 
             }
 
             if($sync_connection > 0)
@@ -88,16 +88,18 @@ class InboxController extends Controller
                 $query->where('documents.status', $status);
             if($dealer_ship > 0)
                 $query->where('documents.employees_users_id', $dealer_ship);
+            if($route == 'inbox')
+                $query->where('documents.status', '!=', 4);
             if($route == 'archive')
                 $query->where('documents.status', 4);
 
              $documents = $query->get($fields);
-             return $this->buildInboxDataTable($documents, $route);
+             return $this->buildInboxDataTable($documents, $route, $logged_user);
         }
         abort(403, 'Unauthorized action');
     }
 
-    private function buildInboxDataTable($documents, $route)
+    private function buildInboxDataTable($documents, $route, $logged_user)
     {
         return Datatables::of($documents)
               ->editColumn('semaphore', function($document) {
@@ -108,10 +110,19 @@ class InboxController extends Controller
               ->editColumn('created_at', function($document) {
                 return date_format(new \DateTime($document->created_at), 'd/m/Y');
               })
-              ->addColumn('actions', function($document) use ($route) {
-                $actions = ($route == 'inbox') 
-                ? '<a href="/inbox/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a><a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '"><i class="fa fa-user"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="archiveDocument(event, ' . $document->id . ')"><i class="fa fa-archive"></i></a>'
-                : '<a href="/archive/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';
+              ->addColumn('actions', function($document) use ($route, $logged_user) { 
+                if($route == 'inbox') {
+                    $actions = '<a href="/inbox/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a><a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '"><i class="fa fa-user"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="archiveOrLockDocument(event, ' . $document->id . ', 1)"><i class="fa fa-archive"></i></a>';
+                    $actions .= $logged_user->hasRole('Administrador')
+                    ? '<a class="btn btn-circle btn-icon-only default red" onClick="archiveOrLockDocument(event, ' . $document->id . ', 2)"><i class="fa fa-lock"></i></a>'
+                    : '';
+                }
+                else {
+                    $actions = '<a href="/archive/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';
+                    if($document->is_canceled == 1) { //$logged_user->hasRole('Administrador') && 
+                        $actions .= '<a class="btn btn-circle btn-icon-only default green-meadow" onClick="unlockDocument(event, ' . $document->id . ')"><i class="fa fa-unlock"></i></a>';
+                    }
+                }
                 return $actions;
               })
               ->rawColumns(['semaphore' => 'semaphore', 'actions' => 'actions'])
@@ -152,11 +163,53 @@ class InboxController extends Controller
         return $validator;
     }
 
-    public function archive($document_id)
+    /* Archive or lock(mark as cancelled) a document */
+    public function archiveOrLock($document_id, $action)
+    {
+        $action_name = $action == 1 ? 'archivado' : 'cancelado';
+        $updates = ['status' => 4];
+
+        try {
+            DB::transaction(function() use ($document_id, $action, $updates) {
+                $document = Document::find($document_id);
+
+                if($action == 2) {
+                    $updates['was_canceled'] = 1;
+                    $updates['is_canceled'] = 1;
+                }
+
+                $document->fill($updates);
+                $document->update();
+            });
+            Session::flash('message', 'Documento ' . $action_name . ' correctamente.');
+        } catch(\Exception $e) {
+            back()->withErrors($e->getMessage());
+        }
+    }
+
+    /* Remove cancel mark from document/PCT */
+    public function unlock($document_id)
     {
         try {
-            Document::find($document_id)->fill(['status' => 4])->update();
-            Session::flash('message', 'Elemento archivado correctamente.');
+            $document = Document::find($document_id);
+       
+            $sets_count = $document->supply_sets->count();
+            $ctz_sets_count = $document->supply_sets->where('status', 9)->count();
+
+            $status = 0;
+
+            if($ctz_sets_count == 0) //New
+                $status = 1; 
+            else if($ctz_sets_count != $sets_count) //In process
+                $status = 2; 
+            else //Done
+                $status = 3; 
+
+            $document->fill([
+                'status' => $status,
+                'is_canceled' => 0,
+            ])->update();
+            Session::flash('message', 'Documento reactivado correctamente.');
         } catch(\Exception $e) {
             back()->withErrors($e->getMessage());
         }
@@ -202,7 +255,10 @@ class InboxController extends Controller
 
         $rejection_reasons = DB::table('rejection_reasons')->pluck('title', 'id');
 
-        return view('inbox.show', compact('document', 'manufacturers', 'document_supplies', 'messages', 
+        //Canceled document shows archive's show view (no edit), otherwise It shows inbox's show view (edit)
+        $view = $document->is_canceled == 1 ? 'archive' : 'inbox';
+
+        return view($view . '.show', compact('document', 'manufacturers', 'document_supplies', 'messages', 
             'rejection_reasons'));
     }
 
@@ -240,14 +296,15 @@ class InboxController extends Controller
         abort(403, 'Unauthorized action');
     }
 
-    public function getSetFiles(Request $request, $set_id)
+    //Now files are attached directly to supplies
+    public function getSetFiles(Request $request, $set_supplies_id)
     {
         if($request->ajax()):
 
             $files = DB::table('files')
-            ->join('documents_supplies_files', 'documents_supplies_files.files_id', 'files.id')
-            ->join('documents_supplies', 'documents_supplies.id', 'documents_supplies_files.documents_supplies_id')
-            ->where('documents_supplies.id', $set_id)->get();
+            ->join('supplies_files', 'supplies_files.files_id', 'files.id')
+            ->join('supplies', 'supplies.id', 'supplies_files.supplies_id')
+            ->where('supplies.id', $set_supplies_id)->get();
 
             return Datatables::of($files)
                   ->editColumn('created_at', function($file) {
@@ -638,9 +695,16 @@ class InboxController extends Controller
                 ->withErrors($validator)->render()]);
 
         try {
+            $set = SupplySet::find($data['documents_supplies_id']);
+
             foreach($data['emails'] as $email) {
                 $this->sendSupplierQuotationEmail($email, $data);
+                $this->registerQuotationEmailBinnacle($email, $data, $set);
             }
+            
+            $set->fill(['status' => 2])->update();
+            $doc = Document::find($set->documents_id);
+            $doc->fill(['status' => 2])->update();
         } catch(\Exception $e) {
             return response()->json(
                 ['errors' => true,
@@ -654,42 +718,37 @@ class InboxController extends Controller
 
     private function sendSupplierQuotationEmail($email, $data)
     {   
-            //Spanish as default, cause we have custom emails in addition to registered suppliers
-            $message = DB::table('messages_languages')
-            ->join('languages', 'languages.id', 'messages_languages.languages_id')
-            ->where('languages.name', 'Español')->first();
+        //Spanish as default, cause we have custom emails in addition to registered suppliers
+        $message = DB::table('messages_languages')
+        ->join('languages', 'languages.id', 'messages_languages.languages_id')
+        ->where('languages.name', 'Español')->first();
 
-            if(is_numeric($email)) {
-                $supplier = Supplier::find($email);
-                $email = $supplier->email;
+        if(is_numeric($email)) {
+            $supplier = Supplier::find($email);
+            $email = $supplier->email;
 
-                $message = DB::table('messages_languages')->where('messages_id', $data['message_id'])
-                ->where('languages_id', $supplier->languages_id)->first();
-            }
-            $subject = $message->subject;
-            $body = $message->body . '<div>' . $data['manufacturer'] . '</div>' .
-            '<div>Partes: ' . implode(', ', $data['supplies_names']) . '</div>';
-            try {            
-                Mail::send([], [], function($m) use ($email, $subject, $body) {
-                    $m->to($email);
-                    $m->subject($subject);
-                    $m->setBody($body, 'text/html');
-                });
-            } catch(\Exception $e) {
-                throw new \Exception("Error al enviar el correo.", 1);
-            }
-
-            $this->registerQuotationEmailBinnacle($data, $email);
+            $message = DB::table('messages_languages')->where('messages_id', $data['message_id'])
+            ->where('languages_id', $supplier->languages_id)->first();
+        }
+        $subject = $message->subject;
+        $body = $message->body . '<div>' . $data['manufacturer'] . '</div>' .
+        '<div>Partes: ' . implode(', ', $data['supplies_names']) . '</div>';
+        try {            
+            Mail::send([], [], function($m) use ($email, $subject, $body) {
+                $m->to($email);
+                $m->subject($subject);
+                $m->setBody($body, 'text/html');
+            });
+        } catch(\Exception $e) {
+            throw new \Exception("Error al enviar el correo.", 1);
+        }
     }
 
-    private function registerQuotationEmailBinnacle($data, $email)
+    private function registerQuotationEmailBinnacle($email, $data, SupplySet $set)
     {
         try {        
-            //Binnacle
-            $set = SupplySet::find($data['documents_supplies_id']);
-            $set->fill(['status' => 2])->update();
-            $doc = Document::find($set->documents_id);
-            $doc->fill(['status' => 2])->update();
+
+            $doc = $set->document;
 
             $binnacle_data = [
                 'entity' => 2, //SupplySet
@@ -703,7 +762,7 @@ class InboxController extends Controller
 
             Binnacle::create($binnacle_data);
         } catch(\Exception $e) {
-            throw new \Exception("Error al registrat la bitácora.", 1);
+            throw new \Exception($e->getMessage(), 1);
         }
     }
 
@@ -739,9 +798,11 @@ class InboxController extends Controller
         $base_query = DB::table('documents_supplies');
         $update_query = clone $base_query;
         
-        $files = $base_query->join('documents_supplies_files', 'documents_supplies_files.documents_supplies_id', 'documents_supplies.id')
-        ->join('files', 'documents_supplies_files.files_id', 'files.id')
-        ->where('documents_supplies.id', $request->set_id)
+        $supply_set = SupplySet::find($request->set_id);
+
+        $files = $base_query->join('supplies_files', 'supplies_files.supplies_id', 'supplies.id')
+        ->join('files', 'supplies_files.files_id', 'files.id')
+        ->where('supplies.id', $supply_set->supplies_id)
         ->whereRaw('DATEDIFF(now(), files.created_at) < 30')->get();
 
         if($status == 6 && count($files) == 0)

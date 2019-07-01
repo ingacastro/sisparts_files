@@ -9,7 +9,7 @@ class Document extends Model
     protected $fillable = ['type','number','reference','customer_code','seller_number','state', 'status',
     					   'currency_id','mxn_currency_exchange_rate','customer_requirement_number',
     					   'buyer_name','buyer_number','customers_id', 'sync_connections_id', 'employees_users_id',
-                 'completed_date'];
+                 'completed_date', 'was_canceled', 'is_canceled'];
 
    	public function supplies()
    	{
@@ -31,5 +31,9 @@ class Document extends Model
     public function currency()
     {
       return $this->hasOne('IParts\Currency', 'id', 'currency_id');
+    }
+    public function supply_sets()
+    {
+      return $this->hasMany('IParts\SupplySet', 'documents_id');
     }
 }

@@ -239,7 +239,9 @@ class DocumentSync extends Command
         $supply = Supply::where('number', $cla_isu)->first();
         $supply_data = [
             'number' => $cla_isu,
-            'manufacturers_id' => $manufacturer_id
+            'manufacturers_id' => $manufacturer_id,
+            'short_description' => $siavcom_supply->des_isu,
+            'large_description' => $siavcom_supply->dea_isu
         ];
 
         $is_new_supply = true;

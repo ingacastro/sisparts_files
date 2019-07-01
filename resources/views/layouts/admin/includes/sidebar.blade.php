@@ -88,6 +88,13 @@
             </a>
         </li>
         @endrole
+        <li id="sidebar_supply" class="nav-item">
+            <a href="{{ route('supply.index') }}" class="nav-link nav-toggle">
+                <i class="fa fa-truck"></i>
+                <span class="title">Productos</span>
+                <span class="selected"></span>
+            </a>
+        </li>
     </ul>
     <!-- END SIDEBAR MENU -->
     <!-- END SIDEBAR MENU -->

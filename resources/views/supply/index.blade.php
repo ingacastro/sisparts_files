@@ -1,6 +1,7 @@
 @extends('layouts.admin.master')
 @section('meta-css')
-<meta name="_token" content="{{ csrf_token() }}">
+{{-- <meta name="_token" content="{{ csrf_token() }}"> --}}
+<meta id="root_url" content="{{ url('/') }}">
 <link href="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/css/plugins.min.css" rel="stylesheet" type="text/css" />
 {{-- <link href="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.css" rel="stylesheet" type="text/css" /> --}}
@@ -57,13 +58,11 @@
                             <th>Descripción corta</th>
                             <th>Descripción larga</th>
                             <th>Proveedores</th>
-{{--                            <th>Proveedores</th>
-                            <th>URLs</th>
                             <th>Adjuntos</th>
-                            <th>Reemplazos</th>
+                            <th>Acciones</th>
+{{--                            <th>Reemplazos</th>
                             <th>Observaciones</th>
-                            <th>Cortizaciones</th>
-                            <th>Acciones</th> --}}
+                            <th>Cortizaciones</th> --}}
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -82,7 +81,7 @@
 <script type="text/javascript">
     $(document).ready(function(){
         $('#sidebar_supply').addClass('active');
-
+        let root_url = $('#root_url').attr('content');
         $('#supplies_table').DataTable({
             serverSide: true,
             ajax: '/supply/get-list',
@@ -98,7 +97,22 @@
                         return data == null ? '' : data.split(',').join('</br>');
                     }
                 },
-                /*{ data: 'actions', name: 'actions', orderable: false, searchable: false }*/
+                { 
+                    data: 'files',
+                    render: function(data, type, row){
+                        if(data == null)
+                            return '';
+                        else {
+                            let files = data.split(',');
+                            $.each(files, function(k, v){
+                                let url = root_url + '/' + v;
+                                files[k] = '<a href="' + url + '" download>Archivo ' + (k+1) + '</a>';
+                            });
+                            return files.join('</br>');
+                        }
+                    }
+                },
+                { data: 'actions', name: 'actions', orderable: false, searchable: false }
             ],
             language: {
                 "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"

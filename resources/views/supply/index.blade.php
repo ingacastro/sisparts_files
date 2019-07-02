@@ -1,10 +1,16 @@
 @extends('layouts.admin.master')
 @section('meta-css')
-{{-- <meta name="_token" content="{{ csrf_token() }}"> --}}
+<meta name="_token" content="{{ csrf_token() }}">
 <meta id="root_url" content="{{ url('/') }}">
 <link href="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/css/plugins.min.css" rel="stylesheet" type="text/css" />
-{{-- <link href="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.css" rel="stylesheet" type="text/css" /> --}}
+<link href="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.css" rel="stylesheet" type="text/css" />
+<style>
+    .sweet-alert {
+        z-index: 99999 !important;
+        background-color: #eef1f5;
+    }
+</style>
 @endsection
 @section('content')
 @section('breadcumb')
@@ -72,12 +78,14 @@
         <!-- END EXAMPLE TABLE PORTLET-->
     </div>
 </div>
+@include('supply.modals.replacement_observation')
 @endsection
 @endsection
 @push('scripts')
 <script src="/metronic-assets/global/plugins/datatables/datatables.min.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
-{{-- <script src="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.min.js" type="text/javascript"></script> --}}
+<script src="/js/supply/index.js" type="text/javascript"></script>
+<script src="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.min.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(document).ready(function(){
         $('#sidebar_supply').addClass('active');
@@ -91,7 +99,7 @@
                 { data: "manufacturer", name: "manufacturer" },
                 { data: "short_description", name: "short_description" },
                 { data: "large_description", name: "large_description" },
-                { 
+                {
                     data: 'suppliers',
                     render: function(data, type, row){
                         return data == null ? '' : data.split(',').join('</br>');
@@ -116,7 +124,7 @@
             ],
             language: {
                 "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
-            }, 
+            }
         });
     });
 

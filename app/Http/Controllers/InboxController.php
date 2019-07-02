@@ -103,8 +103,8 @@ class InboxController extends Controller
     {
         return Datatables::of($documents)
               ->editColumn('semaphore', function($document) {
-                return '<div class="form-control" style="background-color: ' . $document->semaphore_color . '; width: 100%; height: 25px;
-                            line-height: 100%; vertical-align: middle; text-align: center; color: #fff">' . 
+                return '<div class="form-control" style="background-color: ' . $document->semaphore_color . '; width: 70%; height: 25px;
+                            line-height: 100%; text-align: center; color: #fff; margin: auto">' . 
                             $document->semaphore_days . ' días </div>';
               })
               ->editColumn('created_at', function($document) {

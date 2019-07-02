@@ -4,8 +4,12 @@ namespace IParts\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
+use Illuminate\Support\Facades\Log;
 use IParts\Supply;
+use Validator;
 use DB;
+use IParts\Replacement;
+use IParts\Observation;
 
 class SupplyController extends Controller
 {
@@ -24,8 +28,7 @@ class SupplyController extends Controller
     }
 
     public function getList(Request $request)
-    {   
-        
+    {    
         if($request->ajax()) {
 
             $supplies = Supply::select('supplies.id', 'supplies.number', 'manufacturers.name as manufacturer',
@@ -44,13 +47,129 @@ class SupplyController extends Controller
 
             return Datatables::of($supplies)
                   ->addColumn('actions', function($supply) {
-                    return '<a href="/supply/'. $supply->id . '/edit" class="btn btn-circle btn-icon-only default"><i class="fa fa-edit"></i></a>';
+                        return '<a href="#replacement_observation_modal" class="btn btn-circle btn-icon-only blue replacement-observation" data-toggle="modal" data-target="#replacement_observation_modal" 
+                            data-supply_id="' . $supply->id . '" data-type="1"><i class="fa fa-refresh"></i></a>
+                        <a href="#replacement_observation_modal" class="btn btn-circle btn-icon-only yellow-crusta replacement-observation" data-toggle="modal" data-target="#replacement_observation_modal" 
+                            data-supply_id="' . $supply->id . '" data-type="2"><i class="fa fa-list-alt"></i></a>';
                   })
                   ->rawColumns(['actions' => 'actions'])
                   ->make(true);
         }
         abort(403, 'Unauthorized action');
     }
+
+    public function getReplacementsObservations(Request $request, $supply_id, $type)
+    {
+        if($request->ajax()) {
+
+            $table = $type == 1 ? 'replacements' : 'observations';
+            $items = DB::table($table)->where('supplies_id', $supply_id)->get();
+
+            return Datatables::of($items)
+                  ->addColumn('actions', function($item) use($type) {
+                        $actions = '<a class="btn btn-circle btn-icon-only red"
+                            onclick="deleteReplacementObservation(event,' . $item->id . ',' . $type . ')"><i class="fa fa-times"></i></a>';
+                        if($type == 1)
+                            $actions = '<a class="btn btn-circle btn-icon-only default replacement-edit" 
+                            data-description="' . $item->description . '" data-id="' . $item->id .'">
+                            <i class="fa fa-edit"></i></a>' . $actions;
+                        return $actions;
+                  })
+                  ->rawColumns(['actions' => 'actions'])
+                  ->make(true);
+        }
+        abort(403, 'Unauthorized action');
+    }
+
+    /*Store and update replacement or store observation*/
+    public function saveReplacementObservation(Request $request, $type)
+    {
+        if(!$request->ajax())
+            return response()->json([
+                'errorrs' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('Acción no autorizada.')->render()
+            ]);
+
+        $data = $request->all();
+
+        $validator = $this->replacementObvservationValidations($data);
+
+        if($validator->fails())
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($validator)->render()]);
+
+        $obj = null;
+        $action = 1; //1. save, 2. update
+        try {
+            if($type == 1) {
+                $replacement_id = $request->replacement_id;
+                if(is_null($replacement_id))
+                    $obj = Replacement::create($data);
+                else {
+                    Replacement::find($replacement_id)->fill($data)->update();
+                    $action = 2;
+                }
+            } else
+                $obj = Observation::create($data);
+        } catch(\Exception $e) {
+            return response()->json([
+                'errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($e->getMessage())->render() 
+            ]);
+        }
+
+      $type_name = $type == 1 ? 'Reemplazo' : 'Observación';
+      return response()->json([
+        'errors' => false,
+        'action' => 2,
+        'obj' => $obj,
+        'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
+        ->with('success_message', $type_name . ($action == 1 ? ' guardado' : ' actualizado') . ' correctamente.')->render()
+      ]);
+    }
+
+    private function replacementObvservationValidations($data)
+    {
+        $messages = [
+            'description.required' => 'El campo descripción es requerido.',
+        ];
+        
+        $validator = Validator::make($data, [
+            'description' => 'required',
+        ], $messages);
+
+        return $validator;
+    }
+
+    public function deleteReplacementObservation(Request $request, $id, $type)
+    {
+        $type_name = 'Reemplazo';
+        try {
+            if($type == 1)
+                Replacement::destroy($id);
+            else {
+                Observation::destroy($id);
+                $type_name = 'Observación';
+            }
+        } catch(\Exception $e) {
+            return response()->json([
+                'errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($e->getMessage())->render() 
+            ]);
+        }
+
+      return response()->json([
+        'errors' => false,
+        'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
+        ->with('success_message', $type_name . ' eliminado correctamente.')->render()
+      ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      *

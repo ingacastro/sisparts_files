@@ -473,6 +473,9 @@ class InboxController extends Controller
             $supplies_sets = $query->get();
 
             return Datatables::of($supplies_sets)
+                  ->editColumn('number', function($document) {
+                    return '<a href="' . url('supply') . '?number=' . $document->number . '">' . $document->number . '</a>';
+                  })
                   ->addColumn('actions', function($supplies_set) use ($request) {
 
                     $total_price = $this->calculateTotalPrice($supplies_set->total_cost, $supplies_set->utility_percentage);
@@ -507,7 +510,7 @@ class InboxController extends Controller
                     $total_price = $this->calculateTotalPrice($supplies_set->total_cost, $supplies_set->utility_percentage);
                     return '$ ' .  number_format($total_price, 2, '.', ',') . ' ' . $supplies_set->currency;
                   })
-                  ->rawColumns(['actions' => 'actions', 'total_cost' => 'total_cost', 
+                  ->rawColumns(['number' => 'number', 'actions' => 'actions', 'total_cost' => 'total_cost', 
                     'total_price' => 'total_price', 'checkbox' => 'checkbox'])
                   ->make(true);
         endif;

@@ -106,4 +106,5 @@ Route::get('supply/get-list', 'SupplyController@getList');
 Route::get('supply/{supply_id}/get-replacements-observations/{type}', 'SupplyController@getReplacementsObservations');
 Route::post('supply/store-replacement-observation/{type}', 'SupplyController@saveReplacementObservation');
 Route::delete('supply/replacement-observation/{id}/{type}', 'SupplyController@deleteReplacementObservation');
+Route::get('supply/{supply_id}/pcts', 'SupplyController@getPcts');
 Route::get('supply', 'SupplyController@index')->name('supply.index');

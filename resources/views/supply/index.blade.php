@@ -79,6 +79,7 @@
     </div>
 </div>
 @include('supply.modals.replacement_observation')
+@include('supply.modals.pcts')
 @endsection
 @endsection
 @push('scripts')
@@ -89,8 +90,10 @@
 <script type="text/javascript">
     $(document).ready(function(){
         $('#sidebar_supply').addClass('active');
+
         let root_url = $('#root_url').attr('content');
-        $('#supplies_table').DataTable({
+
+        let table = $('#supplies_table').DataTable({
             serverSide: true,
             ajax: '/supply/get-list',
             bSort: true,
@@ -126,6 +129,13 @@
                 "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
             }
         });
+
+        //var abcFromUrl = Request.QueryString["number"] ?? string.Empty;
+        let url = window.location.href;
+        url = new URL(url);
+        let supply_number = url.searchParams.get("number");
+        if(supply_number != null)
+            table.search(supply_number).draw();
     });
 
     /*Supplier delete*/

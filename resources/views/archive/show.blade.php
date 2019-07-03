@@ -23,19 +23,6 @@
 #edit_set_modal {
     padding-right: 0 !important;
 }
-.modal-xl {
-    width: 95%;
-}
-.modal-xl .modal-body {
-    padding-bottom: 0px !important;
-}
-.modal-content-border {
-    border: 1px solid #869ab3;
-    border-radius: 4px;
-    padding-top: 10px;
-    margin-left: -5px !important;
-    margin-right: -5px !important;
-}
 .budget-currency-data {
     padding-top: 0 !important;
 }

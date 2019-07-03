@@ -10,6 +10,7 @@ use Validator;
 use DB;
 use IParts\Replacement;
 use IParts\Observation;
+use IParts\Document;
 
 class SupplyController extends Controller
 {
@@ -50,7 +51,33 @@ class SupplyController extends Controller
                         return '<a href="#replacement_observation_modal" class="btn btn-circle btn-icon-only blue replacement-observation" data-toggle="modal" data-target="#replacement_observation_modal" 
                             data-supply_id="' . $supply->id . '" data-type="1"><i class="fa fa-refresh"></i></a>
                         <a href="#replacement_observation_modal" class="btn btn-circle btn-icon-only yellow-crusta replacement-observation" data-toggle="modal" data-target="#replacement_observation_modal" 
-                            data-supply_id="' . $supply->id . '" data-type="2"><i class="fa fa-list-alt"></i></a>';
+                            data-supply_id="' . $supply->id . '" data-type="2"><i class="fa fa-clipboard"></i></a>
+                        <a href="#pcts_modal" class="btn btn-circle btn-icon-only default pcts" data-toggle="modal" data-target="#pcts_modal" 
+                            data-supply_id="' . $supply->id . '"><i class="fa fa-list"></i></a>';
+                  })
+                  ->rawColumns(['actions' => 'actions'])
+                  ->make(true);
+        }
+        abort(403, 'Unauthorized action');
+    }
+
+    public function getPcts(Request $request, $supply_id)
+    {
+        if($request->ajax()) {
+
+            $documents = Document::select('documents.id', 'documents.created_at', 'documents.number',
+            DB::raw('"RFQ" as rfq'), DB::raw('"Cantidad" as amount'), 
+            DB::raw('"Costo unitario y costo total" as unit_total_cost'), DB::raw('"Precio unitario y precio total" as unit_total_price'),
+            DB::raw('"Proveedor" as supplier'))->get();
+
+            Log::notice($documents);
+
+            return Datatables::of($documents)
+                  ->editColumn('created_at', function($document) {
+                    return date('d/m/Y', strtotime($document->created_at));
+                  })
+                  ->addColumn('actions', function($document) {
+                        return '';
                   })
                   ->rawColumns(['actions' => 'actions'])
                   ->make(true);

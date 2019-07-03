@@ -139,3 +139,31 @@ function deleteReplacementObservationRequest(id, type) {
         }
     });
 }
+
+$(document).on('click', '.pcts', function() {
+
+	let supply_id = $(this).data('supply_id');
+
+	$('#pcts_table').DataTable({
+        ajax: '/supply/' + supply_id + '/pcts/',
+        sort: false,
+        destroy: true,
+        //iDisplayLength: 6,
+        lengthChange: false,
+        processData: false,
+        serverSide: true,
+        columns: [
+            { data: "created_at", name: "created_at" },
+            { data: "number", name: "number" },
+            { data: "rfq", name: "rfq" },
+            { data: "amount", name: "amount" },
+            { data: "unit_total_cost", name: "unit_total_cost" },
+            { data: "unit_total_price", name: "unit_total_price" },
+            { data: "supplier", name: "supplier" },
+            { data: 'actions', name: 'actions', orderable: false, searchable: false }
+        ],
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+        }
+	});
+});

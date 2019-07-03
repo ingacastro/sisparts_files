@@ -33,5 +33,18 @@
         .page-sidebar-menu { padding-top: 44px !important; }
         .page-title { color: #e7505a!important; font-weight: normal; }
         #user_data:hover { background-color: transparent !important; cursor: default !important; }
+        .modal-xl {
+            width: 95%;
+        }
+        .modal-xl .modal-body {
+            padding-bottom: 0px !important;
+        }
+        .modal-content-border {
+            border: 1px solid #869ab3;
+            border-radius: 4px;
+            padding-top: 10px;
+            margin-left: -5px !important;
+            margin-right: -5px !important;
+        }
     </style>
 </head>

@@ -66,18 +66,36 @@ class SupplyController extends Controller
         if($request->ajax()) {
 
             $documents = Document::select('documents.id', 'documents.created_at', 'documents.number',
-            DB::raw('"RFQ" as rfq'), DB::raw('"Cantidad" as amount'), 
-            DB::raw('"Costo unitario y costo total" as unit_total_cost'), DB::raw('"Precio unitario y precio total" as unit_total_price'),
-            DB::raw('"Proveedor" as supplier'))->get();
-
-            Log::notice($documents);
+            DB::raw('"RFQ" as rfq'), 'documents_supplies.products_amount', 'documents_supplies.sale_unit_cost',
+            DB::raw('documents_supplies.sale_unit_cost * documents_supplies.products_amount + documents_supplies.importation_cost
+            + documents_supplies.warehouse_shipment_cost + documents_supplies.customer_shipment_cost + documents_supplies.extra_charges as total_cost'),
+            DB::raw('CASE WHEN documents_supplies.utility_percentages_id IS NOT null THEN utility_percentages.percentage
+                ELSE documents_supplies.custom_utility_percentage END AS utility_percentage'),
+            'suppliers.trade_name as supplier')
+            ->leftJoin('documents_supplies', 'documents_supplies.documents_id', 'documents.id')
+            ->leftJoin('utility_percentages', 'utility_percentages.id', 'documents_supplies.utility_percentages_id')
+            ->leftJoin('suppliers', 'suppliers.id', 'documents_supplies.suppliers_id')
+            ->where('documents_supplies.supplies_id', $supply_id)
+            ->get();
 
             return Datatables::of($documents)
                   ->editColumn('created_at', function($document) {
                     return date('d/m/Y', strtotime($document->created_at));
                   })
+                  ->addColumn('unit_total_cost', function($supplies_set) {
+                    return '$' . number_format($supplies_set->sale_unit_cost, 2, '.', ',') . ' ' . $supplies_set->currency . ' - ' .
+                           '$' . number_format($supplies_set->total_cost, 2, '.', ',') . ' ' . $supplies_set->currency;
+                  })
+                  ->addColumn('unit_total_price', function($supplies_set) {
+
+                    $total_price = $supplies_set->total_cost / ((100 - $supplies_set->utility_percentage) / 100);
+                    $unit_price = $total_price / $supplies_set->products_amount;
+
+                    return '$' . number_format($unit_price, 2, '.', ',') . ' ' . $supplies_set->currency . ' - ' .
+                           '$' . number_format($total_price, 2, '.', ',') . ' ' . $supplies_set->currency;
+                  })
                   ->addColumn('actions', function($document) {
-                        return '';
+                        return '<a href="/inbox/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';
                   })
                   ->rawColumns(['actions' => 'actions'])
                   ->make(true);

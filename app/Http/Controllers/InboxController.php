@@ -486,10 +486,10 @@ class InboxController extends Controller
                     return ($request->route == 'inbox') 
                     ? '<a data-target="#edit_set_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default edit-set" 
                     data-id="' . $supplies_set->documents_id . '_' . $supplies_set->supplies_id . '"
-                    data-total_cost="' . '$ ' . number_format($supplies_set->total_cost, 2, '.', ',') . $currency . '" 
-                    data-total_price="' . '$ ' . number_format($total_price, 2, '.', ',') . $currency . '"
-                    data-unit_price="' . '$ ' . number_format($unit_price, 2, '.', ',') . $currency . '"
-                    data-total_profit="' . '$ ' . number_format($total_profit, 2, '.', ',') . $currency . '"
+                    data-total_cost="' . '$' . number_format($supplies_set->total_cost, 2, '.', ',') . $currency . '" 
+                    data-total_price="' . '$' . number_format($total_price, 2, '.', ',') . $currency . '"
+                    data-unit_price="' . '$' . number_format($unit_price, 2, '.', ',') . $currency . '"
+                    data-total_profit="' . '$' . number_format($total_profit, 2, '.', ',') . $currency . '"
                     data-set_number=" ' . $supplies_set->set . '"
                     data-supply_number=" ' . $supplies_set->number . '"><i class="fa fa-edit"></i></a>
                     <a data-target="#quotation_request_modal" data-toggle="modal" class="btn btn-circle yellow-crusta btn-icon-only default quotation-request"
@@ -504,11 +504,11 @@ class InboxController extends Controller
                     return '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input type="checkbox" class="checkboxes" value="' . $supplies_set->id . '"><span></span></label>';
                   })
                   ->editColumn('total_cost', function($supplies_set) {
-                    return '$ ' . number_format($supplies_set->total_cost, 2, '.', ',') . ' ' . $supplies_set->currency;
+                    return '$' . number_format($supplies_set->total_cost, 2, '.', ',') . ' ' . $supplies_set->currency;
                   })
                   ->addColumn('total_price', function($supplies_set) {
                     $total_price = $this->calculateTotalPrice($supplies_set->total_cost, $supplies_set->utility_percentage);
-                    return '$ ' .  number_format($total_price, 2, '.', ',') . ' ' . $supplies_set->currency;
+                    return '$' .  number_format($total_price, 2, '.', ',') . ' ' . $supplies_set->currency;
                   })
                   ->rawColumns(['number' => 'number', 'actions' => 'actions', 'total_cost' => 'total_cost', 
                     'total_price' => 'total_price', 'checkbox' => 'checkbox'])

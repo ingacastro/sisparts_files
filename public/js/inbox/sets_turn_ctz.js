@@ -65,7 +65,7 @@ $('#sets_turn_ctz_form').submit(function(e){
         success: function(response) {
 
             if(response.errors) {
-                $('#file_attachment_error_messages').html(response.errors_fragment);
+                $('#sets_turn_ctz_error_messages').html(response.errors_fragment);
                 return;
             }
             

@@ -20,14 +20,14 @@ class DocumentSync extends Command
      *
      * @var string
      */
-    protected $signature = 'siavcom:sync';
+    protected $signature = 'siavcom:document-sync';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Siavcom PCT synchronization.';
+    protected $description = 'Siavcom Document/PCT synchronization.';
 
     /**
      * Create a new command instance.
@@ -347,7 +347,7 @@ class DocumentSync extends Command
         ->where('cop_nom', 'C')
         ->first();
 
-        //If customer were found on siavcom db, we're not gonna try to find it or create it
+        //If customer wasn't found on siavcom db, we're not gonna try to find it or create it
         if(!isset($siavcom_customer)) return null;
         
         //Otherwise, we found it, or create it in our db
@@ -361,7 +361,8 @@ class DocumentSync extends Command
                 'business_name' => $siavcom_customer->nom_nom,
                 'post_code' => $siavcom_customer->cpo_nom,
                 'state' => $siavcom_customer->edo_edo,
-                'country' => $siavcom_customer->pai_nom
+                'country' => $siavcom_customer->pai_nom,
+                'type' => $siavcom_customer->tip_tdn
             ];
 
         if(isset($customer))

@@ -13,8 +13,8 @@ class SupplySet extends Model
     {
     	return $this->hasOne('IParts\Document', 'id', 'documents_id');
     }
-/*    public function supply()
+    public function supply()
     {
-    	return $this->hasOne('IParts\Supply', 'id', 'documents_id');
-    }*/
+    	return $this->hasOne('IParts\Supply', 'id', 'supplies_id');
+    }
 }

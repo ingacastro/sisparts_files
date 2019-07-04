@@ -15,6 +15,7 @@ use IParts\Message;
 use IParts\Binnacle;
 use IParts\SupplySet;
 use IParts\Rejection;
+use IParts\Customer;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Validator;
@@ -926,59 +927,124 @@ class InboxController extends Controller
         return $validator;
     }
 
+    /*Turns a supply set into CTZs*/
     public function setsTurnCTZ(Request $request)
     {
         if(!$request->ajax())
             return response()->json([
-                'errors' => true, 
+                'errors' => true,
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
                 ->withErrors('Acción no autorizada.')->render()]);
 
         $document_id = $request->document_id;
 
         try {
-            DB::table('documents_supplies')->whereIn('id', $request->sets)->update(['status' => 9, 'completed_date' => Carbon::now()->toDateTimeString()]);
-            foreach($request->sets as $set_id) {
+            
+/*            DB::table('documents_supplies')->whereIn('id', $request->sets)
+            ->update(['status' => 9, 'completed_date' => Carbon::now()->toDateTimeString()]);*/
+
+            $supplies_sets = SupplySet::whereIn('id', $request->sets)->get();
+            $customers_errors = [];
+
+            foreach($supplies_sets as $supply_set) {
+
+                $customer = $supply_set->document->customer;
+
+                $customer_verification = $this->verifyTurnCTZCustomer($customer);
+
+                if(!$customer_verification['is_valid']) {
+                    $customers_errors[] = trim($supply_set->supply->number) . ' - ' .
+                    $customer_verification['message'];
+                    continue;
+                }
+
                 $set_binnacle_data = [
                     'entity' => 2,
-                    'documents_supplies_id' => $set_id,
+                    'documents_supplies_id' => $supply_set->id,
                     'comments' => 'Partida convertida a CTZ',
                     'pct_status' => 2,
                     'employees_users_id' => Auth::user()->id,
                     'type' => 2, //Just a silly number tha means nothing
                     'documents_id' => $document_id,
                 ];
-                Binnacle::create($set_binnacle_data);
-            }
-           //PCT Binnacle 
-            $pct = Document::find($document_id);
-            $pct->fill(['status' => 3, 'completed_date' => Carbon::now()->toDateTimeString()])->update();
-            $pct_supplies_count = $pct->supplies->count();
-            $pct_ctz_supplies_count = $pct->supplies()->wherePivot('status', '=', 9)->count();
 
-            if($pct_supplies_count == $pct_ctz_supplies_count) {
-                $pct_binnacle_data = [
-                    'entity' => 1,
-                    'comments' => 'PCT convertida a CTZ',
-                    'pct_status' => 3,
-                    'employees_users_id' => Auth::user()->id,
-                    'type' => 2, //Just a silly number tha means nothing
-                    'documents_id' => $document_id
-                ];
-                Binnacle::create($pct_binnacle_data);
+                DB::transaction(function() use($set_binnacle_data, $supply_set) {
+
+                    $supply_set->fill(['status' => 9, 'completed_date' => Carbon::now()->toDateTimeString()])
+                    ->update();
+                    Binnacle::create($set_binnacle_data);
+                });
             }
+           
+            $this->turnPCTtoCTZ($document_id);
+
         } catch(\Exception $e) {
             return response()->json(
                 ['errors' => true,
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
                 ->withErrors($e->getMessage())->render()]);
         }
+        if(empty($customers_errors)){
+            return response()->json([
+                'errors' => false,
+                'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
+                ->with('success_message', 'Partidas convertidas a CTZ correctamente.')->render()]); 
+        } else {
+            return response()->json(
+                ['errors' => true,
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors($customers_errors)->with('title', 'Algunas de las partidas seleccionadas no pudieron ser convertidas a CTZ.')
+                ->render()]);
+        }
+    }
 
-        return response()->json([
-            'errors' => false,
-            'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
-            ->with('success_message', 'Partidas convertidas a CTZ correctamente.')->render()
-        ]); 
+    private function turnPCTtoCTZ($document_id)
+    {
+        $pct = Document::find($document_id);
+        $pct_supplies_count = $pct->supplies->count();
+        $pct_ctz_supplies_count = $pct->supplies()->wherePivot('status', '=', 9)->count();
+
+        if($pct_ctz_supplies_count < $pct_supplies_count) return;
+
+        $pct_binnacle_data = [
+            'entity' => 1,
+            'comments' => 'PCT convertida a CTZ',
+            'pct_status' => 3,
+            'employees_users_id' => Auth::user()->id,
+            'type' => 2, //Just a silly number tha means nothing
+            'documents_id' => $document_id
+        ];
+
+        try {           
+            DB::transaction(function() use($pct, $pct_binnacle_data) {
+                $pct->fill(['status' => 3, 'completed_date' => Carbon::now()->toDateTimeString()])->update();
+                Binnacle::create($pct_binnacle_data);
+            });
+        } catch(\Exception $e) {
+            throw new \Exception($e->getMessage(), 1);
+        }
+    }
+
+    /*Verify if supply set's customer is correct to turn a pct into a CTZ*/
+    private function verifyTurnCTZCustomer(Customer $customer)
+    {
+        $result = ['is_valid' => true];
+        $country = trim(strtolower($customer->country));
+        
+        $search = ['é','í','ó','è','ì','ò','ë','ï','ö','ê','î','ô'];
+        $replace = ['e','i','o','e','i','o','e','i','o','e','i','o'];
+        $country = str_replace($search, $replace, $country);
+
+        if($customer->type == 1 && $country == 'mexico') { //Foreign customer
+            $result['is_valid'] = false;
+            $result['message'] = 'El cliente asociado a la partida es extranjero y tiene a México como país.';
+        }
+        if($customer->type == 9 && $country != 'mexico') {
+            $result['is_valid'] = false;
+            $result['message'] = 'El cliente asociado a la partida es persona moral y tiene un país diferente a México.';
+        }
+
+        return $result;
     }
 
     public function binnacleEntry(Request $request)

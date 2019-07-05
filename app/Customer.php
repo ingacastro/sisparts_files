@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Customer extends Model
 {
 	//protected $primaryKey = 'users_id';
+<<<<<<< HEAD
     protected $fillable = ['code', 'trade_name', 'business_name', 'post_code', 'state', 'country', 'sync_connections_id', 'type'];
     public $types = [
 			'' => 0, //MEANS NOTHING
@@ -25,4 +26,7 @@ class Customer extends Model
     {
     	$this->attributes['type'] = $this->types[$value];
     }
+=======
+    protected $fillable = ['code', 'trade_name', 'business_name', 'post_code', 'state', 'country', 'sync_connections_id'];
+>>>>>>> bcb3529f8d5412b84105d5884c5f50c4b9770d0e
 }

@@ -82,12 +82,8 @@ class CustomerUpdate extends Command
                 'business_name' => $siavcomCustomer->nom_nom,
                 'post_code' => $siavcomCustomer->cpo_nom,
                 'state' => $siavcomCustomer->edo_edo,
-<<<<<<< HEAD
                 'country' => $siavcomCustomer->pai_nom,
                 'type' => $siavcomCustomer->tip_tdn
-=======
-                'country' => $siavcomCustomer->pai_nom
->>>>>>> bcb3529f8d5412b84105d5884c5f50c4b9770d0e
             ];
 
         $customer->fill($data)->update();

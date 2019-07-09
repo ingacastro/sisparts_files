@@ -113,18 +113,54 @@ class DocumentSync extends Command
             'customer_requirement_number' => $siavcomDocument->ob1_doc,
             'buyer_name' => $siavcomDocument->ob2_doc,
             'buyer_number' => $siavcomDocument->tcd_tcd,
-            'employees_users_id' => $quoter->users_id
+            'employees_users_id' => $quoter->users_id,
+            
+            'cop_nom' => $siavcomDocument->cop_nom,
+            'con_con' => $siavcomDocument->con_con,
+            'fel_doc' => $siavcomDocument->fel_doc,
+            'fec_doc' => $siavcomDocument->fec_doc,
+            'im1_doc' => $siavcomDocument->im1_doc,
+            'im2_doc' => $siavcomDocument->im2_doc,
+            'im4_doc' => $siavcomDocument->im4_doc,
+            'im5_doc' => $siavcomDocument->im5_doc,
+            'com_doc' => $siavcomDocument->com_doc,
+            'vm4_doc' => $siavcomDocument->vm4_doc,
+            'vm5_doc' => $siavcomDocument->vm5_doc,
+            'sal_doc' => $siavcomDocument->sal_doc,
+            'ob1_doc' => $siavcomDocument->ob1_doc,
+            'sau_doc' => $siavcomDocument->sau_doc,
+            'fau_doc' => $siavcomDocument->fau_doc,
+            'rut_rut' => $siavcomDocument->rut_rut,
+            'num_pry' => $siavcomDocument->num_pry,
+            'che_doc' => $siavcomDocument->che_doc,
+            'usu_usu' => $siavcomDocument->usu_usu,
+            'tor_doc' => $siavcomDocument->tor_doc,
+            'nor_doc' => $siavcomDocument->nor_doc,
+            'im0_doc' => $siavcomDocument->im0_doc,
+            'mov_doc' => $siavcomDocument->mov_doc,
+            'fip_doc' => $siavcomDocument->fip_doc,
+            'tpa_doc' => $siavcomDocument->tpa_doc,
+            'rpa_doc' => $siavcomDocument->rpa_doc,
+            'tip_tdn' => $siavcomDocument->tip_tdn,
+            'npa_doc' => $siavcomDocument->npa_doc,
+            'mpa_sat' => $siavcomDocument->mpa_sat,
+            'fpa_sat' => $siavcomDocument->fpa_sat,
+            'uso_sat' => $siavcomDocument->uso_sat,
+            'ndr_doc' => $siavcomDocument->ndr_doc,
+            'dto_doc' => $siavcomDocument->dto_doc
         ];
 
         DB::beginTransaction();
         try {       
             //Document's customer   
-            $customer = $this->getCustomer($customerCode, $conn);
+            $customer = $this->getCustomer($customerCode,
+             $conn);
             if(!isset($customer)) { DB::rollback(); return; }
 
             //Document
             $data['customers_id'] = $customer->id;
-            $document = Document::where('number', $documentNumber)
+            $document = Document::where('number',
+             $documentNumber)
                         ->where('sync_connections_id', $conn->id)->first();
 
             if(isset($document))
@@ -156,9 +192,6 @@ class DocumentSync extends Command
         $siavcomDocumentSupplies = DB::connection($conn->name)->table($documentSuppliesTable)
         ->where('ndo_doc', $documentNumber)->get();
         //->where('tdo_tdo', config('siavcom_sync.acr_quotation'))->get();
-
-        //Document has no supplies
-        if(empty($siavcomDocumentSupplies)) return;
 
         foreach($siavcomDocumentSupplies as $pivot) {
             $this->attachDocumentSupply($pivot, $conn,  $document);
@@ -211,7 +244,27 @@ class DocumentSync extends Command
             'sale_unit_cost' => $pivot->pve_mov,
             'type' => $pivot->tdo_tdo,
             'currencies_id' => $currency->id ?? null,
-            'status' => 1
+            'status' => 1,
+
+            'ens_mov' => $pivot->ens_mov,
+            'inv_tdo' => $pivot->inv_tdo,
+            'dga_pro' => $pivot->dga_pro,
+            'de1_mov' => $pivot->de1_mov,
+            'de2_mov' => $pivot->de2_mov,
+            'de3_mov' => $pivot->de3_mov,
+            'de4_mov' => $pivot->de4_mov,
+            'de5_mov' => $pivot->de5_mov,
+            'im1_mov' => $pivot->im1_mov,
+            'im2_mov' => $pivot->im2_mov,
+            'im4_mov' => $pivot->im4_mov,
+            'im5_mov' => $pivot->im5_mov,
+            'adv_tar' => $pivot->adv_tar,
+            'cuo_tar' => $pivot->cuo_tar,
+            'npe_mov' => $pivot->npe_mov,
+            'mpe_mov' => $pivot->mpe_mov,
+            'cen_mov' => $pivot->cen_mov,
+            'est_mov' => $pivot->est_mov,
+            'im0_mov' => $pivot->im0_mov
         ];
 
         $supply_id = $supply->id;
@@ -237,11 +290,18 @@ class DocumentSync extends Command
         //Retrieve supply or create it
         $cla_isu = $siavcom_supply->cla_isu;
         $supply = Supply::where('number', $cla_isu)->first();
+
+        //Undefined tax
+        $tax = 2;
+        if($siavcom_supply->ta3_isu == 'I1') $tax = 1; //16%
+        else if($siavcom_supply->ta3_isu == 'I4') $tax = 0; //0%
+
         $supply_data = [
             'number' => $cla_isu,
             'manufacturers_id' => $manufacturer_id,
             'short_description' => $siavcom_supply->des_isu,
-            'large_description' => $siavcom_supply->dea_isu
+            'large_description' => $siavcom_supply->dea_isu,
+            'tax' => $tax
         ];
 
         $is_new_supply = true;

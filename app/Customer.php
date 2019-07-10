@@ -8,6 +8,12 @@ class Customer extends Model
 {
 	//protected $primaryKey = 'users_id';
 
+	public function __construct() 
+	{
+		$type = $this->attributes['type']; 
+		$this->iva = ($type == 'PG' || $type == 'PF' || $type == 'PM') 0.16 : 0;
+	}
+
     protected $fillable = ['code', 'trade_name', 'business_name', 'post_code', 'state', 'country', 'sync_connections_id', 'type'];
     public $types = [
 			'' => 0, //MEANS NOTHING

@@ -147,7 +147,11 @@ class DocumentSync extends Command
             'fpa_sat' => $siavcomDocument->fpa_sat,
             'uso_sat' => $siavcomDocument->uso_sat,
             'ndr_doc' => $siavcomDocument->ndr_doc,
-            'dto_doc' => $siavcomDocument->dto_doc
+            'dto_doc' => $siavcomDocument->dto_doc,
+            'mon_doc' => $siavcomDocument->mon_doc,
+            'vmo_doc' => $siavcomDocument->vmo_doc,
+            'vm2_doc' => $siavcomDocument->vm2_doc,
+            'vm3_doc' => $siavcomDocument->vm3_doc
         ];
 
         DB::beginTransaction();

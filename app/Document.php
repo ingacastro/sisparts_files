@@ -13,7 +13,7 @@ class Document extends Model
                  'im1_doc','im2_doc','im4_doc','im5_doc','com_doc','vm4_doc','vm5_doc','sal_doc','ob1_doc',
                  'sau_doc','fau_doc','rut_rut','num_pry','che_doc','usu_usu','tor_doc','nor_doc','im0_doc',
                  'mov_doc','fip_doc','tpa_doc','rpa_doc','tip_tdn','npa_doc','mpa_sat','fpa_sat','uso_sat',
-                 'ndr_doc','dto_doc'];
+                 'ndr_doc','dto_doc', 'mon_doc', 'vmo_doc', 'vm2_doc', 'vm3_doc'];
 
    	public function supplies()
    	{

@@ -937,11 +937,15 @@ class InboxController extends Controller
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
                 ->withErrors('Acción no autorizada.')->render()]);
 
-        $document = Docunemt::find($request->document_id);
 
         try {
             
             $supplies_sets = SupplySet::whereIn('id', $request->sets)->get();
+            
+            if($supplies_sets->count() == 0) return;
+
+            $document = Document::find($request->document_id);
+
             $customers_errors = [];
 
             foreach($supplies_sets as $supply_set) {
@@ -973,8 +977,21 @@ class InboxController extends Controller
                     Binnacle::create($set_binnacle_data);
                 });
             }
-           
-            $this->turnPCTtoCTZ($document);
+
+            DB::transaction(function() use($document) {            
+                //Create CTZ on siavcom DB (zukaely, pavan or mxmro)
+                if($document->siavcom_ctz == 0) {
+                    $this->createSiavcomCTZ($document);
+                    $document->fill(['siavcom_ctz' => 1])->update();
+                }
+                
+                $this->turnPCTtoCTZ($document);
+            });
+
+            return response()->json([
+                'errors' => false,
+                'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
+                ->with('success_message', 'Partidas convertidas a CTZ correctamente.')->render()]); 
 
         } catch(\Exception $e) {
             return response()->json(
@@ -983,14 +1000,7 @@ class InboxController extends Controller
                 ->withErrors($e->getMessage())->render()]);
         }
 
-        if(empty($customers_errors)) {
-            //Create CTZ on siavcom DB (zukaely, pavan or mxmro)
-            $this->createSiavcomCTZ($document);
-            return response()->json([
-                'errors' => false,
-                'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
-                ->with('success_message', 'Partidas convertidas a CTZ correctamente.')->render()]); 
-        } else {
+        if(!empty($customers_errors)) {
             return response()->json(
                 ['errors' => true,
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
@@ -1003,81 +1013,87 @@ class InboxController extends Controller
     {
         $conn = DB::table('sync_connections')->find($document->sync_connections_id);
         //here
-        $last_siavcom_ctz = DB::connection($conn->name)->table($this->siavcomDocumentsTable)
+        $last_siavcom_ctz_ndo_doc = DB::connection($conn->name)->table($this->siavcomDocumentsTable)
         ->where('tdo_tdo', 'CTZ')
         ->OrderBy('ndo_doc', 'DESC')
         ->first();
+        $last_siavcom_ctz_key_pri = DB::connection($conn->name)->table($this->siavcomDocumentsTable)
+        ->where('tdo_tdo', 'CTZ')
+        ->OrderBy('key_pri', 'DESC')
+        ->first();
 
-        $subtotal = array_sum($document->supply_sets->pluck('sale_unit_cost'));
+        $subtotal = array_sum($document->supply_sets->pluck('sale_unit_cost')->toArray());
 
-        'tdo_tdo' => 'CTZ',  //GREEN CTZ
-        'ndo_doc' => $last_siavcom_ctz->ndo_doc + 1,  //GREEN last siavcom  ctz plus 1
-        'ref_doc' => $document->reference,  //GREEN PCT reference
-        'cop_nom' => $document->cop_nom,  //YELLOW
-        'cod_nom' => $document->cod_nom,  //YELLOW
-        'con_con' => $document->con_con,  //YELLOW
-        'fel_doc' => $document->fel_doc,  //YELLOW
-        'fec_doc' => $document->fec_doc,  //YELLOW
-        'fve_doc' => date('Y-m-d H:i:s', strtotime($document->created_at . ' + 15 days')),  //GREEN 15 days from pct created_at
-        'imp_doc' => $subtotal,  //GREEN Importe (subtotal) del documento
-        'im1_doc' => $document->im1_doc,  //YELLOW
-        'im2_doc' => $document->im2_doc,  //YELLOW
-        'im3_doc' => $subtotal * $document->customer->iva,  //GREEN IVA del documento
-        'im4_doc' => $document->im4_doc,  //YELLOW
-        'im5_doc' => $document->im5_doc,  //YELLOW
-        'ven_ven' => null,  //GREEN SABE
-        'com_doc' => $document->com_doc,  //YELLOW
-        'sta_doc' => 'P',  //GREEN Estado del documento, este debería indicar la P
-        'mon_doc' => $document->mon_doc,  //GREEN Código de moneda del documento
-        'vmo_doc' => $document->vmo_doc,  //GREEN MXN tipo de cambio con relación a la moneda del documento
-        'vm2_doc' => $document->vm2_doc,  //GREEN USD tipo de cambio con relación a la moneda del documento
-        'vm3_doc' => $document->vm3_doc,  //GREEN EUR tipo de cambio con relación a la moneda del documento
-        'vm4_doc' => $document->vm4_doc,  //YELLOW
-        'vm5_doc' => $document->vm5_doc,  //YELLOW
-        'sal_doc' => $document->sal_doc,  //YELLOW 
-
-
-        'ob1_doc' => $document->ob1_doc,  //YELLOW
-        'ob2_doc' => $document->dealership->user->name,  //GREEN Nombre del cotizador
-
-
-        'sau_doc' => $document->sau_doc,  //YELLOW
-        'fau_doc' => $document->fau_doc,  //YELLOW
+        $data = [
+            'tdo_tdo' => 'CTZ',  //GREEN CTZ
+            'ndo_doc' => $last_siavcom_ctz_ndo_doc->ndo_doc + 1,  //GREEN last siavcom  ctz plus 1
+            'ref_doc' => $document->reference,  //GREEN PCT reference
+            'cop_nom' => $document->cop_nom,  //YELLOW
+            'cod_nom' => $document->customer->code,  //YELLOW
+            'con_con' => $document->con_con,  //YELLOW
+            'fel_doc' => $document->fel_doc,  //YELLOW
+            'fec_doc' => $document->fec_doc,  //YELLOW
+            'fve_doc' => date('Y-m-d H:i:s', strtotime($document->created_at . ' + 15 days')),  //GREEN 15 days from pct created_at
+            'imp_doc' => $subtotal,  //GREEN Importe (subtotal) del documento
+            'im1_doc' => $document->im1_doc,  //YELLOW
+            'im2_doc' => $document->im2_doc,  //YELLOW
+            'im3_doc' => $subtotal * $document->customer->getIVA(),  //GREEN IVA del documento
+            'im4_doc' => $document->im4_doc,  //YELLOW
+            'im5_doc' => $document->im5_doc,  //YELLOW
+            'ven_ven' => null,  //GREEN SABE
+            'com_doc' => $document->com_doc,  //YELLOW
+            'sta_doc' => 'P',  //GREEN Estado del documento, este debería indicar la P
+            'mon_doc' => $document->mon_doc,  //GREEN Código de moneda del documento
+            'vmo_doc' => $document->vmo_doc,  //GREEN MXN tipo de cambio con relación a la moneda del documento
+            'vm2_doc' => $document->vm2_doc,  //GREEN USD tipo de cambio con relación a la moneda del documento
+            'vm3_doc' => $document->vm3_doc,  //GREEN EUR tipo de cambio con relación a la moneda del documento
+            'vm4_doc' => $document->vm4_doc,  //YELLOW
+            'vm5_doc' => $document->vm5_doc,  //YELLOW
+            'sal_doc' => $document->sal_doc,  //YELLOW 
 
 
-        'hrs_doc' => date('H:i:s'),  //GREEN Hora del registro
-        'rut_rut' => $document->rut_rut,  //YELLOW
-        'num_pry' => $document->num_pry,  //YELLOW
-        'tcd_tcd' => $document->dealership->buyer_number, //GREEN Número de cotizador/comprador
+            'ob1_doc' => $document->ob1_doc,  //YELLOW
+            'ob2_doc' => $document->dealership->user->name,  //GREEN Nombre del cotizador
 
 
-        'che_doc' => $document->che_doc,  //YELLOW 
-        'usu_usu' => $document->usu_usu,  //YELLOW
-        'tie_uac' => null,  //RED
-        'key_pri' => $last_siavcom_ctz->key_pri + 1,  //Llave primaria (autoincremental con relación a la tabla documentos)
-        'tor_doc' => $document->tor_doc,  // YELLOW
-        'nor_doc' => $document->nor_doc,  // YELLOW
+            'sau_doc' => $document->sau_doc,  //YELLOW
+            'fau_doc' => $document->fau_doc,  //YELLOW
 
 
-        'im0_doc' => $document->im0_doc,  // YELLOW
-        'mov_doc' => $document->mov_doc,  // YELLOW
-        'fip_doc' => $document->fip_doc,  // YELLOW
-        'tpa_doc' => $document->tpa_doc,  // YELLOW
-        'rpa_doc' => $document->rpa_doc,  // YELLOW
-        'tip_tdn' => $document->tip_tdn,  // YELLOW
-        'npa_doc' => $document->npa_doc,  // YELLOW
-        'mpa_sat' => $document->mpa_sat,  // YELLOW
-        'fpa_sat' => $document->fpa_sat,  // YELLOW
-        'uso_sat' => $document->uso_sat,  // YELLOW
+            'hrs_doc' => date('H:i:s'),  //GREEN Hora del registro
+            'rut_rut' => $document->rut_rut,  //YELLOW
+            'num_pry' => $document->num_pry,  //YELLOW
+            'tcd_tcd' => $document->dealership->buyer_number, //GREEN Número de cotizador/comprador
 
 
-        'ndr_doc' => $document->ndr_doc,  // YELLOW
-        'dto_doc' => $document->dto_doc  //YELLOW
+            'che_doc' => $document->che_doc,  //YELLOW 
+            'usu_usu' => $document->usu_usu,  //YELLOW
+            'tie_uac' => null,  //RED
+            'key_pri' => $last_siavcom_ctz_key_pri->key_pri + 1,  //Llave primaria (autoincremental con relación a la tabla documentos)
+            'tor_doc' => $document->tor_doc,  // YELLOW
+            'nor_doc' => $document->nor_doc,  // YELLOW
+
+
+            'im0_doc' => $document->im0_doc,  // YELLOW
+            'mov_doc' => $document->mov_doc,  // YELLOW
+            'fip_doc' => $document->fip_doc,  // YELLOW
+            'tpa_doc' => $document->tpa_doc,  // YELLOW
+            'rpa_doc' => $document->rpa_doc,  // YELLOW
+            'tip_tdn' => $document->tip_tdn,  // YELLOW
+            'npa_doc' => $document->npa_doc,  // YELLOW
+            'mpa_sat' => $document->mpa_sat,  // YELLOW
+            'fpa_sat' => $document->fpa_sat,  // YELLOW
+            'uso_sat' => $document->uso_sat,  // YELLOW
+
+            'ndr_doc' => $document->ndr_doc,  // YELLOW
+            'dto_doc' => $document->dto_doc  //YELLOW
+        ];
+
+        DB::connection($conn->name)->table('comedoc')->insert($data);        
     }
 
-    private function turnPCTtoCTZ(Document $document)
+    private function turnPCTtoCTZ(Document $pct)
     {
-        $document_id = $document->id;
         $pct_supplies_count = $pct->supplies->count();
         $pct_ctz_supplies_count = $pct->supplies()->wherePivot('status', '=', 9)->count();
 
@@ -1093,10 +1109,10 @@ class InboxController extends Controller
         ];
 
         try {           
-            DB::transaction(function() use($pct, $pct_binnacle_data) {
-                $pct->fill(['status' => 3, 'completed_date' => Carbon::now()->toDateTimeString()])->update();
-                Binnacle::create($pct_binnacle_data);
-            });
+
+            $pct->fill(['status' => 3, 'completed_date' => Carbon::now()->toDateTimeString()])->update();
+            Binnacle::create($pct_binnacle_data);
+
         } catch(\Exception $e) {
             throw new \Exception($e->getMessage(), 1);
         }

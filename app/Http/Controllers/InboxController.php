@@ -32,6 +32,7 @@ class InboxController extends Controller
     {
         $this->middleware('auth');
         $this->siavcomDocumentsTable = config('siavcom_sync.siavcom_documents');
+        $this->siavcomDocumentsSuppliesTable = config('siavcom_sync.siavcom_documents_supplies');
     }
     /**
      * Display a listing of the resource.
@@ -948,6 +949,18 @@ class InboxController extends Controller
 
             $customers_errors = [];
 
+
+            $conn = DB::table('sync_connections')->find($document->sync_connections_id);
+            
+            $ctz_number = $document->siavcom_ctz_number;
+
+            if($document->siavcom_ctz == 0) {
+                $last_siavcom_ctz_ndo_doc = DB::connection($conn->name)->table($this->siavcomDocumentsTable)
+                ->OrderBy('ndo_doc', 'desc')
+                ->first();
+                $ctz_number = $last_siavcom_ctz_ndo_doc->ndo_doc + 1;
+            }
+
             foreach($supplies_sets as $supply_set) {
 
                 $customer = $supply_set->document->customer;
@@ -970,21 +983,23 @@ class InboxController extends Controller
                     'documents_id' => $document->id,
                 ];
 
-                DB::transaction(function() use($set_binnacle_data, $supply_set) {
-
+                DB::transaction(function() use($set_binnacle_data, $supply_set, $conn, $ctz_number) {
                     $supply_set->fill(['status' => 9, 'completed_date' => Carbon::now()->toDateTimeString()])
                     ->update();
                     Binnacle::create($set_binnacle_data);
+
+                    $this->createSiavcomCTZSet($supply_set, $conn, $ctz_number);
                 });
             }
 
-            DB::transaction(function() use($document) {            
-                //Create CTZ on siavcom DB (zukaely, pavan or mxmro)
+            //Create CTZ on siavcom DB (zukaely, pavan or mxmro)
+            DB::transaction(function() use($document, $conn, $ctz_number) {            
                 if($document->siavcom_ctz == 0) {
-                    $this->createSiavcomCTZ($document);
-                    $document->fill(['siavcom_ctz' => 1])->update();
+                    $this->createSiavcomCTZ($document, $conn, $ctz_number);
+                    $document->fill(['siavcom_ctz' => 1, 'siavcom_ctz_number' => $ctz_number])
+                    ->update();
                 }
-                
+
                 $this->turnPCTtoCTZ($document);
             });
 
@@ -1009,24 +1024,71 @@ class InboxController extends Controller
         }
     }
 
-    private function createSiavcomCTZ(Document $document) 
+    private function createSiavcomCTZSet(SupplySet $supply_set, $conn, $ctz_number)
     {
-        $conn = DB::table('sync_connections')->find($document->sync_connections_id);
-        //here
-        $last_siavcom_ctz_ndo_doc = DB::connection($conn->name)->table($this->siavcomDocumentsTable)
-        ->where('tdo_tdo', 'CTZ')
-        ->OrderBy('ndo_doc', 'DESC')
+        $conn = DB::table('sync_connections')->find($supply_set->document->sync_connections_id);
+        $last_siavcom_ctz_set_key_pri = DB::connection($conn->name)->table($this->siavcomDocumentsSuppliesTable)
+        ->OrderBy('key_pri', 'desc')
         ->first();
+        $data = [
+            'tdo_tdo' => 'CTZ',//GREEN CTZ  
+            'ndo_doc' => $ctz_number,//GREEN Número de documento (ctz en siavcom) al que pertenece la partida
+            'mov_mov' => $supply_set->set,//GREEN Número de partida supply_set->set
+            'ens_mov' => 0,//YELLOW 0
+            'inv_tdo' => 'N',//YELLOW N
+            'cla_isu' => $supply_set->supply->number,//GREEN Clave de insumo supply->number
+            'dse_mov' => $supply_set->supply->large_description,//GREEN supply_set->supply->short/large_description
+            'dga_pro' => 0,//YELLOW 0
+            'can_mov' => $supply_set->products_amount,//GREEN supply_set->products_amount
+            'med_mov' => $supply_set->measurement_unit_code,//GREEN supply_set->measurement_unit_code
+            'pve_mov' => $supply_set->sale_unit_cost,//GREEN supply_set->sale_unit_cost
+            'de1_mov' => 0,//YELLOW 0
+            'de2_mov' => 0,//YELLOW 0
+            'de3_mov' => 0,//YELLOW 0
+            'de4_mov' => 0,//YELLOW 0
+            'de5_mov' => 0,//YELLOW 0
+            'im1_mov' => 0,//YELLOW 0
+            'im2_mov' => 0,//YELLOW 0
+            'im3_mov' => $supply_set->document->customer->getIVA(),//GREEN supply_set->document->customer->getIVA()
+            'im4_mov' => 0,//YELLOW 0 
+            'im5_mov' => 0,//YELLOW 0
+            'mon_mov' => $supply_set->currencies_id,//GREEN supply_set->currency / supply_set->document->currency
+            'adv_tar' => 0,//YELLOW 0
+            'cuo_tar' => 0,//YELLOW 0
+            'fec_mov' => $supply_set->created_at,//GREEN supply_set->created_at
+            'fme_mov' => date('Y-m-d H:i:s', strtotime($supply_set->created_at . ' + 15 days')),//GREEN supply_set->created_at + 15 days
+            'npe_mov' => 0,//YELLOW 0
+            'mpe_mov' => 0,//YELLOW 00
+            'cen_mov' => 0,//YELLOW 0
+            'est_mov' => 'A',//YELLOW A
+            'usu_usu' => $supply_set->usu_usu,//GREEN supply_set->usu_usu
+            'key_pri' => $last_siavcom_ctz_set_key_pri->key_pri + 1,//GREEN Last comemov key_pri + 1
+            'im0_mov' => 0//YELLOW 0
+        ];
+        try {
+            DB::connection($conn->name)->table('comemov')->insert($data);
+        } catch(\Exception $e) {
+            throw new \Exception($e->getMessage(), 1);
+        }
+    }
+
+    private function createSiavcomCTZ(Document $document, $conn, $ctz_number) 
+    {
         $last_siavcom_ctz_key_pri = DB::connection($conn->name)->table($this->siavcomDocumentsTable)
-        ->where('tdo_tdo', 'CTZ')
-        ->OrderBy('key_pri', 'DESC')
+        //->where('tdo_tdo', 'CTZ')
+        ->OrderBy('key_pri', 'desc')
         ->first();
 
         $subtotal = array_sum($document->supply_sets->pluck('sale_unit_cost')->toArray());
+        $key_pri = $last_siavcom_ctz_key_pri->key_pri + 1;
+
+/*        Log::notice($conn->name);
+        Log::notice($ctz_number);
+        Log::notice($last_siavcom_ctz_key_pri->key_pri);*/
 
         $data = [
             'tdo_tdo' => 'CTZ',  //GREEN CTZ
-            'ndo_doc' => $last_siavcom_ctz_ndo_doc->ndo_doc + 1,  //GREEN last siavcom  ctz plus 1
+            'ndo_doc' => $ctz_number,  //GREEN last siavcom  ctz plus 1
             'ref_doc' => $document->reference,  //GREEN PCT reference
             'cop_nom' => $document->cop_nom,  //YELLOW
             'cod_nom' => $document->customer->code,  //YELLOW
@@ -1069,7 +1131,7 @@ class InboxController extends Controller
             'che_doc' => $document->che_doc,  //YELLOW 
             'usu_usu' => $document->usu_usu,  //YELLOW
             'tie_uac' => null,  //RED
-            'key_pri' => $last_siavcom_ctz_key_pri->key_pri + 1,  //Llave primaria (autoincremental con relación a la tabla documentos)
+            'key_pri' => $key_pri,  //Llave primaria (autoincremental con relación a la tabla documentos)
             'tor_doc' => $document->tor_doc,  // YELLOW
             'nor_doc' => $document->nor_doc,  // YELLOW
 
@@ -1088,8 +1150,11 @@ class InboxController extends Controller
             'ndr_doc' => $document->ndr_doc,  // YELLOW
             'dto_doc' => $document->dto_doc  //YELLOW
         ];
-
-        DB::connection($conn->name)->table('comedoc')->insert($data);        
+        try {
+            DB::connection($conn->name)->table('comedoc')->insert($data);
+        } catch(\Exception $e) {
+            throw new \Exception($e->getMessage(), 1);            
+        }
     }
 
     private function turnPCTtoCTZ(Document $pct)
@@ -1105,7 +1170,7 @@ class InboxController extends Controller
             'pct_status' => 3,
             'employees_users_id' => Auth::user()->id,
             'type' => 2, //Just a silly number tha means nothing
-            'documents_id' => $document_id
+            'documents_id' =>$pct->id
         ];
 
         try {           

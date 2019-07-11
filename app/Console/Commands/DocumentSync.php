@@ -94,11 +94,11 @@ class DocumentSync extends Command
     {
         $customerCode = $siavcomDocument->cod_nom;
         $documentNumber = $siavcomDocument->ndo_doc;
-        $quoter = Employee::where('buyer_number', $siavcomDocument->tcd_tcd)->first();
+        $dealer_ship = Employee::where('buyer_number', $siavcomDocument->tcd_tcd)->first();
 
         //Default quoter
-        if($quoter == null)
-            $quoter = Employee::where('buyer_number', config('siavcom_sync.generic_quoter_buyer_num'))->first();
+        if($dealer_ship == null)
+            $dealer_ship = Employee::where('buyer_number', config('siavcom_sync.generic_quoter_buyer_num'))->first();
          
         $data = [
             'type' => $siavcomDocument->tdo_tdo,
@@ -113,7 +113,7 @@ class DocumentSync extends Command
             'customer_requirement_number' => $siavcomDocument->ob1_doc,
             'buyer_name' => $siavcomDocument->ob2_doc,
             'buyer_number' => $siavcomDocument->tcd_tcd,
-            'employees_users_id' => $quoter->users_id,
+            'employees_users_id' => $dealer_ship->users_id,
             
             'cop_nom' => $siavcomDocument->cop_nom,
             'con_con' => $siavcomDocument->con_con,
@@ -163,9 +163,8 @@ class DocumentSync extends Command
 
             //Document
             $data['customers_id'] = $customer->id;
-            $document = Document::where('number',
-             $documentNumber)
-                        ->where('sync_connections_id', $conn->id)->first();
+            $document = Document::where('number',$documentNumber)
+            ->where('sync_connections_id', $conn->id)->first();
 
             if(isset($document))
                 $document->fill($data)->update();
@@ -194,8 +193,8 @@ class DocumentSync extends Command
         $documentSuppliesTable = config('siavcom_sync.siavcom_documents_supplies');
 
         $siavcomDocumentSupplies = DB::connection($conn->name)->table($documentSuppliesTable)
-        ->where('ndo_doc', $documentNumber)->get();
-        //->where('tdo_tdo', config('siavcom_sync.acr_quotation'))->get();
+        ->where('ndo_doc', $documentNumber)
+        ->where('tdo_tdo', config('siavcom_sync.acr_quotation'))->get(); //supplies_sets type PCT
 
         foreach($siavcomDocumentSupplies as $pivot) {
             $this->attachDocumentSupply($pivot, $conn,  $document);
@@ -268,7 +267,8 @@ class DocumentSync extends Command
             'mpe_mov' => $pivot->mpe_mov,
             'cen_mov' => $pivot->cen_mov,
             'est_mov' => $pivot->est_mov,
-            'im0_mov' => $pivot->im0_mov
+            'im0_mov' => $pivot->im0_mov,
+            'usu_usu' => $pivot->usu_usu,
         ];
 
         $supply_id = $supply->id;

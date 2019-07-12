@@ -949,7 +949,6 @@ class InboxController extends Controller
 
             $customers_errors = [];
 
-
             $conn = DB::table('sync_connections')->find($document->sync_connections_id);
             
             $ctz_number = $document->siavcom_ctz_number;
@@ -1002,7 +1001,7 @@ class InboxController extends Controller
 
                 $this->turnPCTtoCTZ($document);
             });
-
+            $document->touch();
             return response()->json([
                 'errors' => false,
                 'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')

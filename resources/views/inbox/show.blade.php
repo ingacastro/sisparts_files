@@ -144,6 +144,19 @@
                                 </td>
                                 <td></td>
                             </tr>
+                            <tr>
+                                <td>
+                                    <span><span class="detail-title">Número CTZ Saivcom: </span>{{ $document->siavcom_ctz_number }}</span>
+                                </td>
+                                <td>
+                                    <span>
+                                        <span class="detail-title">Fecha última actualización: </span>
+                                        {{ $document->supply_sets->where('status', 9)->count() > 0 
+                                        ? date('d/m/Y', strtotime($document->updated_at)) : null }}
+                                    </span>
+                                </td>
+                                <td></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div> 

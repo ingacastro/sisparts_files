@@ -37,7 +37,7 @@ class ReportController extends Controller
     {
         //Log::notice($request);
 
-        $query = Document::select('documents.created_at as sync_date', 'documents.completed_date as send_date', 
+        $query = Document::select('documents.created_at as sync_date', 'documents.completed_date as send_date',
             DB::raw('(CASE 
                 WHEN documents.completed_date <> "" THEN DATEDIFF(documents.completed_date, documents.created_at)
                 ELSE null END) as elapsed_days'),
@@ -49,7 +49,7 @@ class ReportController extends Controller
                       WHEN documents.status = 2 THEN "En proceso"
                       WHEN documents.status = 3 THEN "Terminada"
                       WHEN documents.status = 4 THEN "Archivada"
-                      ELSE "Indefinido" END) as status'))
+                      ELSE "Indefinido" END) as status'), 'documents.siavcom_ctz_number')
             ->join('sync_connections', 'sync_connections.id', 'documents.sync_connections_id')
             ->join('employees', 'employees.users_id', 'documents.employees_users_id')
             ->join('users', 'users.id', 'employees.users_id')

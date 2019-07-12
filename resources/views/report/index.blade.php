@@ -116,6 +116,7 @@
                             <th>Cliente</th>
                             <th>Items cotizados</th>
                             <th>Estatus</th>
+                            <th>No. CTZ</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -173,6 +174,7 @@
                 { data: 'customer', name: 'customer' },
                 { data: 'ctz_supplies', name: 'ctz_supplies' },
                 { data: 'status', name: 'status' },
+                { data: 'siavcom_ctz_number', name: 'siavcom_ctz_number' },
             ],
             language: {
                 "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"

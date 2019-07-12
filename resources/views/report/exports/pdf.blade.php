@@ -38,6 +38,7 @@
       <th>Cliente</th>
       <th>Items cotizados</th>
       <th>Estatus</th>
+      <th>No. CTZ</th>
     </tr>
   </thead>
   <tbody>
@@ -53,6 +54,7 @@
         <td>{{ $pct->customer }}</td>
         <td>{{ $pct->ctz_supplies }}</td>
         <td>{{ $pct->status }}</td>
+        <td>{{ $pct->siavcom_ctz_number }}</td>
       </tr>
     @endforeach
   </tbody>

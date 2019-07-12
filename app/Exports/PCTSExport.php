@@ -30,7 +30,8 @@ class PCTSExport implements FromArray, WithHeadings
         	"Cotizador", 
         	"Cliente", 
         	"Items cotizados", 
-        	"Estatus"
+        	"Estatus",
+            "No. CTZ"
         ];
     }
 }

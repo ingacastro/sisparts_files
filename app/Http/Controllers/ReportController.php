@@ -20,6 +20,13 @@ class ReportController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        //PCTS by dealership and sync_connection
+        $this->matrix = Document::select('users.name as dealership', 'sync_connections.display_name as connection', DB::raw('COUNT(*) as amount'))
+        ->join('employees', 'employees.users_id', 'documents.employees_users_id')
+        ->join('users', 'employees.users_id', 'users.id')
+        ->join('sync_connections', 'sync_connections.id', 'documents.sync_connections_id')
+        ->groupBy('sync_connections.id', 'employees.users_id')
+        ->get();
     }
     /**
      * Display a listing of the resource.
@@ -85,18 +92,11 @@ class ReportController extends Controller
 
     public function downloadPCTSExcel(Request $request)
     {
-      //PCTS by dealership and sync_connection
-      $matrix = Document::select('users.name as dealership', 'sync_connections.display_name as connection', DB::raw('COUNT(*) as amount'))
-      ->join('employees', 'employees.users_id', 'documents.employees_users_id')
-      ->join('users', 'employees.users_id', 'users.id')
-      ->join('sync_connections', 'sync_connections.id', 'documents.sync_connections_id')
-      ->groupBy('sync_connections.id', 'employees.users_id')
-      ->get()->toArray();
 
         $pcts = json_decode($request->get('data'));
 
         try {
-            return Excel::download(new PCTSExport($pcts, $matrix), 'reporte_pcts.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+            return Excel::download(new PCTSExport($pcts, $this->matrix->toArray()), 'reporte_pcts.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         }catch(\Exception $e) {
             return redirect()->back()->withErrors($e->getMessage());
         }
@@ -106,7 +106,8 @@ class ReportController extends Controller
 
         $pcts = json_decode($request->get('data'));
         try {
-            $pdf = PDF::loadView('report.exports.pdf', compact('pcts'))->setPaper('a4', 'landscape');
+            $matrix = $this->matrix;
+            $pdf = PDF::loadView('report.exports.pdf', compact('pcts', 'matrix'))->setPaper('a4', 'landscape');
             return $pdf->download('reporte_pcts.pdf');
         }catch(\Exception $e) {
             return redirect()->back()->withErrors($e->getMessage());

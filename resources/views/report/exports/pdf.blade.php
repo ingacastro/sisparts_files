@@ -23,6 +23,10 @@
       padding: 10px;
       text-shadow: 1px 1px 1px #fff;
   }
+  /*BarryVdh css*/
+  .page-break {
+      page-break-after: always;
+  }
 </style>
 <h1 id="title">Reporte de Cotizaciones</h1>
 <table>
@@ -55,6 +59,26 @@
         <td>{{ $pct->ctz_supplies }}</td>
         <td>{{ $pct->status }}</td>
         <td>{{ $pct->siavcom_ctz_number }}</td>
+      </tr>
+    @endforeach
+  </tbody>
+</table>
+<div class="page-break"></div>
+<h1 id="title">Cotizaciones por cotizador y empresa</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Cotizador</th>
+      <th>Empresa</th>
+      <th>Cotizaciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach($matrix as $entry)
+      <tr>
+        <td>{{ $entry->dealership }}</td>
+        <td>{{ $entry->connection }}</td>
+        <td>{{ $entry->amount }}</td>
       </tr>
     @endforeach
   </tbody>

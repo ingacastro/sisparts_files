@@ -12,6 +12,7 @@ use IParts\Datatables\ReportDataTable;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use IParts\Exports\PCTSExport;
+use IParts\Exports\PCTSMatrix;
 use PDF;
 
 class ReportController extends Controller
@@ -35,8 +36,6 @@ class ReportController extends Controller
 
     public function getList(Request $request)
     {
-        //Log::notice($request);
-
         $query = Document::select('documents.created_at as sync_date', 'documents.completed_date as send_date',
             DB::raw('(CASE 
                 WHEN documents.completed_date <> "" THEN DATEDIFF(documents.completed_date, documents.created_at)
@@ -86,9 +85,18 @@ class ReportController extends Controller
 
     public function downloadPCTSExcel(Request $request)
     {
-        $pcts = $request->get('data');
+      //PCTS by dealership and sync_connection
+      $matrix = Document::select('users.name as dealership', 'sync_connections.display_name as connection', DB::raw('COUNT(*) as amount'))
+      ->join('employees', 'employees.users_id', 'documents.employees_users_id')
+      ->join('users', 'employees.users_id', 'users.id')
+      ->join('sync_connections', 'sync_connections.id', 'documents.sync_connections_id')
+      ->groupBy('sync_connections.id', 'employees.users_id')
+      ->get()->toArray();
+
+        $pcts = json_decode($request->get('data'));
+
         try {
-            return Excel::download(new PCTSExport(json_decode($pcts)), 'reporte_pcts.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+            return Excel::download(new PCTSExport($pcts, $matrix), 'reporte_pcts.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         }catch(\Exception $e) {
             return redirect()->back()->withErrors($e->getMessage());
         }

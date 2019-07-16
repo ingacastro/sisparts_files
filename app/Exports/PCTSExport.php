@@ -1,37 +1,33 @@
 <?php
 namespace IParts\Exports;
 
-use Maatwebsite\Excel\Concerns\FromArray;
-use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\Exportable;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use IParts\Exports\PCTSReportSheet;
+use IParts\Exports\PCTSMatrixSheet;
 
-class PCTSExport implements FromArray, WithHeadings
+class PCTSExport implements WithMultipleSheets
 {
-    protected $pcts;
+    use Exportable;
 
-    public function __construct(array $pcts)
+    protected $pcts;
+    protected $matrix;
+    
+    public function __construct(array $pcts, array $matrix)
     {
         $this->pcts = $pcts;
+        $this->matrix = $matrix;
     }
 
-    public function array(): array
+    public function sheets(): array
     {
-        return $this->pcts;
-    }
-
-   public function headings(): array
-    {
-        return [
-			"Fecha recibida", 
-			"Fecha enviada", 
-			"Tiempo respuesta", 
-			"Empresa", 
-			"Folio" , 
-        	"Referencia", 
-        	"Cotizador", 
-        	"Cliente", 
-        	"Items cotizados", 
-        	"Estatus",
-            "No. CTZ"
-        ];
+        $sheets = [];
+        for($i = 0; $i < 2; $i++) {
+            if($i == 0)
+                $sheets[] = new PCTSReportSheet($this->pcts);
+            else
+                $sheets[] = new PCTSMatrixSheet($this->matrix);
+        }
+        return $sheets;
     }
 }

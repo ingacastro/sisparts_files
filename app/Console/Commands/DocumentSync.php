@@ -436,8 +436,6 @@ class DocumentSync extends Command
             $customer = Customer::create($data);
         }
 
-        Log::notice($customer->getIVA());
-
         return $customer;
     }
 }

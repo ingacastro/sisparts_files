@@ -1048,7 +1048,7 @@ class InboxController extends Controller
             'de5_mov' => 0,//YELLOW 0
             'im1_mov' => 0,//YELLOW 0
             'im2_mov' => 0,//YELLOW 0
-            'im3_mov' => $supply_set->document->customer->getIVA(),//GREEN supply_set->document->customer->getIVA()
+            'im3_mov' => $supply_set->document->customer->getIVA() * 100,//GREEN supply_set->document->customer->getIVA()
             'im4_mov' => 0,//YELLOW 0 
             'im5_mov' => 0,//YELLOW 0
             'mon_mov' => $supply_set->currencies_id,//GREEN supply_set->currency / supply_set->document->currency

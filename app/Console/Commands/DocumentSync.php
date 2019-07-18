@@ -248,7 +248,6 @@ class DocumentSync extends Command
             'type' => $pivot->tdo_tdo,
             'currencies_id' => $currency->id ?? null,
             'status' => 1,
-
             'ens_mov' => $pivot->ens_mov,
             'inv_tdo' => $pivot->inv_tdo,
             'dga_pro' => $pivot->dga_pro,

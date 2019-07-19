@@ -73,7 +73,7 @@ License: You must have a valid license purchased only from themeforest(the above
                                 <ul class="dropdown-menu dropdown-menu-default">
                                     <li>
                                         <a href="{{ route('logout') }}">
-                                            <i class="icon-key"></i> Log Out </a>
+                                            <i class="icon-key"></i> Salir </a>
                                     </li>
                                 </ul>
                             </li>

@@ -1,4 +1,5 @@
 var sets_turn_ctz_table;
+ var root_url = $('#root_url').attr('content');
 $('#sets_turn_ctz').click(function(){
     initSetsCTZTable();
 });
@@ -9,7 +10,7 @@ function initSetsCTZTable()
 
     sets_turn_ctz_table = $('#sets_turn_ctz_table').DataTable({
         ajax: {
-            url: '/inbox/document-supplies',
+            url: root_url + '/inbox/document-supplies',
             data: {'document_id': doc_id, 'status': 8}
         },
         iDisplayLength: 8,
@@ -57,7 +58,7 @@ $('#sets_turn_ctz_form').submit(function(e){
     let serialized_form = $(form).serialize();
 
     $.ajax({
-        url: '/inbox/sets-turn-ctz',
+        url: root_url + '/inbox/sets-turn-ctz',
         type: 'post',
         dataType: 'json',
         headers: {'X-CSRF-TOKEN': token},

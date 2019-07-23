@@ -1,7 +1,6 @@
 @extends('layouts.admin.master')
 @section('meta-css')
 <meta name="_token" content="{{ csrf_token() }}">
-<meta id="root_url" content="{{ url('/') }}">
 <link href="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/css/plugins.min.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.css" rel="stylesheet" type="text/css" />
@@ -88,14 +87,13 @@
 <script src="/js/supply/index.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.min.js" type="text/javascript"></script>
 <script type="text/javascript">
+     var root_url = $('#root_url').attr('content');
     $(document).ready(function(){
         $('#sidebar_supply').addClass('active');
 
-        let root_url = $('#root_url').attr('content');
-
         let table = $('#supplies_table').DataTable({
             serverSide: true,
-            ajax: '/supply/get-list',
+            ajax: root_url + '/supply/get-list',
             bSort: true,
             columns: [
                 { data: "number", name: "number" },

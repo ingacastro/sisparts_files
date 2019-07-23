@@ -70,12 +70,13 @@
 <script src="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.min.js" type="text/javascript"></script>
 <script type="text/javascript">
+    var root_url = $('#root_url').attr('content');
     $(document).ready(function(){
         $('#sidebar_rejection_reason').addClass('active');
 
         $('#rejection_reasons_table').DataTable({
             serverSide: true,
-            ajax: '/rejection-reason/get-list',
+            ajax: root_url + '/rejection-reason/get-list',
             bSort: true,
             columns: [
                 { data: "title", name: "title" },
@@ -108,7 +109,7 @@
     function deleteRequest(id) {
         let token = $('meta[name=_token]').attr('content');
         $.ajax({
-            url: '/rejection-reason/' + id,
+            url: root_url + '/rejection-reason/' + id,
             method: 'delete',
             headers: {'X-CSRF-TOKEN': token},
             success: function(response) {

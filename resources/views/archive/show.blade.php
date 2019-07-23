@@ -194,13 +194,14 @@
 <script src="/js/inbox/quotation_request.js" type="text/javascript"></script>
 <script src="/js/inbox/sets_turn_ctz.js" type="text/javascript"></script>
 <script type="text/javascript">
+var root_url = $('#root_url').attr('content');
 $(document).ready(function(){
     $('#sidebar_inbox').addClass('active');
     
     $('#supplies_table').DataTable({
         serverSide: true,
         ajax: {
-            url: '/inbox/document-supplies',
+            url: root_url + '/inbox/document-supplies',
             data: {
                 'document_id': '{{ $document->id }}',
                 'route': 'archive'

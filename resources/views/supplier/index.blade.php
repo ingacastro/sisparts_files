@@ -105,12 +105,13 @@
 <script src="/js/supplier/brands.js" type="text/javascript"></script>
 
 <script type="text/javascript">
+     var root_url = $('#root_url').attr('content');
     $(document).ready(function(){
         $('#sidebar_supplier').addClass('active');
 
         $('#suppliers_table').DataTable({
             serverSide: true,
-            ajax: '/supplier/get-list',
+            ajax: root_url + '/supplier/get-list',
             bSort: true,
             columns: [
                 { data: "trade_name", name: "trade_name" },
@@ -163,7 +164,7 @@
     function deleteRequest(id) {
         let token = $('meta[name=_token]').attr('content');
         $.ajax({
-            url: '/supplier/' + id,
+            url: root_url + '/supplier/' + id,
             method: 'delete',
             headers: {'X-CSRF-TOKEN': token},
             success: function() {
@@ -179,7 +180,7 @@
 
         $('#brands_table').DataTable({
             destroy: true,
-            ajax: '/supplier/get-brands/' + id,
+            ajax: root_url + '/supplier/get-brands/' + id,
             searching: false,
             info: false,
             lengthChange: false,

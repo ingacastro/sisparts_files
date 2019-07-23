@@ -1,3 +1,4 @@
+ var root_url = $('#root_url').attr('content');
 $('#file_attachment').click(function(){
 
     $('#sets_select2').select2({
@@ -20,7 +21,7 @@ function initDocAttachmentsTable()
     $('#file_attachment_table').DataTable({
         destroy: true,
         serverSide: true,
-        ajax: '/inbox/document-sets-files/' + doc_id,
+        ajax: root_url + '/inbox/document-sets-files/' + doc_id,
         bSort: true,
         iDisplayLength: 6,
         lengthChange: false,
@@ -40,7 +41,7 @@ function initSetAttachmentsTable()
     let set_auto_id = $('#set_auto_id').val();
     $('#files_table').DataTable({
         serverSide: true,
-        ajax: '/inbox/set-files/' + set_auto_id,
+        ajax: root_url + '/inbox/set-files/' + set_auto_id,
         iDisplayLength: 6,
         destroy: true,
         lengthChange: false,
@@ -63,7 +64,7 @@ $('#set_file_attachment_from_pct_form').submit(function(e){
     let formData = new FormData(form);
 
     $.ajax({
-        url: '/inbox/sets-file-attachment',
+        url: root_url + '/inbox/sets-file-attachment',
         type: 'post',
         dataType: 'json',
         headers: {'X-CSRF-TOKEN': token},
@@ -105,7 +106,7 @@ $('#set_file_attachment_form').submit(function(e){
     let formData = new FormData(form);
 
     $.ajax({
-        url: '/inbox/sets-file-attachment',
+        url: root_url + '/inbox/sets-file-attachment',
         method: 'post',
         dataType: 'json',
         headers: {'X-CSRF-TOKEN': token},
@@ -147,7 +148,7 @@ function detachFile(e, files_id, type)
 function deleteRequest(files_id, type) {
     let token = $('#meta_token').attr('content');
     $.ajax({
-        url: '/inbox/supply-file-delete/' + files_id,
+        url: root_url + '/inbox/supply-file-delete/' + files_id,
         method: 'delete',
         headers: {'X-CSRF-TOKEN': token},
         success: function(response) {

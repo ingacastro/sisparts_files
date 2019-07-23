@@ -1,8 +1,9 @@
+ var root_url = $('#root_url').attr('content');
 $(document).ready(function(){
     $('#brands_select2').select2({
         tags: true,
         ajax: {
-        	url: '/supplier/brands-id-name',
+        	url: root_url + '/supplier/brands-id-name',
         	dataType: 'json',
         	type: "get",
         	delay: 250,
@@ -30,7 +31,7 @@ $('#add_brand').click(function(){
 	if(select2_val == null) return;
 	
 	$.ajax({
-		url: '/supplier/create-brand',
+		url: root_url + '/supplier/create-brand',
 		type: 'post',
 		dataType: 'json',
 		headers: {'X-CSRF-TOKEN': token},

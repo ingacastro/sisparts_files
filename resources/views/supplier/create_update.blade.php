@@ -124,6 +124,7 @@
 <script src="/js/supplier/brands.js" type="text/javascript"></script>
 @endif
 <script type="text/javascript">
+     var root_url = $('#root_url').attr('content');
     $(document).ready(function(){
         $('#sidebar_supplier').addClass('active');
 
@@ -189,7 +190,7 @@
     {
         let country_id = $('#countries_id').val();
         $.ajax({
-            url: '/country-states',
+            url: root_url + '/country-states',
             method: 'get',
             dataType: 'json',
             data: {country_id: country_id},

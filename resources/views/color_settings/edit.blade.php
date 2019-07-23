@@ -47,6 +47,7 @@
 @include('utils.form_masks')
 <script src="/metronic-assets/global/plugins/bootstrap-tagsinput/bootstrap-tagsinput.min.js" type="text/javascript"></script>
 <script type="text/javascript">
+ var root_url = $('#root_url').attr('content');
 $(document).ready(function(){
     $('#sidebar_configuration').addClass('active');
 
@@ -58,7 +59,7 @@ $(document).ready(function(){
         let serialized_form = $(this).serialize();
         
         $.ajax({
-            url: '/color-settings',
+            url: root_url + '/color-settings',
             type: 'post',
             dataType: 'json',
             data: serialized_form,

@@ -72,12 +72,13 @@
 <script src="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.min.js" type="text/javascript"></script>
 <script type="text/javascript">
+    var root_url = $('#root_url').attr('content');
     $(document).ready(function(){
         $('#sidebar_configuration').addClass('active');
 
         $('#alerts_table').DataTable({
             serverSide: true,
-            ajax: '/alert/get-list',
+            ajax: root_url + '/alert/get-list',
             bSort: true,
             columns: [
                 { data: "title", name: "title" },
@@ -112,7 +113,7 @@
     function deleteRequest(id) {
         let token = $('meta[name=_token]').attr('content');
         $.ajax({
-            url: '/alert/' + id,
+            url: root_url + '/alert/' + id,
             method: 'delete',
             headers: {'X-CSRF-TOKEN': token},
             success: function() {

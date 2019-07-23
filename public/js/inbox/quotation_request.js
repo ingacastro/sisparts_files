@@ -1,3 +1,4 @@
+ var root_url = $('#root_url').attr('content');
 $(document).on('click', '.quotation-request', function(){
 
 	cleanQuotationRequestMessages();
@@ -40,7 +41,7 @@ $('#quotation_request_form').submit(function(e){
 	let serialized_form = $(this).serialize();
 	
     $.ajax({
-        url: '/inbox/send-suppliers-quotation',
+        url: root_url + '/inbox/send-suppliers-quotation',
         type: 'post',
         dataType: 'json',
         headers: {'X-CSRF-TOKEN': token},

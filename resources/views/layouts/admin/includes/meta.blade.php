@@ -28,6 +28,7 @@
     <link href="/metronic-assets/layouts/layout/css/custom.min.css" rel="stylesheet" type="text/css" />
     <!-- END THEME LAYOUT STYLES -->
     <link rel="shortcut icon" href="/favicon.ico" />
+    <meta id="root_url" content="{{ config('app.url') }}">
     @yield('meta-css')
     <style>
         .page-sidebar-menu { padding-top: 44px !important; }

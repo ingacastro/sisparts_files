@@ -103,6 +103,7 @@
 <script src="/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script>
 <script src="/plugins/quill-1.3.6/js/quill.js"></script>
 <script type="text/javascript">
+ var root_url = $('#root_url').attr('content');
 $(document).ready(function(){
     
     $('#sidebar_message').addClass('active');
@@ -178,7 +179,7 @@ $('.message-form').submit(function(e){
     let language_id = is_create ? '' : '/' + $('#languages_id_' + active_tab_id).val();
     
     $.ajax({
-        url: '/message' + language_id,
+        url: root_url + '/message' + language_id,
         method: 'post',
         dataType: 'json',
         data: serialized_form,

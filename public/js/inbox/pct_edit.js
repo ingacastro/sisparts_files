@@ -1,3 +1,4 @@
+ var root_url = $('#root_url').attr('content');
 $(document).on('click', '.edit-set', function() {
 
     let set_id = $(this).attr('data-id');
@@ -14,7 +15,7 @@ $(document).on('click', '.edit-set', function() {
     
     //Set tabs
     $.ajax({
-        url: '/inbox/get-set-tabs/' + set_id,
+        url: root_url + '/inbox/get-set-tabs/' + set_id,
         method: 'get',
         dataType: 'json',
         success: function(response) {
@@ -33,7 +34,7 @@ $(document).on('click', '.edit-set', function() {
 
             $('#files_table').DataTable({
                 serverSide: true,
-                ajax: '/inbox/set-files/' + set_supplies_id,
+                ajax: root_url + '/inbox/set-files/' + set_supplies_id,
                 iDisplayLength: 6,
                 destroy: true,
                 lengthChange: false,
@@ -64,7 +65,7 @@ $(document).on('submit', '#edit_budget_form', function(e){
     let serialized_form = $(this).serialize();
 
     $.ajax({
-        url: '/inbox/update-set-budget/' + set_id,
+        url: root_url + '/inbox/update-set-budget/' + set_id,
         method: 'post',
         dataType: 'json',
         data: serialized_form,
@@ -97,7 +98,7 @@ function checkChecklistItem(checklist_id, field)
 {
     let token = $('#meta_token').attr('content');
     $.ajax({
-        url: '/inbox/check-checklist-item',
+        url: root_url + '/inbox/check-checklist-item',
         method: 'post',
         dataType: 'json',
         data: {'checklist_id': checklist_id, 'field': field},
@@ -118,7 +119,7 @@ $(document).on('click', '.set-status-change', function() {
 
     let token = $('#meta_token').attr('content');
     $.ajax({
-        url: '/inbox/change-set-status',
+        url: root_url + '/inbox/change-set-status',
         method: 'post',
         dataType: 'json',
         data: {'document_id': doc_id, 'set_id': set_id, 'status': status},
@@ -149,7 +150,7 @@ $(document).on('submit', '#edit_conditions_form', function(e){
     let serialized_form = $(this).serialize();
 
     $.ajax({
-        url: '/inbox/update-set-conditions/' + conditions_id,
+        url: root_url + '/inbox/update-set-conditions/' + conditions_id,
         method: 'post',
         dataType: 'json',
         data: serialized_form,
@@ -171,7 +172,7 @@ $(document).on('click', '.condition-checkbox', function(){
     let id = item.attr('data-id');
     let field = item.attr('data-field');
 
-    $.get('/inbox/get-condition-value/' + id + '/'+ field, function(value) {
+    $.get(root_url + '/inbox/get-condition-value/' + id + '/'+ field, function(value) {
         $('#' + field + '_input').val(value);
     });
     

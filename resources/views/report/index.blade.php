@@ -137,6 +137,7 @@
 <script src="https://cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js" type="text/javascript"></script>
 <script src="https://cdn.datatables.net/buttons/1.2.4/js/buttons.html5.min.js" type="text/javascript"></script>
 <script type="text/javascript">
+     var root_url = $('#root_url').attr('content');
     $(document).ready(function(){
         $('#sidebar_report').addClass('active');
         $('#report_date_ranges').datepicker();
@@ -159,7 +160,7 @@
             destroy: true,
             //serverSide: true,
             ajax: {
-                url: '/report/get-list',
+                url: root_url + '/report/get-list',
                 data: {'start_date': start_date, 'end_date': end_date, 'sync_connection': sync_connection, 
                 'status': status, 'dealer_ship': dealer_ship, 'customer': customer}
             },

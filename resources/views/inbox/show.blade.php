@@ -240,13 +240,14 @@
 <script src="/js/inbox/set_rejection.js" type="text/javascript"></script>
 <script src="/js/inbox/binnacle_entry.js" type="text/javascript"></script>
 <script type="text/javascript">
+var root_url = $('#root_url').attr('content');
 $(document).ready(function(){
     $('#sidebar_inbox').addClass('active');
     
     $('#supplies_table').DataTable({
         serverSide: true,
         ajax: {
-            url: '/inbox/document-supplies',
+            url: root_url + '/inbox/document-supplies',
             data: {
                 'document_id': '{{ $document->id }}',
                 'route': 'inbox'
@@ -271,7 +272,7 @@ $(document).ready(function(){
 
     $('#binnacle_table').DataTable({
         serverSide: true,
-        ajax: '/inbox/document-binnacle/{{ $document->id }}',
+        ajax: root_url + '/inbox/document-binnacle/{{ $document->id }}',
         bSort: true,
         destroy: true,
         columns: [

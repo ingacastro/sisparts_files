@@ -1,3 +1,4 @@
+ var root_url = $('#root_url').attr('content');
 
 $('#custom_binnacle_entry').click(function(){
 	clearModalMessages();
@@ -22,7 +23,7 @@ function initBinnacleEntryDataTable()
 
     new_binnacle_entry_supplies_table = $('#new_binnacle_entry_supplies_table').DataTable({
         ajax: {
-            url: '/inbox/document-supplies',
+            url: root_url + '/inbox/document-supplies',
             data: {'document_id': doc_id}
         },
         iDisplayLength: 6,
@@ -70,7 +71,7 @@ $('#binnacle_entry_form').submit(function(e){
 	
 
     $.ajax({
-        url: '/inbox/binnacle-entry',
+        url: root_url + '/inbox/binnacle-entry',
         type: 'post',
         dataType: 'json',
         headers: {'X-CSRF-TOKEN': token},

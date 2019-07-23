@@ -1,3 +1,4 @@
+var root_url = $('#root_url').attr('content');
 $(document).on('click', '.change-dealership', function(){
     let current_dealership = $(this).attr('data-buyer');
     $('#current_dealership').html('Cotizador actual: ' + current_dealership);
@@ -10,7 +11,7 @@ $('#change_dealership_form').submit(function(e){
     let serialized_form = $(this).serialize();
     let token = $('meta[name=_token]').attr('content');
     $.ajax({
-        url: '/inbox/change-dealership',
+        url: root_url + '/inbox/change-dealership',
         dataType: 'json',
         method: 'post',
         headers: {'X-CSRF-TOKEN': token},
@@ -48,7 +49,7 @@ function archiveOrLockDocument(e, id, action) {
 function archiveOrLockRequest(id, action) {
     let token = $('meta[name=_token]').attr('content');
     $.ajax({
-        url: '/inbox/' + id + '/archive-lock/' + action,
+        url: root_url + '/inbox/' + id + '/archive-lock/' + action,
         method: 'post',
         headers: {'X-CSRF-TOKEN': token},
         success: function() {
@@ -79,7 +80,7 @@ function unlockDocument(e, id) {
 function unlockRequest(id) {
     let token = $('meta[name=_token]').attr('content');
     $.ajax({
-        url: '/inbox/' + id + '/unlock',
+        url: root_url + '/inbox/' + id + '/unlock',
         method: 'post',
         headers: {'X-CSRF-TOKEN': token},
         success: function() {

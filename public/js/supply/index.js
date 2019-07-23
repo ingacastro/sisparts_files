@@ -1,3 +1,4 @@
+ var root_url = $('#root_url').attr('content');
 $(document).on('click', '.replacement-observation', function() {
 
 	$('#replacement_observation_form_description').val('');
@@ -9,7 +10,7 @@ $(document).on('click', '.replacement-observation', function() {
 	$('#replacement_observation_modal_supplies_id').val(supply_id);
 
 	$('#replacement_observation_table').DataTable({
-        ajax: '/supply/' + supply_id + '/get-replacements-observations/' + type,
+        ajax: root_url + '/supply/' + supply_id + '/get-replacements-observations/' + type,
         bSort: true,
         destroy: true,
         iDisplayLength: 6,
@@ -34,7 +35,7 @@ $('#replacement_observation_form').submit(function(e) {
     let serialized_form = $(this).serialize();
 
     $.ajax({
-        url: '/supply/store-replacement-observation/' + type,
+        url: root_url + '/supply/store-replacement-observation/' + type,
         type: 'post',
         dataType: 'json',
         headers: {'X-CSRF-TOKEN': token},
@@ -121,7 +122,7 @@ function deleteReplacementObservation(e, id, type) {
 function deleteReplacementObservationRequest(id, type) {
     let token = $('meta[name=_token]').attr('content');
     $.ajax({
-        url: '/supply/replacement-observation/' + id +'/' + type,
+        url: root_url + '/supply/replacement-observation/' + id +'/' + type,
         method: 'delete',
         headers: {'X-CSRF-TOKEN': token},
         success: function(response) {
@@ -145,7 +146,7 @@ $(document).on('click', '.pcts', function() {
 	let supply_id = $(this).data('supply_id');
 
 	$('#pcts_table').DataTable({
-        ajax: '/supply/' + supply_id + '/pcts/',
+        ajax: root_url + '/supply/' + supply_id + '/pcts/',
         sort: false,
         destroy: true,
         iDisplayLength: 6,

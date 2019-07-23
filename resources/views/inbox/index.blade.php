@@ -131,13 +131,14 @@
 <script src="/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script>
 <script src="/js/inbox/index.js" type="text/javascript"></script>
 <script type="text/javascript">
+var root_url = $('#root_url').attr('content');
 $(document).ready(function(){
     $('#sidebar_inbox').addClass('active');
 
     $('#inbox_table').DataTable({
         serverSide: true,
         ajax: {
-            url: '/inbox/get-list',
+            url: root_url + '/inbox/get-list',
             data: {'route': 'inbox'}
         },
         bSort: true,
@@ -169,7 +170,7 @@ $('#filters_form').submit(function(e){
         serverSide: true,
         destroy: true,
         ajax: {
-            url: '/inbox/get-list',
+            url: root_url + '/inbox/get-list',
             data: {'sync_connection': sync_connection, 'status': status, 
             'dealer_ship': dealer_ship, 'route': 'inbox'}
         },

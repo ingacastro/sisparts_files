@@ -1,3 +1,4 @@
+ var root_url = $('#root_url').attr('content');
 $(document).on('click', '.set-rejection', function(){
 	$('#rejection_modal_set_id').val($(this).attr('data-set_id'));
 });
@@ -9,7 +10,7 @@ $('#set_rejection_form').submit(function(e){
 	let token = $('input[name=_token]').val();
 
 	$.ajax({
-		url: '/inbox/reject-set',
+		url: root_url + '/inbox/reject-set',
 		method: 'post',
 		data: serialized_form,
 		headers: {'X-CSRF-TOKEN': token},

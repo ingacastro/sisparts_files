@@ -33,7 +33,7 @@ class RejectionReasonController extends Controller
 
             return Datatables::of($rejection_reasons)
                   ->addColumn('actions', function($reject_reason) {
-                    return '<a href="/rejection-reason/'. $reject_reason->id . '/edit" class="btn btn-circle btn-icon-only default"><i class="fa fa-edit"></i></a>
+                    return '<a href="' . config('app.url') . '/rejection-reason/'. $reject_reason->id . '/edit" class="btn btn-circle btn-icon-only default"><i class="fa fa-edit"></i></a>
                             <button class="btn btn-circle btn-icon-only red"
                             onclick="deleteModel(event, ' . $reject_reason->id . ')"><i class="fa fa-times"></i></a>';
                   })

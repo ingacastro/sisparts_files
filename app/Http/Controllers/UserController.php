@@ -43,7 +43,7 @@ class UserController extends Controller
 
             return Datatables::of($users)
                   ->addColumn('actions', function($user) {
-                    return '<a href="/user/'. $user->id . '/edit" class="btn btn-circle btn-icon-only default"><i class="fa fa-edit"></i></a>
+                    return '<a href="' . config('app.url') . '/user/'. $user->id . '/edit" class="btn btn-circle btn-icon-only default"><i class="fa fa-edit"></i></a>
                             <button class="btn btn-circle btn-icon-only red"
                             onclick="deleteModel(event, ' . $user->id . ')"><i class="fa fa-times"></i></a>';
                   })

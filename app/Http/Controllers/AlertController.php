@@ -33,7 +33,7 @@ class AlertController extends Controller
             $alerts = Alert::all();
             return Datatables::of($alerts)
                   ->addColumn('actions', function($alert) {
-                    return '<a href="/alert/'. $alert->id . '/edit" class="btn btn-circle btn-icon-only default"><i class="fa fa-edit"></i></a>
+                    return '<a href="' . config('app.url') . '/alert/'. $alert->id . '/edit" class="btn btn-circle btn-icon-only default"><i class="fa fa-edit"></i></a>
                             <button class="btn btn-circle btn-icon-only red"
                             onclick="deleteModel(event, ' . $alert->id . ')"><i class="fa fa-times"></i></a>';
                   })

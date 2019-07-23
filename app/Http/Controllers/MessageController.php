@@ -39,7 +39,7 @@ class MessageController extends Controller
             
             return Datatables::of($messages)
                   ->addColumn('actions', function($message) {
-                    return '<a href="/message/'. $message->id . '/edit" class="btn btn-circle btn-icon-only default edit-message">
+                    return '<a href="' . config('app.url') . '/message/'. $message->id . '/edit" class="btn btn-circle btn-icon-only default edit-message">
                             <i class="fa fa-edit"></i></a>
                             <button class="btn btn-circle btn-icon-only red"
                             onclick="deleteModel(event, ' . $message->id . ')"><i class="fa fa-times"></i></a>';
@@ -101,7 +101,7 @@ class MessageController extends Controller
                 ->withErrors($e->getMessage())->render()]);
         }
 
-        return response()->json(['errors' => false, 'url' => '/message/' . $message_id . '/edit']);
+        return response()->json(['errors' => false, 'url' => config('app.url') . '/message/' . $message_id . '/edit']);
         
     }
 
@@ -173,7 +173,7 @@ class MessageController extends Controller
                 ->withErrors($e->getMessage())->render()]);
         }
         
-        return response()->json(['errors' => false, 'url' => '/message/' . $message->id . '/edit']);
+        return response()->json(['errors' => false, 'url' => config('app.url') . '/message/' . $message->id . '/edit']);
     }
 
     /**

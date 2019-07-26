@@ -53,7 +53,7 @@ return [
             'engine' => null,
         ],
         /*Virtual catalog connection*/
-        'virtual_catalog' => [
+        'mysql_virtual_catalog' => [
             'driver' => 'mysql',
             'host' => env('VIRTUAL_DB_HOST', '127.0.0.1'),
             'port' => env('VIRTUAL_DB_PORT', '3306'),

@@ -51,7 +51,7 @@ class DocumentSync extends Command
 
     private function main()
     {
-        $sync_connections = DB::table('sync_connections')->get();
+        $sync_connections = DB::table('sync_connections')->where('name', 'like', 'pgsql_')->get();
         foreach($sync_connections as $conn) {
             //if($conn->name == 'pgsql_zukaely') continue;
             $this->connectAndSync($conn);
@@ -114,7 +114,6 @@ class DocumentSync extends Command
             'buyer_name' => $siavcomDocument->ob2_doc,
             'buyer_number' => $siavcomDocument->tcd_tcd,
             'employees_users_id' => $dealer_ship->users_id,
-            
             'cop_nom' => $siavcomDocument->cop_nom,
             'con_con' => $siavcomDocument->con_con,
             'fel_doc' => $siavcomDocument->fel_doc,

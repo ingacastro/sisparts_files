@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Auth;
 use DB;
+use Storage;
 
 class DashboardController extends Controller
 {
@@ -35,6 +36,16 @@ class DashboardController extends Controller
      */
     public function index()
     {
+
+        //header("Content-Type:application/pdf");
+/*        $file = DB::connection('mysql_virtual_catalog')->table('archivos_num_parte')
+        ->where('num_parte', 'FP25R12KT4_B11')
+        ->first();
+
+        Storage::disk('supplies_files')->put(uniqid() . '_' . $file->nombre, $file->contenido);
+
+*/
+
         $stats = $this->getStats();
         $supply_sets_amount = SupplySet::count();
         $rejected_ppas_percentage = ($supply_sets_amount > 0) ? $stats['rejected_ppas'] / $supply_sets_amount : $stats['rejected_ppas'];

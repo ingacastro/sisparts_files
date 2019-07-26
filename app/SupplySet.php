@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class SupplySet extends Model
 {
     protected $table = 'documents_supplies';
-    protected $fillable = ['status'];
+    protected $fillable = ['status', 'documents_id', 'supplies_id'];
 
     public function document()
     {

@@ -682,7 +682,7 @@ class InboxController extends Controller
     }
 
     public function sendSuppliersQuotation(Request $request)
-    {
+    {        
         $data = $request->all();
 
         $data['emails'] = [];
@@ -740,12 +740,25 @@ class InboxController extends Controller
         $body = $message->body . '<div>' . $data['manufacturer'] . '</div>' .
         '<div>Partes: ' . implode(', ', $data['supplies_names']) . '</div>';
         try {            
-            Mail::send([], [], function($m) use ($email, $subject, $body) {
+/*            Mail::send([], [], function($m) use ($email, $subject, $body) {
+                $m->from(Auth::user()->email);
                 $m->to($email);
                 $m->subject($subject);
                 $m->setBody($body, 'text/html');
-            });
+            });*/
+            $dealership_email = Auth::user()->email;
+
+            //$from = "gmessoft@gmail.com";
+            $to = $email;
+            $subject = $subject;
+            $message = $body;
+            $headers = 'From: ' . $dealership_email . "\r\n". 
+              'Reply-To: ' . $dealership_email . "\r\n" . 
+              'X-Mailer: PHP/' . phpversion() . "\r\n" . 
+              "Content-type: text/html\r\n";
+            Log::notice(mail($to, $subject, $message, $headers) ? 'TRUE' : 'FALSE');
         } catch(\Exception $e) {
+            Log::notice($e);
             throw new \Exception("Error al enviar el correo.", 1);
         }
     }

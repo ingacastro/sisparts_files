@@ -115,13 +115,13 @@ class InboxController extends Controller
               })
               ->addColumn('actions', function($document) use ($route, $logged_user) { 
                 if($route == 'inbox') {
-                    $actions = '<a href="/inbox/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a><a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '"><i class="fa fa-user"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="archiveOrLockDocument(event, ' . $document->id . ', 1)"><i class="fa fa-archive"></i></a>';
+                    $actions = '<a href="' . config('app.url') . '/inbox/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a><a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '"><i class="fa fa-user"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="archiveOrLockDocument(event, ' . $document->id . ', 1)"><i class="fa fa-archive"></i></a>';
                     $actions .= $logged_user->hasRole('Administrador')
                     ? '<a class="btn btn-circle btn-icon-only default red" onClick="archiveOrLockDocument(event, ' . $document->id . ', 2)"><i class="fa fa-lock"></i></a>'
                     : '';
                 }
                 else {
-                    $actions = '<a href="/archive/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';
+                    $actions = '<a href="' . config('app.url') . '/archive/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';
                     if($document->is_canceled == 1) { //$logged_user->hasRole('Administrador') && 
                         $actions .= '<a class="btn btn-circle btn-icon-only default green-meadow" onClick="unlockDocument(event, ' . $document->id . ')"><i class="fa fa-unlock"></i></a>';
                     }

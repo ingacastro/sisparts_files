@@ -95,7 +95,7 @@ class SupplyController extends Controller
                            '$' . number_format($total_price, 2, '.', ',') . ' ' . $supplies_set->currency;
                   })
                   ->addColumn('actions', function($document) {
-                        return '<a href="/inbox/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';
+                        return '<a href="' . config('app.url') . '/inbox/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';
                   })
                   ->rawColumns(['actions' => 'actions'])
                   ->make(true);

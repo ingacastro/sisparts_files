@@ -261,7 +261,7 @@ class InboxController extends Controller
         //Canceled document shows archive's show view (no edit), otherwise It shows inbox's show view (edit)
         $view = $document->is_canceled == 1 ? 'archive' : 'inbox';
 
-        return view($view . '.show', compact('document', 'manufacturers', 'document_supplies', 'messages', 
+        return view($view . '.show', compact('document', 'document_supplies', 'messages', 
             'rejection_reasons'));
     }
 

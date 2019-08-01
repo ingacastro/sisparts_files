@@ -314,7 +314,7 @@ class InboxController extends Controller
                     return date('d/m/Y', strtotime($file->created_at));
                   })
                   ->addColumn('actions', function($file) {
-                    return '<a href="' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="/' . $file->path . '" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,' . $file->documents_supplies_id .',' . $file->files_id .',2' . ')"><i class="fa fa-trash"></i></a>';
+                    return '<a href="' . config('app.url') . '/' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="' . config('app.url') . '/' . $file->path . '" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,' . $file->documents_supplies_id .',' . $file->files_id .',2' . ')"><i class="fa fa-trash"></i></a>';
                   })
                   ->rawColumns(['actions' => 'actions'])
                   ->make(true);
@@ -411,7 +411,7 @@ class InboxController extends Controller
                     return date('d/m/Y', strtotime($file->created_at));
                   })
                   ->addColumn('actions', function($file) {
-                    return '<a href="' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="/' . $file->path .'" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,'. $file->files_id .',1' . ')"><i class="fa fa-trash"></i></a>';
+                    return '<a href="' . config('app.url') . '/' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="' . config('app.url') . '/' . $file->path .'" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,'. $file->files_id .',1' . ')"><i class="fa fa-trash"></i></a>';
                   })
                   ->rawColumns(['actions' => 'actions'])
                   ->make(true);

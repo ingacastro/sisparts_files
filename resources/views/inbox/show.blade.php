@@ -243,7 +243,26 @@
 var root_url = $('#root_url').attr('content');
 $(document).ready(function(){
     $('#sidebar_inbox').addClass('active');
-    
+    initSupplySetsTable();
+    $('#binnacle_table').DataTable({
+        serverSide: true,
+        ajax: root_url + '/inbox/document-binnacle/{{ $document->id }}',
+        bSort: true,
+        destroy: true,
+        columns: [
+            { data: "created_at", name: "created_at" },
+            { data: "entity", name: "entity" },
+            { data: "type", name: "type" },
+            { data: "user", name: "user" },
+            { data: "comments", name: "comments" },
+        ],
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+        }, 
+    });
+});
+
+function initSupplySetsTable() {
     $('#supplies_table').DataTable({
         serverSide: true,
         ajax: {
@@ -269,24 +288,10 @@ $(document).ready(function(){
             "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
         }, 
     });
+}
 
-    $('#binnacle_table').DataTable({
-        serverSide: true,
-        ajax: root_url + '/inbox/document-binnacle/{{ $document->id }}',
-        bSort: true,
-        destroy: true,
-        columns: [
-            { data: "created_at", name: "created_at" },
-            { data: "entity", name: "entity" },
-            { data: "type", name: "type" },
-            { data: "user", name: "user" },
-            { data: "comments", name: "comments" },
-        ],
-        language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
-        }, 
-    });
+$(document).on('click', '#close_set_edition_modal', function() {
+    initSupplySetsTable();
 });
-
 </script>
 @endpush

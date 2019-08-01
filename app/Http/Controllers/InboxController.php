@@ -590,8 +590,11 @@ class InboxController extends Controller
         }
 
         try {
+
             $document_supply = DB::table('documents_supplies')->where('documents_id', $set_id[0])
             ->where('supplies_id', $set_id[1])->first();
+
+            $data['set']['status'] = 5; //Budget resgistered
             DB::table('documents_supplies')->where('documents_id', $set_id[0])
             ->where('supplies_id', $set_id[1])->update($data['set']);
             
@@ -618,17 +621,37 @@ class InboxController extends Controller
             'set.warehouse_shipment_cost.required' => 'El campo envío al almacen es requerido.',
             'set.customer_shipment_cost.required' => 'El campo envío al cliente es requerido.',
             'set.extra_charges.required' => 'El campo gastos extra es requerido.',
+            'set.suppliers_id.required' => 'El campo proveedor es requerido.',
+            'set.currencies_id.required' => 'El campo moneda es requerido.',
+            'measurement.cm1.required' => 'El campo 1 de Peso voulmen *kg es requerido.',
+            'measurement.cm2.required' => 'El campo 2 de Peso voulmen *kg es requerido.',
+            'measurement.cm3.required' => 'El campo 3 de Peso voulmen *kg es requerido.',
+            'measurement.kgs.required' => 'El campo 4 de Peso voulmen *kg es requerido.',
+            'measurement.in1.required' => 'El campo 5 de Peso voulmen *kg es requerido.',
+            'measurement.in2.required' => 'El campo 6 de Peso voulmen *kg es requerido.',
+            'measurement.in3.required' => 'El campo 7 de Peso voulmen *kg es requerido.',
+            'set.source_country_id.required' => 'El campo país de origen es requerido.',
             'utility_percentage.required' => 'El porcentaje de utilidad es requerido.',
             'utility_percentage.min' => 'El porcentaje de utilidad mínimo, es 1.',
             'utility_percentage.max' => 'El porcentaje de utilidad máximo, es 100.'
         ];
         
         $validator = Validator::make($data, [
+            'set.suppliers_id' => 'required',
+            'set.currencies_id' => 'required',
             'set.sale_unit_cost' => 'required',
             'set.importation_cost' => 'required',
             'set.warehouse_shipment_cost' => 'required',
             'set.customer_shipment_cost' => 'required',
             'set.extra_charges' => 'required',
+            'measurement.cm1' => 'required',
+            'measurement.cm2' => 'required',
+            'measurement.cm3' => 'required',
+            'measurement.kgs' => 'required',
+            'measurement.in1' => 'required',
+            'measurement.in2' => 'required',
+            'measurement.in3' => 'required',
+            'set.source_country_id' => 'required',
             'utility_percentage' => 'required|numeric|min:1|max:100'
         ], $messages);
 
@@ -644,8 +667,9 @@ class InboxController extends Controller
                 ->withErrors('Acción no autorizada.')->render()]);
 
         try {
-            $obj = DB::table('checklist')->where('id', $request->checklist_id)
-            ->update([$request->field => 'checked']);
+            //og::notice($request->checklist_id);
+            DB::table('checklist')->where('id', $request->checklist_id)
+            ->update([$request->field => $request->status]);
         } catch(\Exception $e) {
             return response()->json(
                 ['errors' => true,
@@ -711,9 +735,16 @@ class InboxController extends Controller
                 $this->registerQuotationEmailBinnacle($email, $data, $set);
             }
             
-            $set->fill(['status' => 2])->update();
-            $doc = Document::find($set->documents_id);
-            $doc->fill(['status' => 2])->update();
+            //Quotation request sent
+            if($set->status < 2)
+                $set->fill(['status' => 2])->update();
+
+            //Document/PCT in process
+            if($set->document->status < 2) {
+                $doc = Document::find($set->documents_id);
+                $doc->fill(['status' => 2])->update();
+            }
+
         } catch(\Exception $e) {
             return response()->json(
                 ['errors' => true,
@@ -809,11 +840,19 @@ class InboxController extends Controller
 
     public function changeSetStatus(Request $request)
     {
+        
         if(!$request->ajax())
             return response()->json([
                 'errors' => true, 
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
                 ->withErrors('Acción no autorizada.')->render()]);
+
+        if(count($request->checklist_form) < 13) { //All of the checkboxes in checklist must be checked
+            return response()->json([
+                'errors' => true, 
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('Existen puntos en el checklist sin revisar.')->render()]);
+        }
 
         $status = $request->status;
 
@@ -822,16 +861,16 @@ class InboxController extends Controller
         
         $supply_set = SupplySet::find($request->set_id);
 
-        $files = $base_query->join('supplies_files', 'supplies_files.supplies_id', 'supplies.id')
+        $files = $base_query->join('supplies_files', 'supplies_files.supplies_id', 'documents_supplies.supplies_id')
         ->join('files', 'supplies_files.files_id', 'files.id')
-        ->where('supplies.id', $supply_set->supplies_id)
+        ->where('supplies_files.supplies_id', $supply_set->supplies_id)
         ->whereRaw('DATEDIFF(now(), files.created_at) < 30')->get();
 
         if($status == 6 && count($files) == 0)
             return response()->json([
                 'errors' => true, 
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
-                ->withErrors('La partida debe tener al menos un archivo de menos de 30 días de antigüedad.')->render()]);
+                ->withErrors('La partida debe tener al menos un archivo o url de menos de 30 días de antigüedad.')->render()]);
 
         try {
            $update_query->where('id', $request->set_id)->update(['status' => $status]);            

@@ -1,6 +1,9 @@
  var root_url = $('#root_url').attr('content');
 $(document).on('click', '.edit-set', function() {
 
+    $('#pct_edit_modal_error_messages').html('');
+    $('#pct_edit_modal_success_message').html('');
+
     let set_id = $(this).attr('data-id');
     let total_cost = $(this).attr('data-total_cost');
     let total_price = $(this).attr('data-total_price');
@@ -91,17 +94,18 @@ $(document).on('click', '.set-checklist', function(){
 
     let set_id = $(this).attr('data-set_id');
     let field = $(this).attr('data-field');
-    checkChecklistItem(set_id, field);
+    checkChecklistItem(set_id, field, checked);
 });
 
-function checkChecklistItem(checklist_id, field)
+function checkChecklistItem(checklist_id, field, checked)
 {
     let token = $('#meta_token').attr('content');
+    let status = checked ? 'checked' : '';
     $.ajax({
         url: root_url + '/inbox/check-checklist-item',
         method: 'post',
         dataType: 'json',
-        data: {'checklist_id': checklist_id, 'field': field},
+        data: {'checklist_id': checklist_id, 'field': field, 'status': status},
         headers: {'X-CSRF-TOKEN': token},
         success: function(response) {
             $('#pct_edit_modal_error_messages').empty();
@@ -118,11 +122,12 @@ $(document).on('click', '.set-status-change', function() {
     let status = $(this).attr('data-status');
 
     let token = $('#meta_token').attr('content');
+    let checklist_serialized_form = $('#checklist_form').serializeArray();
     $.ajax({
         url: root_url + '/inbox/change-set-status',
         method: 'post',
         dataType: 'json',
-        data: {'document_id': doc_id, 'set_id': set_id, 'status': status},
+        data: {'document_id': doc_id, 'set_id': set_id, 'status': status, 'checklist_form': checklist_serialized_form},
         headers: {'X-CSRF-TOKEN': token},
         success: function(response) {
             $('#pct_edit_modal_error_messages').empty();

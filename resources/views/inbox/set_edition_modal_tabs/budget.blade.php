@@ -8,7 +8,8 @@
                 <div class="row">
                     <div class="col-md-7">
                         <div class="form-group">
-                            {!! Form::select('set[suppliers_id]', $suppliers, $set->suppliers_id, ['class' => 'form-control']) !!}
+                            {!! Form::select('set[suppliers_id]', $suppliers, $set->suppliers_id, ['class' => 'form-control',
+                            'placeholder' => 'Proveedor...']) !!}
                         </div>
                     </div>
                     <div class="col-md-5">
@@ -175,7 +176,7 @@
             </div>
         </div>
         <div class="modal-footer" style="text-align: center;">
-            <button type="button" class="btn btn-circle default" data-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-circle default" id="close_set_edition_modal" data-dismiss="modal">Cerrar</button>
             <button type="submit" class="btn btn-circle blue">Guardar</button>
         </div>
         {!! Form::close() !!}

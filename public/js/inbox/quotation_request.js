@@ -9,7 +9,7 @@ $(document).on('click', '.quotation-request', function(){
 	$('#quotation_request_manufacturer_hidden').val(manufacturer_title);
 	$('#documents_supplies_id').val(item.attr('data-id'));
 
-	$.get('/inbox/get-manufacturer-suppliers-and-supplies/' + item.attr('data-manufacturer_id'), function(response){
+	$.get(root_url + '/inbox/get-manufacturer-suppliers-and-supplies/' + item.attr('data-manufacturer_id'), function(response){
 		$('#left_suppliers').html('');
 		$('#right_suppliers').html('');
 		$('#left_supplies').html('');

@@ -903,6 +903,7 @@ class InboxController extends Controller
         ];
 
         try {
+            DB::table('checklist')->where('id', $request->set_id)->update(['material_specifications' => null, 'quoted_amounts' => null, 'quotation_currency' => null, 'unit_price' => null, 'delivery_time' => null, 'delivery_conditions' => null, 'product_condition' => null, 'entrance_shipment_costs' => null, 'weight_calculation' => null, 'material_origin' => null, 'incoterm' => null, 'minimum_purchase' => null, 'extra_charges' => null]);
             Binnacle::create($set_binnacle_data);
         }catch(\Exception $e) {
             Log::notice($e);

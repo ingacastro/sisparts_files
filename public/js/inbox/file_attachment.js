@@ -127,7 +127,7 @@ $('#set_file_attachment_form').submit(function(e){
     });
 });
 
-function detachFile(e, files_id, type)
+function detachFile(e, supply_id, files_id, type)
 {
     e.preventDefault();
     swal({
@@ -141,14 +141,14 @@ function detachFile(e, files_id, type)
       closeOnConfirm: true,
     },
     function(isConfirm) {
-      if (isConfirm) { deleteRequest(files_id, type); }
+      if (isConfirm) { detachFileRequest(supply_id, files_id, type); }
     });
 }
 
-function deleteRequest(files_id, type) {
+function detachFileRequest(supply_id, files_id, type) {
     let token = $('#meta_token').attr('content');
     $.ajax({
-        url: root_url + '/inbox/supply-file-delete/' + files_id,
+        url: root_url + '/inbox/supply-file-delete/' + supply_id + '/' + files_id,
         method: 'delete',
         headers: {'X-CSRF-TOKEN': token},
         success: function(response) {

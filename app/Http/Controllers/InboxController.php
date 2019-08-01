@@ -314,7 +314,9 @@ class InboxController extends Controller
                     return date('d/m/Y', strtotime($file->created_at));
                   })
                   ->addColumn('actions', function($file) {
-                    return '<a href="' . config('app.url') . '/' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="' . config('app.url') . '/' . $file->path . '" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,' . $file->documents_supplies_id .',' . $file->files_id .',2' . ')"><i class="fa fa-trash"></i></a>';
+                    $actions = (isset($file->url)) ? '<a href="' . config('app.url') . '/' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a>' : '';
+                    $actions .= '<a href="' . config('app.url') . '/' . $file->path . '" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,' . $file->supplies_id .',' . $file->files_id .',2' . ')"><i class="fa fa-trash"></i></a>';
+                    return $actions;
                   })
                   ->rawColumns(['actions' => 'actions'])
                   ->make(true);
@@ -397,35 +399,36 @@ class InboxController extends Controller
 
     public function getDocumentSetsFiles(Request $request, $document_id)
     {
-        if($request->ajax()):
+        if(!$request->ajax()) abort(403, 'Unauthorized action');
 
-            $files = DB::table('files')->select('files.id', 'files.created_at', 'files.supplier', 'files.url', 'files.path',
-            'supplies_files.supplies_id', 'supplies_files.files_id')
-            ->join('supplies_files', 'supplies_files.files_id', 'files.id')
-            ->join('supplies', 'supplies.id', 'supplies_files.supplies_id')
-            ->join('documents_supplies', 'documents_supplies.supplies_id', 'supplies.id')
-            ->where('documents_supplies.documents_id', $document_id)->get();
-            
-            return Datatables::of($files)
-                  ->editColumn('created_at', function($file) {
-                    return date('d/m/Y', strtotime($file->created_at));
-                  })
-                  ->addColumn('actions', function($file) {
-                    return '<a href="' . config('app.url') . '/' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="' . config('app.url') . '/' . $file->path .'" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,'. $file->files_id .',1' . ')"><i class="fa fa-trash"></i></a>';
-                  })
-                  ->rawColumns(['actions' => 'actions'])
-                  ->make(true);
-        endif;
-        abort(403, 'Unauthorized action');
+        $files = DB::table('files')->select('files.id', 'files.created_at', 'files.supplier', 'files.url', 'files.path',
+        'supplies_files.supplies_id', 'supplies_files.files_id')
+        ->join('supplies_files', 'supplies_files.files_id', 'files.id')
+        ->join('supplies', 'supplies.id', 'supplies_files.supplies_id')
+        ->join('documents_supplies', 'documents_supplies.supplies_id', 'supplies.id')
+        ->where('documents_supplies.documents_id', $document_id)->get();
+        
+        return Datatables::of($files)
+              ->editColumn('created_at', function($file) {
+                return date('d/m/Y', strtotime($file->created_at));
+              })
+              ->addColumn('actions', function($file) {
+                return '<a href="' . config('app.url') . '/' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="' . config('app.url') . '/' . $file->path .'" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,' . $file->supplies_id .',' . $file->files_id .',1' . ')"><i class="fa fa-trash"></i></a>';
+              })
+              ->rawColumns(['actions' => 'actions'])
+              ->make(true);
     }
 
-    public function supplyFileDelete($file_id)
+    public function supplyFileDetach($supply_id, $file_id)
     {
+            Log::notice($supply_id . ' ' . $file_id);
         try {
             $file = File::find($file_id);
-            $file_path = $file->path;
-            $file->delete();
-            LaravelFile::delete($file->path);
+            Log::notice($file);
+            $file->supplies()->detach($supply_id);
+            //$file_path = $file->path;
+            //$file->delete();
+            //LaravelFile::delete($file->path);
         } catch(\Exception $e) {
             return response()->json(
                 ['errors' => true,
@@ -434,7 +437,7 @@ class InboxController extends Controller
         }
       return response()->json(['errors' => false,
         'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
-        ->with('success_message', 'Archivo eliminado correctamente.')->render()
+        ->with('success_message', 'Archivo removido correctamente.')->render()
       ]);
     }
 
@@ -756,7 +759,7 @@ class InboxController extends Controller
               'Reply-To: ' . $dealership_email . "\r\n" . 
               'X-Mailer: PHP/' . phpversion() . "\r\n" . 
               "Content-type: text/html\r\n";
-            Log::notice(mail($to, $subject, $message, $headers) ? 'TRUE' : 'FALSE');
+            mail($to, $subject, $message, $headers);
         } catch(\Exception $e) {
             Log::notice($e);
             throw new \Exception("Error al enviar el correo.", 1);

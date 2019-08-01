@@ -33,11 +33,11 @@ class SupplierController extends Controller
         if($request->ajax()) {
 
             $supps = Supplier::select('suppliers.id', 'trade_name', 'business_name', 
-                'countries.name as country', 'rfc', 'email', 'landline', 'contact_name', 
-                DB::raw("group_concat(manufacturers.name) as brands"))
+                'countries.name as country', 'rfc', 'email', 'landline', 'contact_name',
+                DB::raw("GROUP_CONCAT(manufacturers.name) as brands"))
             ->join('countries', 'countries.id', 'suppliers.countries_id')
             ->leftJoin('suppliers_manufacturers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
-            ->leftJoin('manufacturers', 'suppliers_manufacturers.suppliers_id', 'manufacturers.id')
+            ->leftJoin('manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
             ->groupBy('suppliers.id')
             ->get();
 

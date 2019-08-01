@@ -15,6 +15,6 @@ class Manufacturer extends Model
 
     public function supplies()
     {
-    	return $this->hasMany('IParts\Supply', 'manufacturers_id');
+    	return $this->hasMany('IParts\Supply', 'manufacturers_id', 'id');
     }
 }

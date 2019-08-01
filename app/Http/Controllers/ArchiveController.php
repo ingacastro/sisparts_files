@@ -59,7 +59,7 @@ class ArchiveController extends Controller
         ->where('languages.name', 'Español')
         ->pluck('messages_languages.title', 'messages.id');
 
-        return view('archive.show', compact('document', 'manufacturers', 'document_supplies', 'messages'));
+        return view('archive.show', compact('document', 'document_supplies', 'messages'));
     }
 
     /**

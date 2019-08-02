@@ -846,7 +846,7 @@ class InboxController extends Controller
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
                 ->withErrors('Acción no autorizada.')->render()]);
 
-        if(count($request->checklist_form) < 13) { //All of the checkboxes in checklist must be checked
+        if(!isset($request->checklist_form) || count($request->checklist_form) < 13) { //All of the checkboxes in checklist must be checked
             return response()->json([
                 'errors' => true, 
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
@@ -993,7 +993,6 @@ class InboxController extends Controller
                 'errors' => true,
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
                 ->withErrors('Acción no autorizada.')->render()]);
-
 
         try {
             

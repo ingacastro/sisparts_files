@@ -137,10 +137,11 @@ $(document).on('click', '.set-status-change', function() {
                 $('#pct_edit_modal_error_messages').html(response.errors_fragment);
             else {
                 $('#pct_edit_modal_success_message').html(response.success_fragment);
-                if(status == 6) {
+                $('#authorization_btns_container').hide();
+/*                if(status == 6) {
                     $('#in_authorization_btn').hide();
                     $('#authorization_btns_container').css('display', 'block');
-                }
+                }*/
             }
         }
     });

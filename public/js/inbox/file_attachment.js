@@ -110,6 +110,7 @@ $('#set_file_attachment_form').submit(function(e){
         method: 'post',
         dataType: 'json',
         headers: {'X-CSRF-TOKEN': token},
+        contentType: 'multipart/form-data',
         data: formData,
         processData: false,
         contentType: false,

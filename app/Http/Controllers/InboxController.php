@@ -325,12 +325,12 @@ class InboxController extends Controller
 
     public function setsFileAttachment(Request $request)
     {
-        if(!$request->ajax())
+/*        if(!$request->ajax())
             return response()->json([
                 'errorrs' => true,
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
                 ->withErrors('Acción no autorizada.')->render()
-            ]);
+            ]);*/
 
         if(!$request->has('file') && empty($request->url))
             return response()->json(

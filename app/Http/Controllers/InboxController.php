@@ -65,8 +65,7 @@ class InboxController extends Controller
              DB::raw('(CASE WHEN documents.status = 1 THEN "Nueva"
                       WHEN documents.status = 2 THEN "En proceso"
                       WHEN documents.status = 3 THEN "Terminada"
-                      WHEN documents.status = 4 THEN "Archivada"
-                      ELSE "Indefinido" END) as status'),
+                      ELSE "Indefinido" END) as status'), //WHEN documents.status = 4 THEN "Archivada"
             DB::raw('(CASE WHEN (SELECT color
                      FROM color_settings WHERE semaphore_days >= days ORDER BY days DESC limit 1)
                      IS NULL THEN "' . $first_color_setting->color . '" ELSE (SELECT color
@@ -75,7 +74,8 @@ class InboxController extends Controller
                          ->join('employees', 'employees.users_id', 'documents.employees_users_id')
                          ->join('users', 'users.id', 'employees.users_id')
                          ->join('customers', 'customers.id', 'documents.customers_id')
-                         ->join('sync_connections', 'documents.sync_connections_id', 'sync_connections.id');
+                         ->join('sync_connections', 'documents.sync_connections_id', 'sync_connections.id')
+                         ->where('documents.status', '!=', 4);
 
             $logged_user = Auth::user();
             //Dealership won't see customer

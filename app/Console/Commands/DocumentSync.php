@@ -388,7 +388,7 @@ class DocumentSync extends Command
                 'entity' => 1, //Document
                 'pct_status' => $doc->status, //In process
                 'comments' => 'Solicitud de cotización enviada al proveedor ' . $email,
-                'employees_users_id' => null,
+                'users_id' => null,
                 'type' => 2, //Just a silly number that means nothing
                 'documents_id' => $doc->id,
                 'documents_supplies_id' => null

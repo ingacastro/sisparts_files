@@ -17,4 +17,10 @@ class SupplySet extends Model
     {
     	return $this->hasOne('IParts\Supply', 'id', 'supplies_id');
     }
+
+    public function rejections()
+    {
+        return $this->belongsToMany('IParts\RejectionReason', 'rejections', 'documents_supplies_id', 'rejection_reasons_id');
+        //->withPivot('comments');
+    }
 }

@@ -271,8 +271,7 @@ class InboxController extends Controller
 
             $set_pri_key = explode('_', $set_id);
             $doc_id = $set_pri_key[0];
-            $set = DB::table('documents_supplies')->where('documents_id', $doc_id)
-            ->where('supplies_id', $set_pri_key[1])->first();
+            $set = SupplySet::where('documents_id', $doc_id)->where('supplies_id', $set_pri_key[1])->first();
             
             $suppliers = Supplier::pluck('trade_name', 'id');
             $currencies = Currency::pluck('name', 'id');
@@ -532,7 +531,7 @@ class InboxController extends Controller
                 DB::raw('CASE 
                     WHEN binnacles.type = 1 THEN "Llamada" ELSE "" END as type'), 
                 'users.name as user', 'binnacles.comments')
-                ->join('users', 'binnacles.employees_users_id', 'users.id')
+                ->join('users', 'binnacles.users_id', 'users.id')
                 ->leftJoin('supplies', 'binnacles.documents_supplies_id', 'supplies.id')
                 ->where('binnacles.documents_id', $documents_id)->get();
                
@@ -807,7 +806,7 @@ class InboxController extends Controller
                 'entity' => 2, //SupplySet
                 'pct_status' => $doc->status, //In process
                 'comments' => 'Solicitud de cotización enviada al proveedor ' . $email,
-                'employees_users_id' => Auth::user()->id,
+                'users_id' => Auth::user()->id,
                 'type' => 2, //Just a silly number that means nothing
                 'documents_id' => $doc->id,
                 'documents_supplies_id' => $set->id
@@ -896,7 +895,7 @@ class InboxController extends Controller
             'entity' => 2,
             'comments' => $message,
             'pct_status' => 2,
-            'employees_users_id' => Auth::user()->id,
+            'users_id' => Auth::user()->id,
             'type' => 2, //Just a silly number tha means nothing
             'documents_id' => $document_id,
             'documents_supplies_id' => $request->set_id
@@ -918,6 +917,7 @@ class InboxController extends Controller
         ]); 
     }
 
+    /* Rejects a supply set */    
     public function rejectSet(Request $request)
     {
         if(!$request->ajax())
@@ -943,7 +943,7 @@ class InboxController extends Controller
             'entity' => 2, //item (supply set)
             'comments' => $request->comments,
             'pct_status' => $supply_set->document->status,
-            'employees_users_id' => Auth::user()->id,
+            'users_id' => Auth::user()->id,
             'type' => 2, //Just a silly number tha means nothing
             'documents_id' => $supply_set->document->id,
             'documents_supplies_id' => $set_id
@@ -1033,7 +1033,7 @@ class InboxController extends Controller
                     'documents_supplies_id' => $supply_set->id,
                     'comments' => 'Partida convertida a CTZ',
                     'pct_status' => 2,
-                    'employees_users_id' => Auth::user()->id,
+                    'users_id' => Auth::user()->id,
                     'type' => 2, //Just a silly number tha means nothing
                     'documents_id' => $document->id,
                 ];
@@ -1223,7 +1223,7 @@ class InboxController extends Controller
             'entity' => 1,
             'comments' => 'PCT convertida a CTZ',
             'pct_status' => 3,
-            'employees_users_id' => Auth::user()->id,
+            'users_id' => Auth::user()->id,
             'type' => 2, //Just a silly number tha means nothing
             'documents_id' =>$pct->id
         ];
@@ -1278,7 +1278,7 @@ class InboxController extends Controller
                 ->withErrors($validator)->render()]);
 
         $entity = $request->entity;
-        $data['employees_users_id'] = Auth::user()->id;
+        $data['users_id'] = Auth::user()->id;
         $document = Document::find($request->documents_id);
         $data['pct_status'] = $document->status;
         try {

@@ -1,3 +1,6 @@
+@if(Auth::user()->hasRole('Cotizador') && $set->status == 7)
+<strong style="color: red">Motivo de rechazo: </strong>{{ $set->rejections->last()->title }}
+@endif
 <div class="row modal-content-border" style="background: #f1f4f7;">
     <div class="col-md-12 checklist-container">                            
         <h4 class="form-section">Checklist</h4>
@@ -62,14 +65,16 @@
         <div class="checklist-buttons-container">
             <button type="submit" class="btn btn-circle btn-sm green-meadow set-status-change"
             data-set_id="{{$set->id}}" data-document_id="{{ $doc_id }}" data-status="6" id="in_authorization_btn"
-            style="display: {{ $set->status == 5 ? 'inline-block' : 'none' }}">En autorización</button>
+            style="display: {{ Auth::user()->hasRole('Cotizador') && ($set->status == 5 || $set->status == 7) ? 'inline-block' : 'none' }}">En autorización</button>
 
+            @role('Administrador')
             <div id="authorization_btns_container" style="display: {{ $set->status == 6 ? 'block' : 'none' }}">
                 <button type="submit" class="btn btn-circle btn-sm green-meadow set-status-change" data-set_id="{{$set->id}}" 
                     data-status="8" data-document_id="{{ $doc_id }}">Autorizar</button>
                 <button type="button" class="btn btn-circle btn-sm yellow set-rejection" data-set_id="{{$set->id}}" 
                     data-status="7" data-document_id="{{ $doc_id }}" data-target="#set_rejection_modal" data-toggle="modal">Rechazar</button>
             </div>
+            @endrole
         </div>
     </div>                          
 </div>

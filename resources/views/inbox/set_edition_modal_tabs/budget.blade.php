@@ -22,42 +22,48 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            {!! Form::text('set[sale_unit_cost]', $set->sale_unit_cost, ['class' => 'form-control currency-mask', 'placeholder' => 'Costo unitario']) !!}
+                            <label for="sale_unit_cost">Costo unitario</label>
+                            {!! Form::text('set[sale_unit_cost]', $set->sale_unit_cost, ['class' => 'form-control currency-mask', 'id' => 'sale_unit_cost']) !!}
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            {!! Form::text('set[importation_cost]', $set->importation_cost, ['class' => 'form-control currency-mask', 'placeholder' => 'Importación']) !!}
+                            <label for="importation_cost">Importación</label>
+                            {!! Form::text('set[importation_cost]', $set->importation_cost, ['class' => 'form-control currency-mask', 'id' => 'importation_cost']) !!}
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            {!! Form::text('set[warehouse_shipment_cost]', $set->warehouse_shipment_cost, ['class' => 'form-control currency-mask', 'placeholder' => 'Envío al almacen']) !!}
+                            <label for="warehouse_shipment_cost">Envío al almacen</label>
+                            {!! Form::text('set[warehouse_shipment_cost]', $set->warehouse_shipment_cost, ['class' => 'form-control currency-mask', 'id' => 'warehouse_shipment_cost']) !!}
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            {!! Form::text('set[customer_shipment_cost]', $set->customer_shipment_cost, ['class' => 'form-control currency-mask', 'placeholder' => 'Envío al cliente']) !!}
+                            <label for="customer_shipment_cost">Envío al cliente</label>
+                            {!! Form::text('set[customer_shipment_cost]', $set->customer_shipment_cost, ['class' => 'form-control currency-mask', 'id' => 'customer_shipment_cost']) !!}
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            {!! Form::text('set[extra_charges]', $set->extra_charges, ['class' => 'form-control currency-mask', 'placeholder' => 'Gastos extra']) !!}
+                            <label for="extra_charges">Gastos extra</label>
+                            {!! Form::text('set[extra_charges]', $set->extra_charges, ['class' => 'form-control currency-mask', 'id' => 'extra_charges']) !!}
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            {!! Form::text('set[notes]', $set->notes, ['class' => 'form-control', 'placeholder' => 'Notas']) !!}
+                            <label for="notes">Notas</label>
+                            {!! Form::text('set[notes]', $set->notes, ['class' => 'form-control', 'id' => 'notes']) !!}
                         </div>
                     </div>
                 </div>

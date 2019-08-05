@@ -37,6 +37,7 @@
             </div>
             <div class="portlet-body">
                 {!! Form::open(['route' => 'inbox.get-list', 'id' => 'filters_form']) !!}
+                    @role('Administrador')
                     <label class="control-label" for="language">Filtros</label>
                     <div class="row">
                         <div class="col-md-3">
@@ -45,12 +46,13 @@
                                 ['placeholder' => 'Empresa...', 'class' => 'form-control drop-down', 'id' => 'filters_sync_connection']) !!}
                             </div>
                         </div>
-                        <div class="col-md-3">
+
+{{--                         <div class="col-md-3">
                             <div class="form-group">
                                 {!! Form::select('status', [0 => 'TODOS', 1 => 'Nueva', 2 => 'En proceso', 3 => 'Terminada'], null, 
                                 ['placeholder' => 'Estatus...', 'class' => 'form-control drop-down', 'id' => 'filters_status']) !!}
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="col-md-3">
                             <div class="form-group">
                                 {!! Form::select('dealer_ship',  $dealerships, null, 
@@ -62,6 +64,7 @@
                                 <button type="submit" class="btn btn-circle blue">Filtrar</button>
                             </div>
                         </div>
+                        @endrole
                     </div>
                 {!! Form::close() !!}
                 <div class="table-toolbar">

@@ -39,24 +39,28 @@
                 {!! Form::open(['route' => 'inbox.get-list', 'id' => 'filters_form']) !!}
                     <label class="control-label" for="language">Filtros</label>
                     <div class="row">
+                        @role('Administrador')
                         <div class="col-md-3">
                             <div class="form-group">
                                 {!! Form::select('sync_connection', $sync_connections, null, 
                                 ['placeholder' => 'Empresa...', 'class' => 'form-control drop-down', 'id' => 'filters_sync_connection']) !!}
                             </div>
                         </div>
+                        @endrole
                         <div class="col-md-3">
                             <div class="form-group">
                                 {!! Form::select('status', [0 => 'TODOS', 1 => 'Nueva', 2 => 'En proceso', 3 => 'Terminada'], null, 
                                 ['placeholder' => 'Estatus...', 'class' => 'form-control drop-down', 'id' => 'filters_status']) !!}
                             </div>
                         </div>
+                        @role('Administrador')
                         <div class="col-md-3">
                             <div class="form-group">
                                 {!! Form::select('dealer_ship',  $dealerships, null, 
                                 ['placeholder' => 'Asignado...', 'class' => 'form-control drop-down', 'id' => 'filters_dealer_ship']) !!}
                             </div>
                         </div>
+                        @endrole
                         <div class="col-md-3">
                             <div class="form-group">
                                 <button type="submit" class="btn btn-circle blue">Filtrar</button>

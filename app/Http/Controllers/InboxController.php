@@ -63,9 +63,10 @@ class InboxController extends Controller
         'sync_connections.display_name as sync_connection',
         'users.name as buyer', 'documents.number', 'customers.trade_name as customer', 
          DB::raw('DATEDIFF(NOW(), documents.created_at) as semaphore_days'),
-         DB::raw('(CASE WHEN documents.status = 1 THEN "Nueva"
-                  WHEN documents.status = 2 THEN "En proceso"
-                  WHEN documents.status = 3 THEN "Terminada"
+         DB::raw('(CASE documents.status WHEN 1 THEN "Nueva"
+                  WHEN 2 THEN "En proceso"
+                  WHEN 3 THEN "Terminada"
+                  WHEN 4 THEN "Archivada"
                   ELSE "Indefinido" END) as status'), //WHEN documents.status = 4 THEN "Archivada"
         DB::raw('(CASE WHEN (SELECT color
                  FROM color_settings WHERE semaphore_days >= days ORDER BY days DESC limit 1)
@@ -78,23 +79,30 @@ class InboxController extends Controller
                      ->join('sync_connections', 'documents.sync_connections_id', 'sync_connections.id');
                      //->where('documents.status', '!=', 4);
 
+
+/*        Log::notice($sync_connection);
+        Log::notice($status);
+        Log::notice($dealer_ship);*/
+        if($sync_connection > 0)
+            $query->where('documents.sync_connections_id', $sync_connection);
+        if($dealer_ship > 0)
+            $query->where('documents.employees_users_id', $dealer_ship);
+        if($status > 0)
+            $query->where('documents.status', $status);
+        else {        
+            if($route == 'inbox')
+                $query->where('documents.status', '!=', 4);
+            if($route == 'archive')
+                $query->where('documents.status', 4);
+        }
+
         $logged_user = Auth::user();
         //Dealership won't see customer
         if($logged_user->hasRole("Cotizador")) {
-            $query->where('employees_users_id', $logged_user->id);
+            $query->where('documents.employees_users_id', $logged_user->id);
             $query->orWhereRaw('DATEDIFF(now(), documents.created_at) > 5');
             unset($fields[6]); //customer removed 
         }
-        if($sync_connection > 0)
-            $query->where('documents.sync_connections_id', $sync_connection);
-        if($status > 0)
-            $query->where('documents.status', $status);
-        if($dealer_ship > 0)
-            $query->where('documents.employees_users_id', $dealer_ship);
-        if($route == 'inbox')
-            $query->where('documents.status', '!=', 4);
-        if($route == 'archive')
-            $query->where('documents.status', 4);
 
          $documents = $query->get($fields);
          return $this->buildInboxDataTable($documents, $route, $logged_user);

@@ -11,7 +11,7 @@ $('#file_attachment').click(function(){
 });
 
 $(document).on('click', '.set-file-attachment', function() {
-    let supply_id = $(this).attr('data-supply_id');
+    let supply_id = $(this).data('supply_id');
     $('#set_file_attachment_modal_supply_id').val(supply_id);
 });
 

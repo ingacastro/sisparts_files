@@ -352,7 +352,7 @@ class InboxController extends Controller
         $file_name = null;
         try {
             DB::transaction(function() use($request, $data, &$file, &$file_name) {   
-                if($request->has('file')) {                   
+                if($request->has('file') && !empty($request->file)) {                   
                     $file_name = $request->file->store(null, 'supplies_files');
                     $data['path'] = 'storage/supplies_files/' . $file_name;
                 }

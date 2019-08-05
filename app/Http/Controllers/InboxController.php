@@ -313,8 +313,9 @@ class InboxController extends Controller
                     return date('d/m/Y', strtotime($file->created_at));
                   })
                   ->addColumn('actions', function($file) {
-                    $actions = (isset($file->url)) ? '<a href="' . config('app.url') . '/' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a>' : '';
-                    $actions .= '<a href="' . config('app.url') . '/' . $file->path . '" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,' . $file->supplies_id .',' . $file->files_id .',2' . ')"><i class="fa fa-trash"></i></a>';
+                    $actions = (isset($file->url)) ? '<a href="' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a>' : '';
+                    $actions .= isset($file->path) ? '<a href="' . config('app.url') . '/' . $file->path . '" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a>' : '';
+                     $actions .= '<a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,' . $file->supplies_id .',' . $file->files_id .',2' . ')"><i class="fa fa-trash"></i></a>';
                     return $actions;
                   })
                   ->rawColumns(['actions' => 'actions'])
@@ -350,8 +351,8 @@ class InboxController extends Controller
         $file = null;
         $file_name = null;
         try {
-            DB::transaction(function() use($request, $data, &$file, &$file_name) {            
-                if($request->has('file')) {
+            DB::transaction(function() use($request, $data, &$file, &$file_name) {   
+                if($request->has('file')) {                   
                     $file_name = $request->file->store(null, 'supplies_files');
                     $data['path'] = 'storage/supplies_files/' . $file_name;
                 }
@@ -412,7 +413,7 @@ class InboxController extends Controller
                 return date('d/m/Y', strtotime($file->created_at));
               })
               ->addColumn('actions', function($file) {
-                return '<a href="' . config('app.url') . '/' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="' . config('app.url') . '/' . $file->path .'" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,' . $file->supplies_id .',' . $file->files_id .',1' . ')"><i class="fa fa-trash"></i></a>';
+                return '<a href="' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="' . config('app.url') . '/' . $file->path .'" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,' . $file->supplies_id .',' . $file->files_id .',1' . ')"><i class="fa fa-trash"></i></a>';
               })
               ->rawColumns(['actions' => 'actions'])
               ->make(true);

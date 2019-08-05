@@ -525,12 +525,12 @@ class InboxController extends Controller
         if($request->ajax()):
 
             $binnacles = Binnacle::select('binnacles.created_at', 
-                DB::raw('CASE WHEN binnacles.entity = 1 THEN "PCT" ELSE supplies.number END as entity'),
-                DB::raw('CASE 
-                    WHEN binnacles.type = 1 THEN "Llamada" ELSE "" END as type'), 
+                DB::raw('(CASE binnacles.entity WHEN 1 THEN "PCT" ELSE supplies.number END) as entity'),
+                DB::raw('(CASE WHEN binnacles.type = 1 THEN "Llamada" ELSE "" END) as type'), 
                 'users.name as user', 'binnacles.comments')
-                ->join('users', 'binnacles.users_id', 'users.id')
-                ->leftJoin('supplies', 'binnacles.documents_supplies_id', 'supplies.id')
+                ->leftJoin('users', 'binnacles.users_id', 'users.id')
+                ->leftJoin('documents_supplies', 'documents_supplies.id', 'binnacles.documents_supplies_id')
+                ->join('supplies', 'documents_supplies.supplies_id', 'supplies.id')
                 ->where('binnacles.documents_id', $documents_id)->get();
                
             return Datatables::of($binnacles)

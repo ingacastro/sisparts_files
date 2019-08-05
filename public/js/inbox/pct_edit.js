@@ -80,7 +80,6 @@ $(document).on('submit', '#edit_budget_form', function(e){
             if(response.errors)
                 $('#pct_edit_modal_error_messages').html(response.errors_fragment);
             else  {
-                console.log(response);
                 $('#budget_total_cost').html(response.budget_data.total_cost);
                 $('#budget_total_price').html(response.budget_data.total_price);
                 $('#budget_unit_price').html(response.budget_data.unit_price);

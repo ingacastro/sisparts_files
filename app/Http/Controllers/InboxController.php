@@ -51,8 +51,6 @@ class InboxController extends Controller
     public function getList(Request $request)
     {
         if(!$request->ajax()) abort(403, 'Unauthorized action');
-        
-        Log::notice($request->all());
 
         $route = $request->route;
         $sync_connection = $request->get('sync_connection') ?? 0;
@@ -422,10 +420,8 @@ class InboxController extends Controller
 
     public function supplyFileDetach($supply_id, $file_id)
     {
-            Log::notice($supply_id . ' ' . $file_id);
         try {
             $file = File::find($file_id);
-            Log::notice($file);
             $file->supplies()->detach($supply_id);
             //$file_path = $file->path;
             //$file->delete();
@@ -596,8 +592,8 @@ class InboxController extends Controller
             ->where('supplies_id', $set_id[1])->first();
 
             $data['set']['status'] = 5; //Budget resgistered
-            DB::table('documents_supplies')->where('documents_id', $set_id[0])
-            ->where('supplies_id', $set_id[1])->update($data['set']);
+            $updated_set = SupplySet::where('documents_id', $set_id[0])->where('supplies_id', $set_id[1])->first();
+            $updated_set->update($data['set']);
             
             DB::table('measurements')->where('id', $document_supply->id)->update($data['measurement']);
         } catch(\Exception $e) {
@@ -606,9 +602,26 @@ class InboxController extends Controller
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
                 ->withErrors($e->getMessage())->render()]);
         }
+
+            $currency = ' ' . $updated_set->currency->name;
+            $total_cost = ($updated_set->sale_unit_cost * $updated_set->products_amount) + 
+                    ($updated_set->importation_cost + $updated_set->warehouse_shipment_cost + 
+                    $updated_set->customer_shipment_cost + $updated_set->extra_charges);
+            
+            $utility_percentage = ($updated_set->utility_percentage) ? $updated_set->utility_percentage->percentage 
+                                : $updated_set->custom_utility_percentage;
+
+            $total_price = $this->calculateTotalPrice($total_cost, $utility_percentage);
+            $budget_data = [
+                'total_cost' => number_format($total_cost, 2, '.', ',') . $currency,
+                'total_price' => number_format($total_price, 2, '.', ',') . $currency,
+                'unit_price' => number_format(($total_price / $updated_set->products_amount), 2, '.', ',') . $currency,
+                'total_profit' => number_format(($total_price - $total_cost), 2, '.', ',') . $currency
+            ];
         
         return response()->json([
             'errors' => false,
+            'budget_data' => $budget_data,
             'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
             ->with('success_message', 'Presupuesto correctamente actualizado.')->render()
         ]);

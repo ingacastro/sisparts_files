@@ -2,9 +2,9 @@
 @extends('layouts.admin.master')
 @section('meta-css')
 <meta name="is_create" content="{{ $is_create }}">
-<link href="/metronic-assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
-<link href="/metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
-<link href="/plugins/quill-1.3.6/css/quill.snow.css" rel="stylesheet">
+<link href="{{config('app.url')}}/metronic-assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
+<link href="{{config('app.url')}}/metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="{{config('app.url')}}/plugins/quill-1.3.6/css/quill.snow.css" rel="stylesheet">
 @endsection
 @section('content')
 @section('breadcumb')
@@ -99,9 +99,9 @@
 </div>
 @endsection
 @push('scripts')
-<script src="/metronic-assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
-<script src="/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script>
-<script src="/plugins/quill-1.3.6/js/quill.js"></script>
+<script src="{{config('app.url')}}/metronic-assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
+<script src="{{config('app.url')}}/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script>
+<script src="{{config('app.url')}}/plugins/quill-1.3.6/js/quill.js"></script>
 <script type="text/javascript">
  var root_url = $('#root_url').attr('content');
 $(document).ready(function(){

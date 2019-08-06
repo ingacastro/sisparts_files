@@ -450,83 +450,81 @@ class InboxController extends Controller
     /*Document supplies sets and only authorized sets*/
     public function getDocumentSupplySets(Request $request)
     {
-        if($request->ajax()):          
+        if(!$request->ajax()) abort(403, 'Unauthorized action');        
 
-            $query = Document::select('documents_supplies.id', 'documents_supplies.set', 'supplies.manufacturers_id', 'supplies.number', 'suppliers.trade_name as supplier', 
-            DB::raw('CAST(documents_supplies.products_amount as UNSIGNED) as products_amount'),
-            DB::raw('CASE WHEN documents_supplies.measurement_unit_code = 1 THEN "Pieza" ELSE "Caja" END AS measurement_unit_code'), 
-            DB::raw('documents_supplies.sale_unit_cost * documents_supplies.products_amount + documents_supplies.importation_cost
-            + documents_supplies.warehouse_shipment_cost + documents_supplies.customer_shipment_cost + documents_supplies.extra_charges as total_cost'), 
-            'currencies.name as currency',
-            DB::raw('CASE WHEN documents_supplies.status = 1 THEN "No solicitado"
-                WHEN documents_supplies.status = 2 THEN "Solicitado automáticamente"
-                WHEN documents_supplies.status = 3 THEN "Solicitado manualmente"
-                WHEN documents_supplies.status = 4 THEN "Confirmado por el proveedor"
-                WHEN documents_supplies.status = 5 THEN "Presupuesto capturado"
-                WHEN documents_supplies.status = 6 THEN "En autorización"
-                WHEN documents_supplies.status = 7 THEN "Rechazado"
-                WHEN documents_supplies.status = 8 THEN "Autorizado"
-                WHEN documents_supplies.status = 9 THEN "Convertido a CTZ"
-                ELSE "INDEFINIDO" END as status'), 
-            'documents_supplies.documents_id', 'documents_supplies.supplies_id',
-            DB::raw('CASE WHEN documents_supplies.utility_percentages_id IS NOT null THEN utility_percentages.percentage
-                ELSE documents_supplies.custom_utility_percentage END AS utility_percentage'), 'manufacturers.name as manufacturer')
-            ->leftJoin('documents_supplies', 'documents.id', 'documents_supplies.documents_id')
-            ->leftJoin('supplies', 'documents_supplies.supplies_id', 'supplies.id')
-            ->leftJoin('manufacturers', 'manufacturers.id', 'supplies.manufacturers_id')
-            ->leftjoin('suppliers', 'suppliers.id', 'documents_supplies.suppliers_id')
-            ->leftJoin('currencies', 'currencies.id', 'documents_supplies.currencies_id')
-            ->leftJoin('utility_percentages', 'utility_percentages.id', 'documents_supplies.utility_percentages_id')
-            ->where('documents.id', $request->document_id);
+        $query = Document::select('documents_supplies.id', 'documents_supplies.set', 'supplies.manufacturers_id', 'supplies.number', 'suppliers.trade_name as supplier', 
+        DB::raw('CAST(documents_supplies.products_amount as UNSIGNED) as products_amount'),
+        DB::raw('CASE WHEN documents_supplies.measurement_unit_code = 1 THEN "Pieza" ELSE "Caja" END AS measurement_unit_code'), 
+        DB::raw('documents_supplies.sale_unit_cost * documents_supplies.products_amount + documents_supplies.importation_cost
+        + documents_supplies.warehouse_shipment_cost + documents_supplies.customer_shipment_cost + documents_supplies.extra_charges as total_cost'), 
+        'currencies.name as currency',
+        DB::raw('CASE WHEN documents_supplies.status = 1 THEN "No solicitado"
+            WHEN documents_supplies.status = 2 THEN "Solicitado automáticamente"
+            WHEN documents_supplies.status = 3 THEN "Solicitado manualmente"
+            WHEN documents_supplies.status = 4 THEN "Confirmado por el proveedor"
+            WHEN documents_supplies.status = 5 THEN "Presupuesto capturado"
+            WHEN documents_supplies.status = 6 THEN "En autorización"
+            WHEN documents_supplies.status = 7 THEN "Rechazado"
+            WHEN documents_supplies.status = 8 THEN "Autorizado"
+            WHEN documents_supplies.status = 9 THEN "Convertido a CTZ"
+            ELSE "INDEFINIDO" END as status'), 
+        'documents_supplies.documents_id', 'documents_supplies.supplies_id',
+        DB::raw('CASE WHEN documents_supplies.utility_percentages_id IS NOT null THEN utility_percentages.percentage
+            ELSE documents_supplies.custom_utility_percentage END AS utility_percentage'), 'manufacturers.name as manufacturer')
+        ->leftJoin('documents_supplies', 'documents.id', 'documents_supplies.documents_id')
+        ->leftJoin('supplies', 'documents_supplies.supplies_id', 'supplies.id')
+        ->leftJoin('manufacturers', 'manufacturers.id', 'supplies.manufacturers_id')
+        ->leftjoin('suppliers', 'suppliers.id', 'documents_supplies.suppliers_id')
+        ->leftJoin('currencies', 'currencies.id', 'documents_supplies.currencies_id')
+        ->leftJoin('utility_percentages', 'utility_percentages.id', 'documents_supplies.utility_percentages_id')
+        ->where('documents.id', $request->document_id);
 
-            if($request->has('status'))
-                $query->where('documents_supplies.status', $request->status);
+        if($request->has('status'))
+            $query->where('documents_supplies.status', $request->status);
 
-            $supplies_sets = $query->get();
+        $supplies_sets = $query->get();
 
-            return Datatables::of($supplies_sets)
-                  ->editColumn('number', function($document) {
-                    return '<a href="' . url('supply') . '?number=' . $document->number . '">' . $document->number . '</a>';
-                  })
-                  ->addColumn('actions', function($supplies_set) use ($request) {
+        return Datatables::of($supplies_sets)
+              ->editColumn('number', function($document) {
+                return '<a href="' . url('supply') . '?number=' . $document->number . '">' . $document->number . '</a>';
+              })
+              ->addColumn('actions', function($supplies_set) use ($request) {
 
-                    $total_price = $this->calculateTotalPrice($supplies_set->total_cost, $supplies_set->utility_percentage);
-                    $unit_price = $total_price / $supplies_set->products_amount;
-                    $total_profit = $total_price - $supplies_set->total_cost;
-                    $currency = ' ' . $supplies_set->currency;
+                $total_price = $this->calculateTotalPrice($supplies_set->total_cost, $supplies_set->utility_percentage);
+                $unit_price = $total_price / $supplies_set->products_amount;
+                $total_profit = $total_price - $supplies_set->total_cost;
+                $currency = ' ' . $supplies_set->currency;
 
-                    return ($request->route == 'inbox') 
-                    ? '<a data-target="#edit_set_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default edit-set" 
-                    data-id="' . $supplies_set->documents_id . '_' . $supplies_set->supplies_id . '"
-                    data-total_cost="' . '$' . number_format($supplies_set->total_cost, 2, '.', ',') . $currency . '" 
-                    data-total_price="' . '$' . number_format($total_price, 2, '.', ',') . $currency . '"
-                    data-unit_price="' . '$' . number_format($unit_price, 2, '.', ',') . $currency . '"
-                    data-total_profit="' . '$' . number_format($total_profit, 2, '.', ',') . $currency . '"
-                    data-set_number=" ' . $supplies_set->set . '"
-                    data-supply_number=" ' . $supplies_set->number . '"><i class="fa fa-edit"></i></a>
-                    <a data-target="#quotation_request_modal" data-toggle="modal" class="btn btn-circle yellow-crusta btn-icon-only default quotation-request"
-                    data-manufacturer="' . $supplies_set->manufacturer . '"
-                    data-manufacturer_id="' . $supplies_set->manufacturers_id . '"
-                    data-id="' . $supplies_set->id . '"><i class="fa fa-envelope"></i></a>
-                    <a class="btn btn-circle btn-icon-only default blue set-file-attachment" href="#set_file_attachment_modal" data-target="#set_file_attachment_modal" data-toggle="modal"
-                    data-supply_id="' . $supplies_set->supplies_id . '"><i class="fa fa-paperclip"></i></a>'
-                    : null;
-                  })
-                  ->addColumn('checkbox', function($supplies_set){
-                    return '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input type="checkbox" class="checkboxes" value="' . $supplies_set->id . '"><span></span></label>';
-                  })
-                  ->editColumn('total_cost', function($supplies_set) {
-                    return '$' . number_format($supplies_set->total_cost, 2, '.', ',') . ' ' . $supplies_set->currency;
-                  })
-                  ->addColumn('total_price', function($supplies_set) {
-                    $total_price = $this->calculateTotalPrice($supplies_set->total_cost, $supplies_set->utility_percentage);
-                    return '$' .  number_format($total_price, 2, '.', ',') . ' ' . $supplies_set->currency;
-                  })
-                  ->rawColumns(['number' => 'number', 'actions' => 'actions', 'total_cost' => 'total_cost', 
-                    'total_price' => 'total_price', 'checkbox' => 'checkbox'])
-                  ->make(true);
-        endif;
-        abort(403, 'Unauthorized action');
+                return ($request->route == 'inbox') 
+                ? '<a data-target="#edit_set_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default edit-set" 
+                data-id="' . $supplies_set->documents_id . '_' . $supplies_set->supplies_id . '"
+                data-total_cost="' . '$' . number_format($supplies_set->total_cost, 2, '.', ',') . $currency . '" 
+                data-total_price="' . '$' . number_format($total_price, 2, '.', ',') . $currency . '"
+                data-unit_price="' . '$' . number_format($unit_price, 2, '.', ',') . $currency . '"
+                data-total_profit="' . '$' . number_format($total_profit, 2, '.', ',') . $currency . '"
+                data-set_number=" ' . $supplies_set->set . '"
+                data-supply_number=" ' . $supplies_set->number . '"><i class="fa fa-edit"></i></a>
+                <a data-target="#quotation_request_modal" data-toggle="modal" class="btn btn-circle yellow-crusta btn-icon-only default quotation-request"
+                data-manufacturer="' . $supplies_set->manufacturer . '"
+                data-manufacturer_id="' . $supplies_set->manufacturers_id . '"
+                data-id="' . $supplies_set->id . '"><i class="fa fa-envelope"></i></a>
+                <a class="btn btn-circle btn-icon-only default blue set-file-attachment" href="#set_file_attachment_modal" data-target="#set_file_attachment_modal" data-toggle="modal"
+                data-supply_id="' . $supplies_set->supplies_id . '"><i class="fa fa-paperclip"></i></a>'
+                : null;
+              })
+              ->addColumn('checkbox', function($supplies_set){
+                return '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input type="checkbox" class="checkboxes" value="' . $supplies_set->id . '"><span></span></label>';
+              })
+              ->editColumn('total_cost', function($supplies_set) {
+                return '$' . number_format($supplies_set->total_cost, 2, '.', ',') . ' ' . $supplies_set->currency;
+              })
+              ->addColumn('total_price', function($supplies_set) {
+                $total_price = $this->calculateTotalPrice($supplies_set->total_cost, $supplies_set->utility_percentage);
+                return '$' .  number_format($total_price, 2, '.', ',') . ' ' . $supplies_set->currency;
+              })
+              ->rawColumns(['number' => 'number', 'actions' => 'actions', 'total_cost' => 'total_cost', 
+                'total_price' => 'total_price', 'checkbox' => 'checkbox'])
+              ->make(true);
     }
 
     public function getDocumentBinnacle(Request $request, $documents_id)

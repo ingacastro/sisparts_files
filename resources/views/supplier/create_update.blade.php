@@ -189,17 +189,24 @@
     function loadStates()
     {
         let country_id = $('#countries_id').val();
+
         $.ajax({
             url: root_url + '/country-states',
             method: 'get',
             dataType: 'json',
-            data: {country_id: country_id},
-            success: function(states) {
+            data: {'country_id': country_id},
+            success: function(response) {
+
+                //Enable state select only for Mexico
+                if(!response.enable) return;
+
                 let state_select = $('#states_id');
                 state_select.removeAttr("disabled");
-                $.each(states, function(id, name) {
+
+                $.each(response.states, function(id, name) {
                     state_select.append('<option value="' + id +'" >' + name + '</option>');
                 });
+
             }
         });
     }

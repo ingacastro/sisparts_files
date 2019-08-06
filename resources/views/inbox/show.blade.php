@@ -172,6 +172,7 @@
                         <tr>
                             <th>Número parte</th>
                             <th>Proveedor</th>
+                            <th>Fabricante</th>
                             <th>Cant</th>
                             <th>U. Medida</th>
                             <th>Costo total</th>
@@ -277,6 +278,7 @@ function initSupplySetsTable() {
         columns: [
             { data: "number", name: "number" },
             { data: "supplier", name: "supplier" },
+            { data: "manufacturer", name: "manufacturer" },
             { data: "products_amount", name: "products_amount" },
             { data: "measurement_unit_code", name: "measurement_unit_code" },
             { data: "total_cost", name: "total_cost" },

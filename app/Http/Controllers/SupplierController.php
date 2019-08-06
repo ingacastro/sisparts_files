@@ -10,7 +10,7 @@ use IParts\Manufacturer;
 use Yajra\Datatables\Datatables;
 use DB;
 use Illuminate\Support\Facades\Log;
-
+use Auth;
 
 class SupplierController extends Controller
 {
@@ -44,12 +44,15 @@ class SupplierController extends Controller
             return Datatables::of($supps)
                   ->addColumn('actions', function($supplier) {
 
-                    return '<a data-toggle="modal" data-id="' . $supplier->id .'" href="#brands_modal" 
+                    $actions = '<a data-toggle="modal" data-id="' . $supplier->id .'" href="#brands_modal" 
                             class ="btn btn-circle btn-icon-only green show-brands"><i class="fa fa-eye"></i></a>
                             <a href="' . config('app.url') . '/supplier/'. $supplier->id . '/edit" class="btn btn-circle btn-icon-only default edit-supplier">
-                            <i class="fa fa-edit"></i></a>
-                            <button class="btn btn-circle btn-icon-only red"
-                            onclick="deleteModel(event, ' . $supplier->id . ')"><i class="fa fa-times"></i></button>';
+                            <i class="fa fa-edit"></i></a>';
+                            
+                    $actions .= Auth::user()->hasRole('Administrador') ? '<button class="btn btn-circle btn-icon-only red"
+                            onclick="deleteModel(event, ' . $supplier->id . ')"><i class="fa fa-times"></i></button>'
+                            : '';
+                    return $actions;
                   })
                   ->rawColumns(['actions' => 'actions'])
                   ->make(true);
@@ -132,7 +135,7 @@ class SupplierController extends Controller
             $brands = Supplier::find($id)->brands;
             return Datatables::of($brands)
                   ->addColumn('actions', function($brand) {
-                    return '<a class="remove-brand" id="' . $brand->id . '">Eliminar</a>';
+                    return (Auth::user()->hasRole('Administrador')) ? '<a class="remove-brand" id="' . $brand->id . '">Eliminar</a>' : '';
                   })
                   ->rawColumns(['actions' => 'actions'])
                   ->make(true);

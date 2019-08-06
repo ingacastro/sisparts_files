@@ -112,6 +112,7 @@
                                 <td>
                                     <span><span class="detail-title">Número requerimiento: </span>{{ $document->customer_requirement_number }}</span>
                                 </td>
+                                <td></td>
                             </tr>
                             <tr>
                                 <td>
@@ -119,19 +120,6 @@
                                 </td>
                                 <td>
                                     <span><span class="detail-title">Comprador: </span>{{ $document->buyer_name }}</span>
-                                </td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span><span class="detail-title">Cliente: </span>{{ $document->customer->trade_name }}</span>
-                                </td>
-                                <td>
-                                    <?php $dealership = $document->dealership; ?>
-                                    <span>
-                                        <span class="detail-title">Cotizador: </span>
-                                        {{ $dealership->number }} - {{ $dealership->user->name }}
-                                    </span>
                                 </td>
                                 <td></td>
                             </tr>
@@ -155,6 +143,31 @@
                                         ? date('d/m/Y', strtotime($document->updated_at)) : null }}
                                     </span>
                                 </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <?php $dealership = $document->dealership; ?>
+                                    <span>
+                                        <span class="detail-title">Cotizador: </span>
+                                        {{ $dealership->number }} - {{ $dealership->user->name }}
+                                    </span>
+                                </td>
+                                <td>
+                                    @role('Administrador')
+                                    <span><span class="detail-title">Cliente: </span>{{ $document->customer->trade_name }}</span>
+                                    @endrole
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span>
+                                        <span class="detail-title">Ubicación del cliente: </span>
+                                        {{ $document->customer->country }} - {{ $document->customer->post_code }}
+                                    </span>
+                                </td>
+                                <td></td>
                                 <td></td>
                             </tr>
                         </tbody>

@@ -35,7 +35,7 @@ $second_row_cols = $model_exist ? [3, 6, 3] : [1, 10, 1];
 					<tr id="row_{{ $brand->id }}">
 						<td>{{ $brand->id }}</td>
 						<td>{{ $brand->name }}</td>
-						<td><a class="remove-brand" id="{{ $brand->id }}">Eliminar</a></td>
+						<td>@role('Administrador')<a class="remove-brand" id="{{ $brand->id }}">Eliminar</a>@endrole</td>
 					</tr>
 					@endforeach
 					@endif

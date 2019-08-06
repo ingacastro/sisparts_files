@@ -37,6 +37,11 @@ Route::group(['middleware' => ['role:Administrador|Cotizador']], function(){
 	Route::resource('supplier', 'SupplierController');
 });
 
+Route::group(['middleware' => ['role:Administrador']], function(){
+	Route::delete('supplier/{supplier}', 'SupplierController@destroy')->name('supplier.destroy');
+});
+
+
 //Admin
 Route::group(['middleware' => ['role:Administrador']], function(){
 	//User
@@ -72,8 +77,12 @@ Route::group(['middleware' => ['role:Administrador']], function(){
 
 //Inbox
 Route::get('inbox/get-list', 'InboxController@getList')->name('inbox.get-list');
-Route::post('inbox/change-dealership', 'InboxController@changeDealerShip')->name('inbox.change-dealership');
-Route::post('inbox/{document}/archive-lock/{action}', 'InboxController@archiveOrLock');
+
+Route::group(['middleware' => ['role:Administrador']], function(){
+	Route::post('inbox/change-dealership', 'InboxController@changeDealerShip')->name('inbox.change-dealership');
+	Route::post('inbox/{document}/archive-lock/{action}', 'InboxController@archiveOrLock');
+});
+
 Route::post('inbox/{document}/unlock', 'InboxController@unlock');
 Route::get('inbox/document-supplies', 'InboxController@getDocumentSupplySets');
 Route::get('inbox/document-binnacle/{documents_id}', 'InboxController@getDocumentBinnacle');

@@ -79,11 +79,12 @@
                         <tr>
                             <th>Fecha</th>
                             <th>Empresa</th>
-                            <th>Folio</th>
+                            <th>PCT</th>
                             <th>Asignado</th>
                             @if($logged_user_role == 'Administrador')<th>Cliente</th>@endif
                             <th>Edad</th>
                             <th>Estatus</th>
+                            <th>RFQ</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -155,6 +156,7 @@ $(document).ready(function(){
             @if($logged_user_role == 'Administrador'){ data: "customer", name: "customer" },@endif
             { data: "semaphore", name: "semaphore" },
             { data: "status", name: "status" },
+            { data: "reference", name: "reference" },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }
         ],
         language: {

@@ -27,7 +27,7 @@ $('#add_brand').click(function(){
 	let select2_val = $('#brands_select2').val();
 	let token = $('#brands_form > input[name=_token]').val();
 	let model_id = $('#model_id').val();
-	console.log(token);
+	let auth_user_is_admin = $('#auth_user_is_admin').attr('content');
 	if(select2_val == null) return;
 	
 	$.ajax({
@@ -41,7 +41,9 @@ $('#add_brand').click(function(){
 			if(row_query.length > 0) return;
 
 			$('#brands_table').DataTable().row.add({
-				'id': brand.id, 'name': brand.name, 'actions': '<a class="remove-brand" id="' + brand.id +'">Eliminar</a>'
+				'id': brand.id, 
+				'name': brand.name, 
+				'actions': (auth_user_is_admin == 1) ? '<a class="remove-brand" id="' + brand.id +'">Eliminar</a>' : ''
 			}).node().id = 'row_' + brand.id;
 			$('#brands_table').DataTable().draw(false);
 		}

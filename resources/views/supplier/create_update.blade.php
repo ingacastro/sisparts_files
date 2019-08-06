@@ -5,6 +5,7 @@
 <link href="/metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet" type="text/css" />
 <link href="/metronic-assets/global/css/plugins.min.css" rel="stylesheet" type="text/css" />
+<meta id="auth_user_is_admin" content="{{Auth::user()->hasRole('Administrador')}}">
 @endsection
 @section('content')
 @section('breadcumb')

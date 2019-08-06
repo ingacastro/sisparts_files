@@ -57,21 +57,14 @@ class InboxController extends Controller
         $status = $request->get('status') ?? 0;
         $dealer_ship = $request->get('dealer_ship') ?? 0;
 
-        $first_color_setting = DB::table('color_settings')->orderBy('days', 'asc')->first();
-
         $fields = ['documents.id', 'documents.is_canceled', 'documents.created_at', 
         'sync_connections.display_name as sync_connection',
-        'users.name as buyer', 'documents.number', 'customers.trade_name as customer', 
-         DB::raw('DATEDIFF(NOW(), documents.created_at) as semaphore_days'),
+        'users.name as buyer', 'documents.number', 'customers.trade_name as customer',
          DB::raw('(CASE documents.status WHEN 1 THEN "Nueva"
                   WHEN 2 THEN "En proceso"
                   WHEN 3 THEN "Terminada"
                   WHEN 4 THEN "Archivada"
-                  ELSE "Indefinido" END) as status'), //WHEN documents.status = 4 THEN "Archivada"
-        DB::raw('(CASE WHEN (SELECT color
-                 FROM color_settings WHERE semaphore_days >= days ORDER BY days DESC limit 1)
-                 IS NULL THEN "' . $first_color_setting->color . '" ELSE (SELECT color
-                 FROM color_settings WHERE semaphore_days >= days ORDER BY days DESC limit 1) END) as semaphore_color')];
+                  ELSE "Indefinido" END) as status'), 'documents.reference'];
         $query = DB::table('documents')
                      ->join('employees', 'employees.users_id', 'documents.employees_users_id')
                      ->join('users', 'users.id', 'employees.users_id')
@@ -79,10 +72,6 @@ class InboxController extends Controller
                      ->join('sync_connections', 'documents.sync_connections_id', 'sync_connections.id');
                      //->where('documents.status', '!=', 4);
 
-
-/*        Log::notice($sync_connection);
-        Log::notice($status);
-        Log::notice($dealer_ship);*/
         if($sync_connection > 0)
             $query->where('documents.sync_connections_id', $sync_connection);
         if($dealer_ship > 0)
@@ -110,23 +99,46 @@ class InboxController extends Controller
         
     }
 
+    private function diffBusinessDays($start_date)
+    {
+        $start_date = new Carbon($start_date);
+        $end_date = Carbon::parse(DB::select('select now() as current')[0]->current);
+
+        $days = 0;
+        $days += $start_date->diffInDaysFiltered(function (Carbon $date) {
+            return $date->isWeekday() ? 1 : 0;
+        }, $end_date);
+        return $days;
+    }
+
     private function buildInboxDataTable($documents, $route, $logged_user)
     {
         return Datatables::of($documents)
-              ->editColumn('semaphore', function($document) {
-                return '<div class="form-control" style="background-color: ' . $document->semaphore_color . '; width: 70%; height: 25px;
+              ->addColumn('semaphore', function($document) {
+                $days = $this->diffBusinessDays($document->created_at);
+                $color = DB::table('color_settings')->where('days', '>=', $days)
+                ->orderBy('days', 'DESC')->first();
+
+                if(!$color)
+                    $color = DB::table('color_settings')->orderBy('days', 'asc')->first();
+
+                return '<div class="form-control" style="background-color: ' . $color->color . '; width: 70%; height: 25px;
                             line-height: 100%; text-align: center; color: #fff; margin: auto">' . 
-                            $document->semaphore_days . ' días </div>';
+                            $days . ' días </div>';
               })
               ->editColumn('created_at', function($document) {
                 return date_format(new \DateTime($document->created_at), 'd/m/Y');
               })
               ->addColumn('actions', function($document) use ($route, $logged_user) { 
                 if($route == 'inbox') {
-                    $actions = '<a href="' . config('app.url') . '/inbox/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a><a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '"><i class="fa fa-user"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="archiveOrLockDocument(event, ' . $document->id . ', 1)"><i class="fa fa-archive"></i></a>';
-                    $actions .= $logged_user->hasRole('Administrador')
-                    ? '<a class="btn btn-circle btn-icon-only default red" onClick="archiveOrLockDocument(event, ' . $document->id . ', 2)"><i class="fa fa-lock"></i></a>'
-                    : '';
+
+                    $is_admin = $logged_user->hasRole('Administrador');
+                    $actions = '<a href="' . config('app.url') . '/inbox/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';
+
+                    //Admin actions
+                    $actions .= $is_admin ? '<a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '"><i class="fa fa-user"></i></a>' : '';
+                    $actions .= $is_admin ? '<a class="btn btn-circle btn-icon-only default blue" onClick="archiveOrLockDocument(event, ' . $document->id . ', 1)"><i class="fa fa-archive"></i></a>' : '';
+                    $actions .= $is_admin ? '<a class="btn btn-circle btn-icon-only default red" onClick="archiveOrLockDocument(event, ' . $document->id . ', 2)"><i class="fa fa-lock"></i></a>' : '';
                 }
                 else {
                     $actions = '<a href="' . config('app.url') . '/archive/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';

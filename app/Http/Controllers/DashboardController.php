@@ -11,6 +11,7 @@ use Carbon\CarbonPeriod;
 use Auth;
 use DB;
 use Storage;
+use IParts\User;
 
 class DashboardController extends Controller
 {
@@ -23,10 +24,6 @@ class DashboardController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->daily_pcts = 5;
-        $this->daily_items = 20;
-        $this->monthly_pcts = $this->daily_pcts * $this->getBusinessDays();
-        $this->monthly_items  = $this->daily_items * $this->getBusinessDays();
     }
 
     /**
@@ -34,57 +31,19 @@ class DashboardController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index(Request $request)
     {
-
-        //header("Content-Type:application/pdf");
-/*        $file = DB::connection('mysql_virtual_catalog')->table('archivos_num_parte')
-        ->where('num_parte', 'FP25R12KT4_B11')
-        ->first();
-
-        Storage::disk('supplies_files')->put(uniqid() . '_' . $file->nombre, $file->contenido);
-
-*/
-
-        $stats = $this->getStats();
-        $supply_sets_amount = SupplySet::count();
-        $rejected_ppas_percentage = ($supply_sets_amount > 0) ? $stats['rejected_ppas'] / $supply_sets_amount : $stats['rejected_ppas'];
-
-    	$dashboard_stats = [
-    		'daily_pcts' => [
-    			'amount' => $stats['daily_ctz_pcts'],
-    			'expected' => $this->daily_pcts,
-    			'percentage' => number_format(($stats['daily_ctz_pcts'] / $this->daily_pcts) * 100, 2),
-    		],
-    		'daily_items' => [
-    			'amount' => $stats['daily_ctz_items'],
-    			'expected' => $this->daily_items,
-    			'percentage' => number_format(($stats['daily_ctz_items'] / $this->daily_items) * 100, 2),
-    		],
-    		'monthly_pcts' => [
-    			'amount' => $stats['monthly_ctz_pcts'],
-    			'expected' => $this->monthly_pcts,
-    			'percentage' => number_format(($stats['monthly_ctz_pcts'] / $this->monthly_pcts) * 100, 2),
-    		],
-    		'monthly_items' => [
-    			'amount' => $stats['monthly_ctz_items'],
-    			'expected' => $this->monthly_items,
-    			'percentage' => number_format(($stats['monthly_ctz_items'] / $this->monthly_items) * 100, 2),
-    		],
-    		'pending_ppas' => $stats['pending_ppas'],
-    		'rejected_ppas' => $stats['rejected_ppas'],
-    		'monthly_rejected_ppas' => $stats['monthly_rejected_ppas'],
-    		'rejected_ppas_percentage' => number_format($rejected_ppas_percentage * 100, 2),
-    		'quotation_average_time' => $stats['ctz_pcts_average_time']
-    	];
-
-        return view('dashboard', compact('dashboard_stats'));
+        $dealerships_pairs = User::role('Cotizador')->pluck('name', 'id');
+        $dealerships_count = $dealerships_pairs->count();
+        $dealerships_pairs->prepend('TODOS', 0);
+        $dashboard_stats = $this->getUserStats($request, null, $dealerships_count);
+        return view('dashboard', compact('dashboard_stats', 'dealerships_pairs'));
     }
 
-    private function getStats()
+    public function getUserStats(Request $request, $user_id, $dealerships_count = null)
     {
+        $user = isset($user_id) && $user_id != 0 ? User::find($user_id) : Auth::user();
         $now = Carbon::now();
-        $user = Auth::user();
         $dealership = $user->hasRole('Cotizador') ? $user : null;
 
         $completed_pcts_base_query = Document::where('status', 3);
@@ -130,7 +89,7 @@ class DashboardController extends Controller
             $ctz_pcts_average_time_base_query->where('documents.employees_users_id', $dealership_id);
         }
 
-        return [
+        $result = [
             'daily_ctz_pcts' => $daily_ctz_pcts_base_query->count(),
             'daily_ctz_items' => $daily_ctz_items_base_query->count(),
             'monthly_ctz_pcts' => $monthly_ctz_pcts_base_query->count(),
@@ -139,6 +98,56 @@ class DashboardController extends Controller
             'rejected_ppas' => $rejected_ppas_base_query->count(),
             'monthly_rejected_ppas' => $monthly_rejected_ppas_base_query->count(),
             'ctz_pcts_average_time' => number_format($ctz_pcts_average_time_base_query->first()->average_time, 2)
+        ];
+
+        $is_ajax = $request->ajax();
+        $result = $this->calculateStats($result, $user, $is_ajax, $dealerships_count);
+
+        if(!$is_ajax) return $result;
+
+        return response()->json($result);
+    }
+
+    private function calculateStats($stats, User $user, $is_ajax, $dealerships_count)
+    {
+        if($is_ajax) $dealerships_count = User::role('Cotizador')->count();
+
+        $is_admin = $user->hasRole('Administrador');
+        
+        $daily_pcts = $is_admin ?  $dealerships_count * 5 : 5;
+        $daily_items = $is_admin ? $dealerships_count * 20 : 20;
+        $monthly = $daily_pcts * $this->getBusinessDays();
+        $monthly_items  = $daily_items * $this->getBusinessDays();
+
+        $supply_sets_amount = SupplySet::count();
+        $rejected_ppas_percentage = ($supply_sets_amount > 0) ? $stats['rejected_ppas'] / $supply_sets_amount : $stats['rejected_ppas'];
+
+        return [
+            'daily_pcts' => [
+                'amount' => $stats['daily_ctz_pcts'],
+                /*'expected' => $daily_pcts,*/
+                'percentage' => number_format(($stats['daily_ctz_pcts'] / $daily_pcts) * 100, 2),
+            ],
+            'daily_items' => [
+                'amount' => $stats['daily_ctz_items'],
+                /*'expected' => $daily_items,*/
+                'percentage' => number_format(($stats['daily_ctz_items'] / $daily_items) * 100, 2),
+            ],
+            'monthly_pcts' => [
+                'amount' => $stats['monthly_ctz_pcts'],
+                /*'expected' => $monthly,*/
+                'percentage' => number_format(($stats['monthly_ctz_pcts'] / $monthly) * 100, 2),
+            ],
+            'monthly_items' => [
+                'amount' => $stats['monthly_ctz_items'],
+                /*'expected' => $monthly_items,*/
+                'percentage' => number_format(($stats['monthly_ctz_items'] / $monthly_items) * 100, 2),
+            ],
+            'pending_ppas' => $stats['pending_ppas'],
+            'rejected_ppas' => $stats['rejected_ppas'],
+            'monthly_rejected_ppas' => $stats['monthly_rejected_ppas'],
+            'rejected_ppas_percentage' => number_format($rejected_ppas_percentage * 100, 2),
+            'quotation_average_time' => $stats['ctz_pcts_average_time']
         ];
     }
 

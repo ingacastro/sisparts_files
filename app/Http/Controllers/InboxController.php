@@ -564,7 +564,6 @@ class InboxController extends Controller
 
     private function calculateTotalPrice($total_cost, $utility_percentage)
     {
-        Log::notice($utility_percentage);
         return $total_cost / ((100 - $utility_percentage) / 100);
     }
 
@@ -1023,6 +1022,7 @@ class InboxController extends Controller
     /*Turns a supply set into CTZ*/
     public function setsTurnCTZ(Request $request)
     {
+        Log::notice($request);
         if(!$request->ajax())
             return response()->json([
                 'errors' => true,
@@ -1075,9 +1075,10 @@ class InboxController extends Controller
                 DB::transaction(function() use($set_binnacle_data, $supply_set, $conn, $ctz_number) {
                     $supply_set->fill(['status' => 9, 'completed_date' => Carbon::now()->toDateTimeString()])
                     ->update();
+
                     Binnacle::create($set_binnacle_data);
 
-                    $this->createSiavcomCTZSet($supply_set, $conn, $ctz_number);
+                    //$this->createSiavcomCTZSet($supply_set, $conn, $ctz_number);
                 });
             }
 
@@ -1170,10 +1171,6 @@ class InboxController extends Controller
 
         $subtotal = array_sum($document->supply_sets->pluck('sale_unit_cost')->toArray());
         $key_pri = $last_siavcom_ctz_key_pri->key_pri + 1;
-
-/*        Log::notice($conn->name);
-        Log::notice($ctz_number);
-        Log::notice($last_siavcom_ctz_key_pri->key_pri);*/
 
         $data = [
             'tdo_tdo' => 'CTZ',  //GREEN CTZ

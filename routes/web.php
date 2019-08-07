@@ -17,7 +17,8 @@ Route::get('/', function () {
 
 Auth::routes(['register' => false]);
 
-Route::group(['middleware' => ['role:Administrador|Cotizador']], function(){
+Route::group(['middleware' => ['role:Administrador|Cotizador']], function() {
+	Route::get('dashboard/get-user-stats/{user}', 'DashboardController@getUserStats');
 	Route::get('dashboard', 'DashboardController@index')->name('dashboard');
 });
 

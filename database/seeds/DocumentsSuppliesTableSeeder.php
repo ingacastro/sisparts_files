@@ -11,10 +11,10 @@ class DocumentsSuppliesTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('utility_percentages')->insert(['name' => 'Nacional', 'percentage' => 5]);
-        DB::table('utility_percentages')->insert(['name' => 'Internacional', 'percentage' => 10]);
-        DB::table('utility_percentages')->insert(['name' => 'Remplazo', 'percentage' => 15]);
-        DB::table('utility_percentages')->insert(['name' => 'Pieza usada', 'percentage' => 20]);
+        DB::table('utility_percentages')->insert(['name' => 'Nacional', 'percentage' => 33.30]);
+        DB::table('utility_percentages')->insert(['name' => 'Internacional', 'percentage' => 37.50]);
+        DB::table('utility_percentages')->insert(['name' => 'Remplazo', 'percentage' => 50.00]);
+        DB::table('utility_percentages')->insert(['name' => 'Pieza usada', 'percentage' => 50.00]);
 
         DB::table('conditions')->insert([
         	'previous_sale' => 'Salvo Previa venta',

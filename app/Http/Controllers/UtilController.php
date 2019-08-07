@@ -12,19 +12,16 @@ class UtilController extends Controller
     public function getCountryStates(Request $request)
     {
     	$country = DB::table('countries')->where('id', $request->country_id)->first();
-
-    	Log::notice($request->country_id);	
-
+        $country_name = strtolower($country->name);
     	$states = [];
-    	$enable = false;
-    	if($country->name == 'Mexico') {
+    	$disabled = true;
+    	if($country_name == 'mexico' || $country_name == 'méxico') {
     		$states = DB::table('states')->pluck('name', 'id');
-    		$enable = true;
+    		$disabled = false;
     	}
 
-    	
     	return response()->json([
-    		'enable' => $enable,
+    		'disabled' => $disabled,
     		'states' =>	$states
     	]);
     }

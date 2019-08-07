@@ -133,8 +133,7 @@
 
         let model_id = $('#model_id').val();
 
-        //In edit mode enable state select
-        if($.isNumeric(model_id)) $('#states_id').removeAttr("disabled");
+        loadStates();
 
         setActiveTab();
 
@@ -189,7 +188,7 @@
     /*Loads states based on country id*/
     function loadStates()
     {
-        let country_id = $('#countries_id').val();
+        let country_id = $('#country_hidden').val();
 
         $.ajax({
             url: root_url + '/country-states',
@@ -198,11 +197,20 @@
             data: {'country_id': country_id},
             success: function(response) {
 
-                //Enable state select only for Mexico
-                if(!response.enable) return;
-
+                //Enable/Disable state select/state_name input based in selected country
                 let state_select = $('#states_id');
-                state_select.removeAttr("disabled");
+                let state_name = $('#state_name');
+                state_select.prop('disabled', response.disabled);
+                state_name.prop('disabled', !response.disabled);
+
+                if(response.disabled) { 
+                    $('#states_id').hide();
+                    $('#state_name').show(); 
+                }
+                else { 
+                    $('#states_id').show();
+                    $('#state_name').hide(); 
+                }
 
                 $.each(response.states, function(id, name) {
                     state_select.append('<option value="' + id +'" >' + name + '</option>');

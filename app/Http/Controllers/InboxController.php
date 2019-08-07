@@ -564,6 +564,7 @@ class InboxController extends Controller
 
     private function calculateTotalPrice($total_cost, $utility_percentage)
     {
+        Log::notice($utility_percentage);
         return $total_cost / ((100 - $utility_percentage) / 100);
     }
 

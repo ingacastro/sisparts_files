@@ -37,7 +37,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="landline"><span class="required">* </span>Teléfono fijo</label>
-                {!! Form::text('landline', $model->landline, ['class' => 'form-control phone-mask', 'id' => 'landline',
+                {!! Form::text('landline', $model->landline, ['class' => 'form-control', 'id' => 'landline',
                 'autocomplete' => 'off']) !!}
             </div>
         </div>
@@ -54,7 +54,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="landline">Teléfono móvil</label>
-                {!! Form::text('mobile', $model->landline, ['class' => 'form-control phone-mask', 'id' => 'landline',
+                {!! Form::text('mobile', $model->landline, ['class' => 'form-control', 'id' => 'landline',
                 'autocomplete' => 'off']) !!}
             </div>
         </div>

@@ -33,7 +33,7 @@ class SupplierRequest extends FormRequest
               //'business_name' => 'required',
               'type' => 'required',
               //'states_id' => 'required',
-              'rfc' => ['nullable', 'regex:/^[a-zA-Z]{3,4}(\d{6})((\D|\d){2,3})?$/', 'unique:suppliers'],
+              'rfc' => ['nullable', 'regex:/^[a-zA-Z]{3,4}(\d{6})((\D|\d){2,3})?$/'],
               //'city' => 'required',
               'post_code' => 'required',
               //'street' => 'required',
@@ -50,6 +50,8 @@ class SupplierRequest extends FormRequest
           $rules['email'] = 'required|email';
           $rules['landline'] = 'required|max:15';
         }
+
+        if($this->isMethod('post')) $rules['rfc'][] = 'unique:suppliers';
 
         return $rules;
     }

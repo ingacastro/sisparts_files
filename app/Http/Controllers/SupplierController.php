@@ -185,6 +185,9 @@ class SupplierController extends Controller
         $data = $request->all();
         if(!$request->has('marketplace')) $data['marketplace'] = 0;
 
+        $data['states_id'] = $data['states_id'] ?? null;
+        $data['state'] = $data['state'] ?? null;
+
         try {
             $model = Supplier::find($id);
             $model->fill($data)->update();

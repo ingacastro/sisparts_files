@@ -18,9 +18,11 @@
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="states_id">Estado</label>
+                <label class="control-label">Estado</label>
                 {!! Form::select('states_id', [], $model->states_id, ['class' => 'form-control', 'id' => 'states_id',
-                'placeholder' => 'Seleccionar...', 'disabled']) !!}
+                'placeholder' => 'Seleccionar...', 'style' => 'display: none', 'disabled']) !!}
+                {!! Form::text('state', $model->state, ['class' => 'form-control', 'style' => 'display: none',
+                'id' => 'state_name', 'autocomplete' => 'off', 'disabled']) !!}
             </div>
         </div>
         <div class="col-md-6">

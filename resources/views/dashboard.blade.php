@@ -208,10 +208,11 @@
 @push('scripts')
 <script type="text/javascript">
     $('#sidebar_dashboard').addClass('active');
+    var root_url = $('#root_url').attr('content');
     $('#dashboard_dealership').change(function() {
         let dealership_id = $(this).val();
         
-        $.get('/dashboard/get-user-stats/' + dealership_id, function(response) { 
+        $.get(root_url + '/dashboard/get-user-stats/' + dealership_id, function(response) { 
 
             let daily_pcts = response.daily_pcts;
             $('#daily_pcts_amount').text(daily_pcts.amount);

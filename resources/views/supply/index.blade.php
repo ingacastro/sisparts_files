@@ -79,6 +79,7 @@
 </div>
 @include('supply.modals.replacement_observation')
 @include('supply.modals.pcts')
+@include('supply.modals.binnacle')
 @endsection
 @endsection
 @push('scripts')
@@ -136,34 +137,30 @@
             table.search(supply_number).draw();
     });
 
-    /*Supplier delete*/
-/*    function deleteModel(e, id) {
-        e.preventDefault();
-        swal({
-          title: "Eliminar usuario",
-          text: "¿Seguro que deseas eliminar este usuario?",
-          type: "warning",
-          showCancelButton: true,
-          confirmButtonClass: "btn-danger",
-          cancelButtonText: "Cancelar",
-          confirmButtonText: "Aceptar",
-          closeOnConfirm: false
-        },
-        function(isConfirm) {
-          if (isConfirm) { deleteRequest(id); }
-        });
-    }
+$(document).on('click', '.supply-binnacle', function() {
 
-    function deleteRequest(id) {
-        let token = $('meta[name=_token]').attr('content');
-        $.ajax({
-            url: '/user/' + id,
-            method: 'delete',
-            headers: {'X-CSRF-TOKEN': token},
-            success: function() {
-                document.location.reload();
-            }
-        });
-    }*/
+    let supply_id = $(this).data('supply_id');
+
+    $('#supply_binnacle_table').DataTable({
+        ajax: root_url + '/supply/' + supply_id + '/binnacle',
+        sort: false,
+        destroy: true,
+        iDisplayLength: 8,
+        lengthChange: false,
+        processData: false,
+        serverSide: true,
+        columns: [
+            { data: "created_at", name: "created_at" },
+            { data: "entity", name: "entity" },
+            { data: "type", name: "type" },
+            { data: "user", name: "user" },
+            { data: "comments", name: "comments" },
+        ],
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+        }
+    });
+});
+
 </script>
 @endpush

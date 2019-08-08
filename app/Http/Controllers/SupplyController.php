@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\Log;
 use IParts\Supply;
+use IParts\SupplySet;
+use IParts\Binnacle;
 use Validator;
 use DB;
 use IParts\Replacement;
@@ -53,7 +55,8 @@ class SupplyController extends Controller
                         <a href="#replacement_observation_modal" class="btn btn-circle btn-icon-only yellow-crusta replacement-observation" data-toggle="modal" data-target="#replacement_observation_modal" 
                             data-supply_id="' . $supply->id . '" data-type="2"><i class="fa fa-clipboard"></i></a>
                         <a href="#pcts_modal" class="btn btn-circle btn-icon-only default pcts" data-toggle="modal" data-target="#pcts_modal" 
-                            data-supply_id="' . $supply->id . '"><i class="fa fa-list"></i></a>';
+                            data-supply_id="' . $supply->id . '"><i class="fa fa-list"></i></a>
+                        <a href="#suppliy_binnacle_modal" class="btn btn-circle btn-icon-only green-meadow supply-binnacle" data-toggle="modal" data-target="#supply_binnacle_modal" data-supply_id="' . $supply->id . '"><i class="fa fa-list"></i></a>';
                   })
                   ->rawColumns(['actions' => 'actions'])
                   ->make(true);
@@ -101,6 +104,22 @@ class SupplyController extends Controller
                   ->make(true);
         }
         abort(403, 'Unauthorized action');
+    }
+
+    public function getBinnacle(Request $request, $supply_id)
+    {
+        if(!$request->ajax()) abort(403, 'Unauthorized action');
+
+          $sets_ids = SupplySet::where('supplies_id', $supply_id)->pluck('id');
+          $binnacles = Binnacle::select('binnacles.*', 'users.name as user',
+          DB::raw('(CASE binnacles.entity WHEN 1 THEN "PCT" ELSE supplies.number END) as entity'),
+          DB::raw('(CASE WHEN binnacles.type = 1 THEN "Llamada" ELSE "" END) as type'))
+          ->leftJoin('documents_supplies', 'documents_supplies.id', 'binnacles.documents_supplies_id')
+          ->join('supplies', 'documents_supplies.supplies_id', 'supplies.id')
+          ->leftJoin('users', 'binnacles.users_id', 'users.id')
+          ->whereIn('documents_supplies_id', $sets_ids)->get();
+          
+          return Datatables::of($binnacles)->make(true);
     }
 
     public function getReplacementsObservations(Request $request, $supply_id, $type)

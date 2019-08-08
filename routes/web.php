@@ -118,4 +118,5 @@ Route::get('supply/{supply_id}/get-replacements-observations/{type}', 'SupplyCon
 Route::post('supply/store-replacement-observation/{type}', 'SupplyController@saveReplacementObservation');
 Route::delete('supply/replacement-observation/{id}/{type}', 'SupplyController@deleteReplacementObservation');
 Route::get('supply/{supply_id}/pcts', 'SupplyController@getPcts');
+Route::get('supply/{supply_id}/binnacle', 'SupplyController@getBinnacle');
 Route::get('supply', 'SupplyController@index')->name('supply.index');

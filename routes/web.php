@@ -88,6 +88,7 @@ Route::post('inbox/{document}/unlock', 'InboxController@unlock');
 Route::get('inbox/document-supplies', 'InboxController@getDocumentSupplySets');
 Route::get('inbox/document-binnacle/{documents_id}', 'InboxController@getDocumentBinnacle');
 Route::get('inbox/get-set-tabs/{set_id}', 'InboxController@getSetTabs');
+Route::get('inbox/get-volumetric-weight/{type}', 'InboxController@getVolumetricWeight');
 Route::post('inbox/update-set-budget/{set_id}', 'InboxController@updateBudget')->name('inbox.update-set-budget');
 Route::post('inbox/check-checklist-item', 'InboxController@checkChecklistItem');
 Route::post('inbox/update-set-conditions/{set_id}', 'InboxController@updateConditions')->name('inbox.update-set-conditions');

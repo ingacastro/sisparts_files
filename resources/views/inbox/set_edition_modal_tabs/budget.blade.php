@@ -67,43 +67,66 @@
                         </div>
                     </div>
                 </div>
-                <h5 class="form-section">Peso voulmen *kg</h4>
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
+                        <h5 class="form-section" style="font-weight: bold">Peso voulmen *kg</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <?php 
+                            $cm_checked = 'checked';
+                            $in_checked = '';
+                            $unit = $measurement->unit;
+                            if($unit == 1) {
+                                $cm_checked = 'checked';    
+                                $in_checked = '';
+                            } else if($unit == 2) {
+                                $cm_checked = '';    
+                                $in_checked = 'checked';
+                            }
+                        ?>
                         <div class="form-group">
-                            {!! Form::text('measurement[cm1]', $measurement->cm1, ['class' => 'form-control numeric-mask', 'placeholder' => 'cm']) !!}
+                            <div class="radio-list">
+                                <label class="radio-inline">
+                                    <input type="radio" name="measurement[unit]" class="budget-measurement-unit" value="1" {{$cm_checked}}> Centimetros </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="measurement[unit]" class="budget-measurement-unit" value="2" {{$in_checked}}> Pulgadas </label>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            {!! Form::text('measurement[cm2]', $measurement->cm2, ['class' => 'form-control numeric-mask', 'placeholder' => 'cm']) !!}
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            {!! Form::text('measurement[cm3]', $measurement->cm3, ['class' => 'form-control numeric-mask', 'placeholder' => 'cm']) !!}
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            {!! Form::text('measurement[kgs]', $measurement->kgs, ['class' => 'form-control numeric-mask', 'placeholder' => 'kgs']) !!}
+                    <div class="col-md-2">
+                        <div class="btn-group-circle btn-group-sm btn-group-solid pull-right">
+                            <button type="button" id="calculate_volumetric_weight" class="btn btn-circle green-meadow">Calcular</button>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">
-                            {!! Form::text('measurement[in1]', $measurement->in1, ['class' => 'form-control numeric-mask', 'placeholder' => 'in']) !!}
+                            <label for="measurement_length'">Largo</label>
+                            {!! Form::text('measurement[length]', $measurement->length, ['class' => 'form-control numeric-mask', 
+                            'id' => 'measurement_length']) !!}
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            {!! Form::text('measurement[in2]', $measurement->in2, ['class' => 'form-control numeric-mask', 'placeholder' => 'in']) !!}
+                            <label for="measurement_width']">Ancho</label>
+                            {!! Form::text('measurement[width]', $measurement->width, ['class' => 'form-control numeric-mask', 
+                            'id' => 'measurement_width']) !!}
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            {!! Form::text('measurement[in3]', $measurement->in3, ['class' => 'form-control numeric-mask', 'placeholder' => 'in']) !!}
+                            <label for="measurement_height">Alto</label>
+                            {!! Form::text('measurement[height]', $measurement->height, ['class' => 'form-control numeric-mask', 
+                            'id' => 'measurement_height']) !!}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="measurement_vol_weight">Peso</label>
+                            {!! Form::text(null, $measurement->weight, ['class' => 'form-control numeric-mask', 
+                            'id' => 'measurement_vol_weight', 'disabled']) !!}
+                            <input type="hidden" name="measurement[weight]" id="measurement_vol_weight_hidden">
                         </div>
                     </div>
                 </div>

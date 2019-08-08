@@ -308,5 +308,26 @@ function initSupplySetsTable() {
 $(document).on('click', '#close_set_edition_modal', function() {
     initSupplySetsTable();
 });
+
+$(document).on('click', '#calculate_volumetric_weight', function() {
+    let unit = $('.budget-measurement-unit:checked').val();
+    let length = $('#measurement_length').val();
+    let width = $('#measurement_width').val();
+    let height = $('#measurement_height').val();
+/*    console.log(unit);
+    console.log(length);
+    console.log(width);
+    console.log(height);*/
+    $.get(root_url + '/inbox/get-volumetric-weight/2', { 'measurement[unit]': unit, 'measurement[length]': length, 'measurement[width]': width, 'measurement[height]': height}, function(response) {
+        $('#pct_edit_modal_error_messages').empty();
+        $('#pct_edit_modal_success_message').empty();
+        
+        if(response.errors)
+            $('#pct_edit_modal_error_messages').html(response.errors_fragment);
+        else  {
+            $('#measurement_vol_weight').val(response.volumetric_weight);
+        }
+    });
+});
 </script>
 @endpush

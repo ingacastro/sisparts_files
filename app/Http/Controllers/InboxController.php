@@ -614,6 +614,7 @@ class InboxController extends Controller
             $updated_set = SupplySet::where('documents_id', $set_id[0])->where('supplies_id', $set_id[1])->first();
             $updated_set->update($data['set']);
             
+            $data['measurement']['weight'] = $this->getVolumetricWeight($request, 1, false);
             DB::table('measurements')->where('id', $document_supply->id)->update($data['measurement']);
         } catch(\Exception $e) {
             return response()->json(
@@ -648,6 +649,7 @@ class InboxController extends Controller
 
     private function budgetValidations($data)
     {
+        $volumetricValidations = $this->volumetricWeightValidations(1, null);
         $messages = [
             'set.sale_unit_cost.required' => 'El campo costo unitario es requerido.',
             'set.importation_cost.required' => 'El campo importación es requerido.',
@@ -656,20 +658,14 @@ class InboxController extends Controller
             'set.extra_charges.required' => 'El campo gastos extra es requerido.',
             'set.suppliers_id.required' => 'El campo proveedor es requerido.',
             'set.currencies_id.required' => 'El campo moneda es requerido.',
-            'measurement.cm1.required' => 'El campo 1 de Peso voulmen *kg es requerido.',
-            'measurement.cm2.required' => 'El campo 2 de Peso voulmen *kg es requerido.',
-            'measurement.cm3.required' => 'El campo 3 de Peso voulmen *kg es requerido.',
-            'measurement.kgs.required' => 'El campo 4 de Peso voulmen *kg es requerido.',
-            'measurement.in1.required' => 'El campo 5 de Peso voulmen *kg es requerido.',
-            'measurement.in2.required' => 'El campo 6 de Peso voulmen *kg es requerido.',
-            'measurement.in3.required' => 'El campo 7 de Peso voulmen *kg es requerido.',
+            /*'measurement.weight.required' => 'El campo peso es requerido.',*/
             'set.source_country_id.required' => 'El campo país de origen es requerido.',
             'utility_percentage.required' => 'El porcentaje de utilidad es requerido.',
             'utility_percentage.min' => 'El porcentaje de utilidad mínimo, es 1.',
             'utility_percentage.max' => 'El porcentaje de utilidad máximo, es 100.'
         ];
         
-        $validator = Validator::make($data, [
+        $rules = [
             'set.suppliers_id' => 'required',
             'set.currencies_id' => 'required',
             'set.sale_unit_cost' => 'required',
@@ -677,18 +673,74 @@ class InboxController extends Controller
             'set.warehouse_shipment_cost' => 'required',
             'set.customer_shipment_cost' => 'required',
             'set.extra_charges' => 'required',
-            'measurement.cm1' => 'required',
-            'measurement.cm2' => 'required',
-            'measurement.cm3' => 'required',
-            'measurement.kgs' => 'required',
-            'measurement.in1' => 'required',
-            'measurement.in2' => 'required',
-            'measurement.in3' => 'required',
+            /*'measurement.weight' => 'required',*/
             'set.source_country_id' => 'required',
             'utility_percentage' => 'required|numeric|min:1|max:100'
-        ], $messages);
+        ];
+        $rules = array_merge($rules, $volumetricValidations['rules']);
+        $messages = array_merge($messages, $volumetricValidations['messages']);
+
+        $validator = Validator::make($data, $rules, $messages);
 
         return $validator;
+    }
+
+    /*Returns type = 1 returns array, type 2 returns validator obj*/
+    private function volumetricWeightValidations($type, $data)
+    {
+            //Log::notice($data);
+            $validations['messages'] = [
+                'measurement.length.required' => 'El campo largo es requerido.',
+                'measurement.width.required' => 'El campo ancho es requerido.',
+                'measurement.height.required' => 'El campo alto es requerido.',
+            ];
+            $validations['rules'] = [
+                'measurement.length' => 'required',
+                'measurement.width' => 'required',
+                'measurement.height' => 'required',
+            ];
+            
+            if($type == 1) return $validations;
+            else
+                return Validator::make($data, $validations['rules'], $validations['messages']);
+    }
+
+    /* returns volumetric weight, type 1 only value, type 2 json response*/
+    public function getVolumetricWeight(Request $request, $type, $validate = true)
+    {
+/*        if(!$request->ajax())
+            return response()->json([
+                'errors' => true, 
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('Acción no autorizada.')->render()]);*/
+                
+        //Centimetres in an inch
+        $cm_in = 2.54;
+        
+        $data = $request->all();
+
+        if($validate) {
+            $validator = $this->volumetricWeightValidations($type, $data);
+            if($validator->fails())
+                return response()->json(
+                    ['errors' => true,
+                    'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                    ->withErrors($validator)->render()]);
+        }
+
+        $measurement_data = $data['measurement'];
+        
+        //getting length, width and height always in cm
+        $unit = $measurement_data['unit'];
+        $length = ($unit == 1) ? $measurement_data['length'] : ($measurement_data['length'] * $cm_in);
+        $width = ($unit == 1) ? $measurement_data['width'] : ($measurement_data['width'] * $cm_in);
+        $height = ($unit == 1) ? $measurement_data['height'] : ($measurement_data['height'] * $cm_in);
+
+        //Applying volumetric weight formula
+        $volumetric_weight = ($length * $width * $height) / 5000;
+        if($type == 1) return $volumetric_weight;
+
+        return response()->json(['errors' => false, 'volumetric_weight' => $volumetric_weight]);
     }
 
     public function checkChecklistItem(Request $request)

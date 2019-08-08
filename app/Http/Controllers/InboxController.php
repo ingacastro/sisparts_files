@@ -16,6 +16,7 @@ use IParts\Binnacle;
 use IParts\SupplySet;
 use IParts\Rejection;
 use IParts\Customer;
+use IParts\Employee;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Validator;
@@ -321,7 +322,7 @@ class InboxController extends Controller
     //Now files are attached directly to supplies
     public function getSetFiles(Request $request, $set_supplies_id)
     {
-        if($request->ajax()):
+        if(!$request->ajax()) abort(403, 'Unauthorized action');
 
             $files = DB::table('files')
             ->join('supplies_files', 'supplies_files.files_id', 'files.id')
@@ -340,8 +341,6 @@ class InboxController extends Controller
                   })
                   ->rawColumns(['actions' => 'actions'])
                   ->make(true);
-        endif;
-        abort(403, 'Unauthorized action');
     }
 
     public function setsFileAttachment(Request $request)
@@ -421,19 +420,25 @@ class InboxController extends Controller
     {
         if(!$request->ajax()) abort(403, 'Unauthorized action');
 
-        $files = DB::table('files')->select('files.id', 'files.created_at', 'files.supplier', 'files.url', 'files.path',
-        'supplies_files.supplies_id', 'supplies_files.files_id')
-        ->join('supplies_files', 'supplies_files.files_id', 'files.id')
-        ->join('supplies', 'supplies.id', 'supplies_files.supplies_id')
+        $files = DB::table('files')->select('files.*',
+        'supplies_files.supplies_id', 'supplies_files.files_id',
+        DB::raw('GROUP_CONCAT(supplies.number) as related_parts'))
+        ->leftJoin('supplies_files', 'supplies_files.files_id', 'files.id')
+        ->leftJoin('supplies', 'supplies.id', 'supplies_files.supplies_id')
         ->join('documents_supplies', 'documents_supplies.supplies_id', 'supplies.id')
-        ->where('documents_supplies.documents_id', $document_id)->get();
+        ->where('documents_supplies.documents_id', $document_id)
+        ->groupBy('supplies_files.files_id')
+        ->get();
         
         return Datatables::of($files)
               ->editColumn('created_at', function($file) {
                 return date('d/m/Y', strtotime($file->created_at));
               })
               ->addColumn('actions', function($file) {
-                return '<a href="' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="' . config('app.url') . '/' . $file->path .'" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a><a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,' . $file->supplies_id .',' . $file->files_id .',1' . ')"><i class="fa fa-trash"></i></a>';
+                $actions = '<a href="' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="' . config('app.url') . '/' . $file->path .'" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a>';
+
+                $actions .= Auth::user()->hasRole('Administrador') ? '<a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,' . $file->supplies_id .',' . $file->files_id .',1' . ')"><i class="fa fa-trash"></i></a>' : '';
+                return $actions;
               })
               ->rawColumns(['actions' => 'actions'])
               ->make(true);
@@ -814,9 +819,11 @@ class InboxController extends Controller
 
         try {
             $set = SupplySet::find($data['documents_supplies_id']);
-
+            $document = $set->document;
+            $reference = $document->reference;
+            $number = $document->number;
             foreach($data['emails'] as $email) {
-                $this->sendSupplierQuotationEmail($email, $data);
+                $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $document->dealership);
                 $this->registerQuotationEmailBinnacle($email, $data, $set);
             }
             
@@ -841,7 +848,7 @@ class InboxController extends Controller
         return response()->json(['errors' => false]);
     }
 
-    private function sendSupplierQuotationEmail($email, $data)
+    private function sendSupplierQuotationEmail($email, $data, $document_number, $document_reference, Employee $dealership)
     {   
         //Spanish as default, cause we have custom emails in addition to registered suppliers
         $message = DB::table('messages_languages')
@@ -856,8 +863,12 @@ class InboxController extends Controller
             ->where('languages_id', $supplier->languages_id)->first();
         }
         $subject = $message->subject;
+        $dealership_user = $dealership->user;
         $body = $message->body . '<div>' . $data['manufacturer'] . '</div>' .
-        '<div>Partes: ' . implode(', ', $data['supplies_names']) . '</div>';
+        '<div>Partes: ' . implode(', ', $data['supplies_names']) . '</div>' .
+        '<div>' . $dealership_user->name . '</div>' .
+        '<div>' . $dealership_user->email . '</div>' . 
+        '<div>' . $dealership->ext . '</div>';
         try {            
 /*            Mail::send([], [], function($m) use ($email, $subject, $body) {
                 $m->from(Auth::user()->email);
@@ -869,7 +880,7 @@ class InboxController extends Controller
 
             //$from = "gmessoft@gmail.com";
             $to = $email;
-            $subject = $subject;
+            $subject = $subject . ' ' . $document_number . ' ' . $document_reference;
             $message = $body;
             $headers = 'From: ' . $dealership_email . "\r\n". 
               'Reply-To: ' . $dealership_email . "\r\n" . 

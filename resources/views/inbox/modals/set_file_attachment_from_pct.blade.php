@@ -77,6 +77,7 @@
                             <tr>
                                 <th>Fecha</th>
                                 <th>Nombre</th>
+                                <th>Partes</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>

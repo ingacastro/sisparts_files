@@ -28,6 +28,7 @@ function initDocAttachmentsTable()
         columns: [
             { data: "created_at", name: "created_at" },
             { data: "supplier", name: "supplier" },
+            { data: "related_parts", name: "related_parts" },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }
         ],
         language: {

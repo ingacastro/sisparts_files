@@ -10,7 +10,7 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="number"><span class="required">* </span>Numero Empleado</label>
+                <label class="control-label" for="number"><span class="required">* </span>Número de empleado</label>
                 {!! Form::text('employee[number]', $employee->number, ['class' => 'form-control', 
                 'id' => 'name', 'autocomplete' => 'off'])!!}
             </div>
@@ -26,7 +26,7 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="buyer_number"><span class="required">* </span>Numero comprador</label>
+                <label class="control-label" for="buyer_number"><span class="required">* </span>Número de cotizador</label>
                 {!! Form::text('employee[buyer_number]', $employee->buyer_number, ['class' => 'form-control integer-mask', 'id' => 'buyer_number', 'autocomplete' => 'off'])!!}
             </div>
         </div>
@@ -34,7 +34,7 @@
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="seller_number">Numero vendedor</label>
+                <label class="control-label" for="seller_number">Número de vendedor</label>
                 {!! Form::text('employee[seller_number]', $employee->seller_number, ['class' => 'form-control integer-mask', 'id' => 'seller_number', 'autocomplete' => 'off'])!!}
             </div>
         </div>
@@ -65,8 +65,8 @@
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="ext">Extensión</label>
-                {!! Form::text('employee[ext]', $employee->ext, ['class' => 'form-control integer-mask', 'id' => 'ext', 'autocomplete' => 'off']) !!}
+                <label class="control-label" for="ext">Teléfono y extensión</label>
+                {!! Form::text('employee[ext]', $employee->ext, ['class' => 'form-control', 'id' => 'ext', 'autocomplete' => 'off']) !!}
             </div>
         </div>
     </div>

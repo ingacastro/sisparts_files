@@ -80,11 +80,11 @@
                             <th>Fecha</th>
                             <th>Empresa</th>
                             <th>PCT</th>
+                            <th>RFQ</th>
                             <th>Asignado</th>
                             @if($logged_user_role == 'Administrador')<th>Cliente</th>@endif
                             <th>Edad</th>
                             <th>Estatus</th>
-                            <th>RFQ</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -152,11 +152,11 @@ $(document).ready(function(){
             { data: "created_at", name: "created_at" },
             { data: "sync_connection", name: "sync_connection" },
             { data: "number", name: "number" },
+            { data: "reference", name: "reference" },
             { data: "buyer", name: "buyer" },
             @if($logged_user_role == 'Administrador'){ data: "customer", name: "customer" },@endif
             { data: "semaphore", name: "semaphore" },
             { data: "status", name: "status" },
-            { data: "reference", name: "reference" },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }
         ],
         language: {

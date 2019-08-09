@@ -69,7 +69,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <h5 class="form-section" style="font-weight: bold">Peso voulmen *kg</h4>
+                        <h5 class="form-section" style="font-weight: bold">Medidas y peso</h4>
                     </div>
                     <div class="col-md-6">
                         <?php 
@@ -123,10 +123,18 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label for="measurement_vol_weight">Peso</label>
+                            <label for="measurement_vol_weight">Peso volumétrico</label>
                             {!! Form::text(null, $measurement->weight, ['class' => 'form-control numeric-mask', 
                             'id' => 'measurement_vol_weight', 'disabled']) !!}
                             <input type="hidden" name="measurement[weight]" id="measurement_vol_weight_hidden">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="real_weight">Peso real</label>
+                            {!! Form::text('measurement[real_weight]', $measurement->real_weight, ['class' => 'form-control', 'id' => 'real_weight']) !!}
                         </div>
                     </div>
                 </div>

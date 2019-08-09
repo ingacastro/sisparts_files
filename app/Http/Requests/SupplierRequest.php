@@ -55,7 +55,7 @@ class SupplierRequest extends FormRequest
           $rules = array_merge($rules, $no_marketplace_rules);
         }
 
-        if($this->isMethod('post')) $rules['rfc'][] = 'unique:suppliers';
+        //if($this->isMethod('post')) $rules['rfc'][] = 'unique:suppliers';
 
         return $rules;
     }

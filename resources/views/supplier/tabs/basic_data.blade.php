@@ -61,7 +61,9 @@
         <div class="col-md-6">
             <div class="form-group" style="margin: 15px 0 0 0">
                 <input type="checkbox" value="1" name="marketplace" {{$model->marketplace == 1 ? 'checked' : ''}} />
-                <label style="margin: 20px 0 0 0">Marketplace </label>
+                <label style="margin: 20px 0 0 0">Marketplace</label>
+                    <span aria-hidden="true" class="icon-question " style="font-size: 18px" 
+                    title="Solo obligatorio capturar nombre, país, idioma."></span>
             </div>
         </div>
     </div>

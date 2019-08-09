@@ -17,6 +17,7 @@ use IParts\SupplySet;
 use IParts\Rejection;
 use IParts\Customer;
 use IParts\Employee;
+use IParts\UtilityPercentage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Validator;
@@ -324,23 +325,23 @@ class InboxController extends Controller
     {
         if(!$request->ajax()) abort(403, 'Unauthorized action');
 
-            $files = DB::table('files')
-            ->join('supplies_files', 'supplies_files.files_id', 'files.id')
-            ->join('supplies', 'supplies.id', 'supplies_files.supplies_id')
-            ->where('supplies.id', $set_supplies_id)->get();
+        $files = DB::table('files')
+        ->join('supplies_files', 'supplies_files.files_id', 'files.id')
+        ->join('supplies', 'supplies.id', 'supplies_files.supplies_id')
+        ->where('supplies.id', $set_supplies_id)->get();
 
-            return Datatables::of($files)
-                  ->editColumn('created_at', function($file) {
-                    return date('d/m/Y', strtotime($file->created_at));
-                  })
-                  ->addColumn('actions', function($file) {
-                    $actions = (isset($file->url)) ? '<a href="' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a>' : '';
-                    $actions .= isset($file->path) ? '<a href="' . config('app.url') . '/' . $file->path . '" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a>' : '';
-                     $actions .= '<a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,' . $file->supplies_id .',' . $file->files_id .',2' . ')"><i class="fa fa-trash"></i></a>';
-                    return $actions;
-                  })
-                  ->rawColumns(['actions' => 'actions'])
-                  ->make(true);
+        return Datatables::of($files)
+              ->editColumn('created_at', function($file) {
+                return date('d/m/Y', strtotime($file->created_at));
+              })
+              ->addColumn('actions', function($file) {
+                $actions = (isset($file->url)) ? '<a href="' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a>' : '';
+                $actions .= isset($file->path) ? '<a href="' . config('app.url') . '/' . $file->path . '" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a>' : '';
+                 $actions .= Auth::user()->hasRole('Administrador') ? '<a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,' . $file->supplies_id .',' . $file->files_id .',2' . ')"><i class="fa fa-trash"></i></a>' : '';
+                return $actions;
+              })
+              ->rawColumns(['actions' => 'actions'])
+              ->make(true);
     }
 
     public function setsFileAttachment(Request $request)
@@ -474,7 +475,7 @@ class InboxController extends Controller
         DB::raw('CASE WHEN documents_supplies.measurement_unit_code = 1 THEN "Pieza" ELSE "Caja" END AS measurement_unit_code'), 
         DB::raw('documents_supplies.sale_unit_cost * documents_supplies.products_amount + documents_supplies.importation_cost
         + documents_supplies.warehouse_shipment_cost + documents_supplies.customer_shipment_cost + documents_supplies.extra_charges as total_cost'), 
-        'currencies.name as currency',
+        'currencies.name as currency', 'documents_supplies.unit_price',
         DB::raw('CASE WHEN documents_supplies.status = 1 THEN "No solicitado"
             WHEN documents_supplies.status = 2 THEN "Solicitado automáticamente"
             WHEN documents_supplies.status = 3 THEN "Solicitado manualmente"
@@ -539,6 +540,9 @@ class InboxController extends Controller
                 $total_price = $this->calculateTotalPrice($supplies_set->total_cost, $supplies_set->utility_percentage);
                 return '$' .  number_format($total_price, 2, '.', ',') . ' ' . $supplies_set->currency;
               })
+              ->editColumn('unit_price', function($supplies_set) {
+                return '$' .  number_format($supplies_set->unit_price, 2, '.', ',') . ' ' . $supplies_set->currency;
+              })
               ->rawColumns(['number' => 'number', 'actions' => 'actions', 'total_cost' => 'total_cost', 
                 'total_price' => 'total_price', 'checkbox' => 'checkbox'])
               ->make(true);
@@ -602,22 +606,29 @@ class InboxController extends Controller
 
         $set_id = explode('_', $set_id);
 
+        $utility_percentage_amount = null;
         if($utility_percent_arr[0] == 0) {
-            $data['set']['custom_utility_percentage'] = $utility_percent_arr[1];
+            $utility_percentage_amount = $data['set']['custom_utility_percentage'] = $utility_percent_arr[1];
             $data['set']['utility_percentages_id'] = null;
         }else {
             $data['set']['utility_percentages_id'] = $utility_percent_arr[0];
             $data['set']['custom_utility_percentage'] = null;
+            $utility_percentage_amount = UtilityPercentage::find($utility_percent_arr[0])->percentage;
         }
+
 
         try {
 
-            $document_supply = DB::table('documents_supplies')->where('documents_id', $set_id[0])
-            ->where('supplies_id', $set_id[1])->first();
+            $document_supply = SupplySet::where('documents_id', $set_id[0])
+            ->where('supplies_id', $set_id[1])
+            ->first();
 
+            $budget_data = $this->calculateBudget($document_supply, $data['set'], $utility_percentage_amount);
+
+            $data['set']['unit_price'] = $budget_data['unit_price'];
             $data['set']['status'] = 5; //Budget resgistered
-            $updated_set = SupplySet::where('documents_id', $set_id[0])->where('supplies_id', $set_id[1])->first();
-            $updated_set->update($data['set']);
+            //$document_supply = SupplySet::where('documents_id', $set_id[0])->where('supplies_id', $set_id[1])->first();
+            $document_supply->update($data['set']);
             
             $data['measurement']['weight'] = $this->getVolumetricWeight($request, 1, false);
             DB::table('measurements')->where('id', $document_supply->id)->update($data['measurement']);
@@ -628,7 +639,7 @@ class InboxController extends Controller
                 ->withErrors($e->getMessage())->render()]);
         }
 
-            $currency = ' ' . $updated_set->currency->name;
+/*            $currency = ' ' . $updated_set->currency->name;
             $total_cost = ($updated_set->sale_unit_cost * $updated_set->products_amount) + 
                     ($updated_set->importation_cost + $updated_set->warehouse_shipment_cost + 
                     $updated_set->customer_shipment_cost + $updated_set->extra_charges);
@@ -642,7 +653,7 @@ class InboxController extends Controller
                 'total_price' => number_format($total_price, 2, '.', ',') . $currency,
                 'unit_price' => number_format(($total_price / $updated_set->products_amount), 2, '.', ',') . $currency,
                 'total_profit' => number_format(($total_price - $total_cost), 2, '.', ',') . $currency
-            ];
+            ];*/
         
         return response()->json([
             'errors' => false,
@@ -650,6 +661,22 @@ class InboxController extends Controller
             'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
             ->with('success_message', 'Presupuesto correctamente actualizado.')->render()
         ]);
+    }
+
+    private function calculateBudget($set, $set_data, $utility_percentage)
+    {
+        $currency = ' ' . $set->currency->name;
+        $total_cost = ($set_data['sale_unit_cost'] * $set->products_amount) + 
+                ($set_data['importation_cost'] + $set_data['warehouse_shipment_cost'] + 
+                $set_data['customer_shipment_cost'] + $set_data['extra_charges']);
+
+        $total_price = $this->calculateTotalPrice($total_cost, $utility_percentage);
+        return [
+            'total_cost' => number_format($total_cost, 2, '.', ',') . $currency,
+            'total_price' => number_format($total_price, 2, '.', ',') . $currency,
+            'unit_price' => number_format(($total_price / $set->products_amount), 2, '.', ',') . $currency,
+            'total_profit' => number_format(($total_price - $total_cost), 2, '.', ',') . $currency
+        ];
     }
 
     private function budgetValidations($data)

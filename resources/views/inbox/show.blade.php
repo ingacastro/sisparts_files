@@ -110,7 +110,7 @@
                                     <span><span class="detail-title">Razón social: </span>{{ $document->sync_connection->display_name }}</span>
                                 </td>
                                 <td>
-                                    <span><span class="detail-title">Número requerimiento: </span>{{ $document->customer_requirement_number }}</span>
+                                    <span><span class="detail-title">RFQ: </span>{{ $document->reference }}</span>
                                 </td>
                                 <td></td>
                             </tr>
@@ -134,7 +134,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <span><span class="detail-title">Número CTZ Saivcom: </span>{{ $document->siavcom_ctz_number }}</span>
+                                    <span><span class="detail-title">Número CTZ: </span>{{ $document->siavcom_ctz_number }}</span>
                                 </td>
                                 <td>
                                     <span>
@@ -190,13 +190,14 @@
                             <th>U. Medida</th>
                             <th>Costo total</th>
                             <th>Precio total</th>
+                            <th>Precio unitario</th>
                             <th>Estatus</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
-                <h3 class="form-section">Bitácora</h3>
+                <h3 class="form-section" style="color: red">Bitácora</h3>
                 <div class="table-toolbar">
                     <div class="row">
                         <div class="col-md-6">
@@ -296,6 +297,7 @@ function initSupplySetsTable() {
             { data: "measurement_unit_code", name: "measurement_unit_code" },
             { data: "total_cost", name: "total_cost" },
             { data: "total_price", name: "total_price" },
+            { data: "unit_price", name: "unit_price" },
             { data: "status", name: "status" },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }
         ],

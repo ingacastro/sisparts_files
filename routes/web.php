@@ -17,6 +17,12 @@ Route::get('/', function () {
 
 Auth::routes(['register' => false]);
 
+//Password reset routes disabled
+Route::post('password/email', function(){ abort(404); })->name('password.email');
+Route::post('password/reset', function(){ abort(404); })->name('password.update');
+Route::get('password/reset', function(){ abort(404); })->name('password.request');
+Route::get('password/reset/{token}', function(){ abort(404); })->name('password.reset');
+
 Route::group(['middleware' => ['role:Administrador|Cotizador']], function() {
 	Route::get('dashboard/get-user-stats/{user}', 'DashboardController@getUserStats');
 	Route::get('dashboard', 'DashboardController@index')->name('dashboard');

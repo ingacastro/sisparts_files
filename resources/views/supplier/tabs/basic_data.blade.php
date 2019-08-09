@@ -9,7 +9,7 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label class="control-label" for="country"><span class="required">* </span>Country</label>
+                <label class="control-label" for="country"><span class="required">* </span>País</label>
                 {!! Form::select(null, $selects_options['countries'], $model->countries_id, 
                 ['placeholder' => 'Seleccionar...', 'class' => 'form-control drop-down', 'id' => 'country']) !!}
                 <input type="hidden" name="countries_id" value="{{ $model->countries_id }}" id="country_hidden">

@@ -20,8 +20,7 @@
                     <label>
                         <input class="set-checklist quotation-currency" data-set_id="{{$checklist->id}}" data-field="quotation_currency" type="checkbox" name="quotation_currency" value="checked" {{ $checklist->quotation_currency }}> Revisar moneda de la cotización
                         <span aria-hidden="true" class="icon-question pull-right checklist-question-mark" 
-                        title="Se deberá revisar a detalle la moneda de la cotización del proveedor, revisar que está seleccionada correctamente en el Sistema International Parts (SISPARTS), y además que esté correctamente seleccionada el SIAVCOM, o en su defecto el
-                        precio de venta esté convertido al tipo de cambio correcto (En caso de cotizar con otra moneda)."></span>
+                        title="Se deberá revisar a detalle la moneda de la cotización del proveedor, revisar que está seleccionada en el Sistema International Parts (SISPARTS), y además que esté correctamente seleccionada el SIAVCOM, o en su defecto el precio de venta esté convertido al tipo de cambio correcto (En caso de cotizar con otra moneda)."></span>
                     </label>
                     <label>
                         <input class="set-checklist unit-price"  data-set_id="{{$checklist->id}}" data-field="unit_price"type="checkbox" name="unit_price" value="checked" {{ $checklist->unit_price }}> Revisar el precio unitario
@@ -31,8 +30,7 @@
                     <label>
                         <input class="set-checklist delivery-time" data-set_id="{{$checklist->id}}" data-field="delivery_time" type="checkbox" name="delivery_time" value="checked" {{ $checklist->delivery_time }}> Revisar el tiempo de entrega
                         <span aria-hidden="true" class="icon-question pull-right checklist-question-mark"
-                        title="Se deberá revisar que se esté considerando una semana más del entrega para productos nacionales, de 2 a 3 semanas
-                        más para productos de importación."></span>
+                        title="Se deberá revisar que se esté considerando una semana más del entrega para productos nacionales, de 2 a 3 semanas más para productos de importación."></span>
                     </label>
                     <label>
                         <input class="set-checklist delivery-conditions" data-set_id="{{$checklist->id}}" data-field="delivery_conditions" type="checkbox" name="delivery_conditions" value="checked" {{ $checklist->delivery_conditions }}> Revisar las condiciones de entrega
@@ -41,8 +39,7 @@
                     <label>
                         <input class="set-checklist product-condition" data-set_id="{{$checklist->id}}" data-field="product_condition" type="checkbox" name="product_condition" value="checked" {{ $checklist->product_condition }}> Revisar la condición del producto
                         <span aria-hidden="true" class="icon-question pull-right checklist-question-mark"
-                        title="Se deberá revisar la condición del producto, en caso de ofrecer un producto en estado diferente a NUEVO se deberá
-                               indicar en las notas de la cotización Por ejemplo: ***PRODUCTO USADO***"></span>
+                        title="Se deberá revisar la condición del producto, en caso de ofrecer un producto en estado diferente a NUEVO se deberá indicar en las notas de la cotización Por ejemplo: ***PRODUCTO USADO***"></span>
                     </label>
                     <label>
                         <input class="set-checklist entrance-shipment_costs" data-set_id="{{$checklist->id}}" data-field="entrance_shipment_costs" type="checkbox" name="entrance_shipment_costs" value="checked" {{ $checklist->entrance_shipment_costs }}> Revisar costos de flete entrada
@@ -52,8 +49,7 @@
                     <label>
                         <input class="set-checklist weight-calculation" data-set_id="{{$checklist->id}}" data-field="weight_calculation" type="checkbox" name="weight_calculation" value="checked" {{ $checklist->weight_calculation }}> Revisar cálculo del peso
                         <span aria-hidden="true" class="icon-question pull-right checklist-question-mark"
-                        title="Se deberá considerar el peso del material x cantidad para cálculo del flete del proveedor a nosotros y utilizar la
-                        tabla de pesos de FedEx, además del cálculo de nuestro almacén al cliente."></span>
+                        title="Se deberá considerar el peso del material x cantidad para cálculo del flete del proveedor a nosotros y utilizar la tabla de pesos de FedEx, además del cálculo de nuestro almacén al cliente."></span>
                     </label>
                     <label>
                         <input class="set-checklist material-origin" data-set_id="{{$checklist->id}}" data-field="material_origin" type="checkbox" name="material_origin" value="checked" {{ $checklist->material_origin }}> Revisar procedencia del material

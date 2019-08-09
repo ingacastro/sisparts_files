@@ -26,12 +26,15 @@ class SupplierRequest extends FormRequest
         $rules = [
               'trade_name' => 'required',
               'countries_id' => 'required',
-              'languages_id' => 'required',
+              'type' => 'required',
+              'languages_id' => 'required'
+            ];
+
+        $no_marketplace_rules = [
               //'currencies_id' => 'required',
               'mobile' => 'nullable|max:15',
               //'marketplace' => 'required',
               //'business_name' => 'required',
-              'type' => 'required',
               //'states_id' => 'required',
               'rfc' => ['nullable', 'regex:/^[a-zA-Z]{3,4}(\d{6})((\D|\d){2,3})?$/'],
               //'city' => 'required',
@@ -42,13 +45,14 @@ class SupplierRequest extends FormRequest
               //'unit_number' => 'required',
               'credit_days' => 'nullable|numeric',
               //'suburb' => 'required',
-              'credit_amount' => 'nullable|numeric'
+              'credit_amount' => 'nullable|numeric',
+              'email' => 'required|email',
+              'landline' => 'required|max:15'
         ];
 
         //only for no marketplace suppliers
         if(!$this->has('marketplace')){
-          $rules['email'] = 'required|email';
-          $rules['landline'] = 'required|max:15';
+          $rules = array_merge($rules, $no_marketplace_rules);
         }
 
         if($this->isMethod('post')) $rules['rfc'][] = 'unique:suppliers';

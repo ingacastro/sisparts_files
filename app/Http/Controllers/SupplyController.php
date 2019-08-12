@@ -13,6 +13,7 @@ use DB;
 use IParts\Replacement;
 use IParts\Observation;
 use IParts\Document;
+use Auth;
 
 class SupplyController extends Controller
 {
@@ -51,12 +52,11 @@ class SupplyController extends Controller
             return Datatables::of($supplies)
                   ->addColumn('actions', function($supply) {
                         return '<a href="#replacement_observation_modal" class="btn btn-circle btn-icon-only blue replacement-observation" data-toggle="modal" data-target="#replacement_observation_modal" 
-                            data-supply_id="' . $supply->id . '" data-type="1"><i class="fa fa-refresh"></i></a>
-                        <a href="#replacement_observation_modal" class="btn btn-circle btn-icon-only yellow-crusta replacement-observation" data-toggle="modal" data-target="#replacement_observation_modal" 
-                            data-supply_id="' . $supply->id . '" data-type="2"><i class="fa fa-clipboard"></i></a>
-                        <a href="#pcts_modal" class="btn btn-circle btn-icon-only default pcts" data-toggle="modal" data-target="#pcts_modal" 
-                            data-supply_id="' . $supply->id . '"><i class="fa fa-list"></i></a>
-                        <a href="#suppliy_binnacle_modal" class="btn btn-circle btn-icon-only green-meadow supply-binnacle" data-toggle="modal" data-target="#supply_binnacle_modal" data-supply_id="' . $supply->id . '"><i class="fa fa-list"></i></a>';
+                            data-supply_id="' . $supply->id . '" data-type="1" data-number="' . $supply->number . '"><i class="fa fa-refresh"></i></a>
+                        <a href="#replacement_observation_modal" class="btn btn-circle btn-icon-only yellow-crusta replacement-observation" data-toggle="modal" data-target="#replacement_observation_modal" data-number="' . $supply->number . '" data-supply_id="' . $supply->id . '" data-type="2"><i class="fa fa-clipboard"></i></a>
+                        <a href="#pcts_modal" class="btn btn-circle btn-icon-only default pcts" data-toggle="modal" data-target="#pcts_modal" data-number="' . $supply->number . '" data-supply_id="' . $supply->id . '"><i class="fa fa-list"></i></a>
+                        <a href="#suppliy_binnacle_modal" class="btn btn-circle btn-icon-only green-meadow supply-binnacle" data-toggle="modal" data-target="#supply_binnacle_modal" data-supply_id="' . $supply->id . '"
+                        data-number="' . $supply->number . '"><i class="fa fa-list"></i></a>';
                   })
                   ->rawColumns(['actions' => 'actions'])
                   ->make(true);
@@ -131,6 +131,10 @@ class SupplyController extends Controller
 
             return Datatables::of($items)
                   ->addColumn('actions', function($item) use($type) {
+                        
+                        if(!Auth::user()->hasRole('Administrador')) return '';
+
+                        //Only admin is able to edit and delete replacements and observations
                         $actions = '<a class="btn btn-circle btn-icon-only red"
                             onclick="deleteReplacementObservation(event,' . $item->id . ',' . $type . ')"><i class="fa fa-times"></i></a>';
                         if($type == 1)

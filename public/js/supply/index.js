@@ -1,12 +1,15 @@
  var root_url = $('#root_url').attr('content');
 $(document).on('click', '.replacement-observation', function() {
 
+    replacementObservationSaveUI();
+
 	$('#replacement_observation_form_description').val('');
 	let type = $(this).data('type');
 	let supply_id = $(this).data('supply_id');
 	$('#replacement_observation_form').data('type', type);
 
-	$('#replacement_observation_modal_title').html(type == 1 ? 'Reemplazo' : 'Observación');
+    let number = $(this).data('number');
+	$('#replacement_observation_modal_title').html('<h4 class="modal-title">' + (type == 1 ? 'Reemplazo' : 'Observación') + '<strong>  Parte:</strong> ' + number + '</h4>');
 	$('#replacement_observation_modal_supplies_id').val(supply_id);
 
 	$('#replacement_observation_table').DataTable({
@@ -79,15 +82,21 @@ $('#replacement_observation_form').submit(function(e) {
 
 
 $(document).on('click', '.replacement-edit', function() {
-	$('#replacement_observation_form_description').val($(this).data('description'));
-	$('#replacement_observation_cancel_btn').show();
-	$('#replacement_observation_save_btn').html('Actualizar');
-	$('#replacement_observation_modal_replacement_id').val($(this).data('id'));
+    replacementObservationUpdateUI(this);
 });
+
+function replacementObservationUpdateUI(context) {
+    $('#replacement_observation_error_messages').html('');
+    $('#replacement_observation_form_description').val($(context).data('description'));
+    $('#replacement_observation_cancel_btn').show();
+    $('#replacement_observation_save_btn').html('Actualizar');
+    $('#replacement_observation_modal_replacement_id').val($(context).data('id'));
+}
 
 $('#replacement_observation_cancel_btn').click(function() { replacementObservationSaveUI(); });
 
 function replacementObservationSaveUI() {
+    $('#replacement_observation_error_messages').html('');
 
 	$('#replacement_observation_save_btn').html('Guardar');
 	$('#replacement_observation_cancel_btn').hide();
@@ -144,7 +153,8 @@ function deleteReplacementObservationRequest(id, type) {
 $(document).on('click', '.pcts', function() {
 
 	let supply_id = $(this).data('supply_id');
-
+    let number = $(this).data('number');
+    $('#supply_pcts_modal_title').html('<h4 class="modal-title">PCTS' + '<strong>  Parte: </strong> ' + number + '</h4>');
 	$('#pcts_table').DataTable({
         ajax: root_url + '/supply/' + supply_id + '/pcts/',
         sort: false,

@@ -66,7 +66,7 @@ class InboxController extends Controller
                   WHEN 2 THEN "En proceso"
                   WHEN 3 THEN "Terminada"
                   WHEN 4 THEN "Archivada"
-                  ELSE "Indefinido" END) as status'), 'documents.reference'];
+                  ELSE "Indefinido" END) as status'), 'documents.reference', 'documents.siavcom_ctz'];
         $query = DB::table('documents')
                      ->join('employees', 'employees.users_id', 'documents.employees_users_id')
                      ->join('users', 'users.id', 'employees.users_id')
@@ -118,7 +118,7 @@ class InboxController extends Controller
         return Datatables::of($documents)
               ->addColumn('semaphore', function($document) {
                 $days = $this->diffBusinessDays($document->created_at);
-                $color = DB::table('color_settings')->where('days', '>=', $days)
+                $color = DB::table('color_settings')->where('days', '<=', $days)
                 ->orderBy('days', 'DESC')->first();
 
                 if(!$color)
@@ -145,7 +145,7 @@ class InboxController extends Controller
                 else {
                     $actions = '<a href="' . config('app.url') . '/archive/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';
                     if($document->is_canceled == 1) { //$logged_user->hasRole('Administrador') && 
-                        $actions .= '<a class="btn btn-circle btn-icon-only default green-meadow" onClick="unlockDocument(event, ' . $document->id . ')"><i class="fa fa-unlock"></i></a>';
+                        $actions .= $document->siavcom_ctz != 1 ? '<a class="btn btn-circle btn-icon-only default green-meadow" onClick="unlockDocument(event, ' . $document->id . ')"><i class="fa fa-unlock"></i></a>' : '';
                     }
                 }
                 return $actions;

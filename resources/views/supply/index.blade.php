@@ -65,9 +65,6 @@
                             <th>Proveedores</th>
                             <th>Adjuntos</th>
                             <th>Acciones</th>
-{{--                            <th>Reemplazos</th>
-                            <th>Observaciones</th>
-                            <th>Cortizaciones</th> --}}
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -140,7 +137,8 @@
 $(document).on('click', '.supply-binnacle', function() {
 
     let supply_id = $(this).data('supply_id');
-
+    let number = $(this).data('number');
+    $('#supply_binnacle_modal_title').html('<h4 class="modal-title">Bitácora' + '<strong>  Parte:</strong> ' + number + '</h4>');
     $('#supply_binnacle_table').DataTable({
         ajax: root_url + '/supply/' + supply_id + '/binnacle',
         sort: false,

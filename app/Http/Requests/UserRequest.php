@@ -3,6 +3,8 @@
 namespace IParts\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use DB;
+use Illuminate\Support\Facades\Log;
 
 class UserRequest extends FormRequest
 {
@@ -28,9 +30,13 @@ class UserRequest extends FormRequest
             'user.email' => ['required', 'email', 'unique:users,email'],
             'user.password' => 'required|confirmed|min:6',
             'role_id' => 'required',
-            'employee.number' => 'required',
-            'employee.buyer_number' => 'required|unique:employees,buyer_number'
+            'employee.number' => 'required'
         ];
+
+        $role = DB::table('roles')->find($this->role_id);
+        
+        if($role && $role->name == 'Cotizador')
+            $rules['employee.buyer_number'] = 'required|unique:employees,buyer_number';
 
         if($this->isMethod('put')) {
             $rules['user.password'] = 'nullable|confirmed|min:6';
@@ -53,7 +59,7 @@ class UserRequest extends FormRequest
             'user.password.min' => 'La contraseña debe ser de al menos 6 caracteres.',
             'user.password.confirmed' => 'Las contraseñas no coinciden.',
             'employee.number.required' => 'El número de empleado es requerido.',
-            'employee.buyer_number.required' => 'El número de comprador es requerido.'
+            'employee.buyer_number.required' => 'El número de cotizador es requerido.'
         ];
     }
 }

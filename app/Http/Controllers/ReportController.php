@@ -47,7 +47,7 @@ class ReportController extends Controller
             DB::raw('(CASE 
                 WHEN documents.completed_date <> "" THEN DATEDIFF(documents.completed_date, documents.created_at)
                 ELSE null END) as elapsed_days'),
-            'sync_connections.name as company', 'documents.number','documents.reference', 
+            'sync_connections.display_name as company', 'documents.number','documents.reference', 
             'users.name as dealership', 'customers.trade_name as customer', 
             DB::raw('CONCAT(SUM(CASE WHEN documents_supplies.status = 9 THEN 1 ELSE 0 END), "/", COUNT(documents_supplies.id)) as ctz_supplies'),
             //DB::raw('COUNT(documents_supplies.id) as supplies'),

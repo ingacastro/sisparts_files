@@ -8,8 +8,8 @@
             <div class="modal-body">
                 {!! Form::open(['class' => 'horizontal-form', 'id' => 'replacement_observation_form', 'data-type' => '1']) !!}
                 <input type="hidden" name="supplies_id" id="replacement_observation_modal_supplies_id">
-                <input type="hidden" name="replacement_id" id="replacement_observation_modal_replacement_id" value="">
-                <input type="hidden" name="observation_id" id="replacement_observation_modal_observation_id" value="">
+                <input type="hidden" name="replacement_id" id="replacement_observation_modal_replacement_id">
+                <input type="hidden" name="observation_id" id="replacement_observation_modal_observation_id">
                 <div id="replacement_observation_error_messages"></div>
                 <div id="replacement_observation_success_message"></div>
                 <div class="row">

@@ -117,7 +117,6 @@
                             <th>Items cotizados</th>
                             <th>Estatus</th>
                             <th>No. CTZ</th>
-                            <th>Matriz</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -177,7 +176,6 @@
                 { data: 'ctz_supplies', name: 'ctz_supplies' },
                 { data: 'status', name: 'status' },
                 { data: 'siavcom_ctz_number', name: 'siavcom_ctz_number' },
-                { data: 'siavcom_ctz_number', name: 'matriz' },
             ],
             language: {
                 "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"

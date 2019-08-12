@@ -2,14 +2,14 @@
     <div class="col-md-8">
         <div class="row modal-content-border">
             <div id="files_table_container" style="display: none; margin: 0 10px">
-                <input type="hidden" id="set_auto_id" value="{{ $set->id }}">
+                <input type="hidden" id="set_supplies_id" value="{{ $set->id }}">
                 <div class="table-toolbar">
                     <div class="row">
                         <div class="col-md-6"></div>
                         <div class="col-md-6"></div>
                     </div>
                 </div>
-                <table class="table table-striped table-hover table-bordered" id="files_table">
+                <table class="table table-striped table-hover table-bordered" id="set_edit_files_table">
                     <thead>
                         <tr>
                             <th>Fecha</th>

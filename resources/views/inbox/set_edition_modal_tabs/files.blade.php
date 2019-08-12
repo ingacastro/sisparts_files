@@ -9,7 +9,7 @@
                         <div class="col-md-6"></div>
                     </div>
                 </div>
-                <table class="table table-striped table-hover table-bordered" id="files_table">
+                <table class="table table-striped table-hover table-bordered" id="set_edit_files_table">
                     <thead>
                         <tr>
                             <th>Fecha</th>

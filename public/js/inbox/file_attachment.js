@@ -39,8 +39,8 @@ function initDocAttachmentsTable()
 
 function initSetAttachmentsTable()
 {
-    let set_auto_id = $('#set_auto_id').val();
-    $('#files_table').DataTable({
+    let set_auto_id = $('#set_supplies_id').val();
+    $('#set_edit_files_table').DataTable({
         serverSide: true,
         ajax: root_url + '/inbox/set-files/' + set_auto_id,
         iDisplayLength: 6,
@@ -75,26 +75,13 @@ $('#set_file_attachment_from_pct_form').submit(function(e){
         processData: false,
         contentType: false,
         success: function(response) {
+            let error_message = $('#set_file_attachment_from_pct_error_messages').html('');
+            let success_message = $('#set_file_attachment_from_pct_success_message').html('');
             if(response.errors) {
-                $('#set_file_attachment_from_pct_error_messages').html(response.errors_fragment);
-                return;
+                error_message.html(response.errors_fragment); return;
             }
-            let file_obj = response.file;
-
-            $('#set_file_attachment_from_pct_error_messages').css('display', 'none');
-            $('#file_attachment_table').DataTable().row.add({
-                'created_at': file_obj.created_at,
-                'supplier': file_obj.supplier, 
-                'actions': '<a href="/' + file_obj.path + '"' +
-                                'class="btn btn-accent m-btn m-btn--icon btn-sm m-btn--icon-only  m-btn--pill m-btn--air" download>' +
-                                '<i class="fa fa-download"></i></a> ' +
-                                '<button type="button" onClick="deleteDocument(event,' + file_obj.id +')"' + 
-                                'class="btn btn-danger m-btn m-btn--icon btn-sm m-btn--icon-only  m-btn--pill m-btn--air remove-document">' +
-                                '<i class="fa fa-times"></i></button>'
-            });
-            $('#file_attachment_table').DataTable().draw(false);
-            $('#set_file_attachment_from_pct_success_message').html(response.success_fragment);
-            $('#set_file_attachment_from_pct_success_message').fadeIn('fast').delay(2000).fadeOut('fast');
+            initDocAttachmentsTable();
+            success_message.html(response.success_fragment).fadeIn('fast').delay(2000).fadeOut('fast');
         }
     });
 });

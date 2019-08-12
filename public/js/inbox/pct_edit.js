@@ -35,7 +35,7 @@ $(document).on('click', '.edit-set', function() {
 
             let set_supplies_id = $('#set_supplies_id').val();
 
-            $('#files_table').DataTable({
+            $('#set_edit_files_table').DataTable({
                 serverSide: true,
                 ajax: root_url + '/inbox/set-files/' + set_supplies_id,
                 iDisplayLength: 6,

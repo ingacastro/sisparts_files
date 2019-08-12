@@ -335,7 +335,7 @@ class InboxController extends Controller
                 return date('d/m/Y', strtotime($file->created_at));
               })
               ->addColumn('actions', function($file) {
-                $actions = (isset($file->url)) ? '<a href="' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a>' : '';
+                $actions = isset($file->url) ? '<a href="' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a>' : '';
                 $actions .= isset($file->path) ? '<a href="' . config('app.url') . '/' . $file->path . '" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a>' : '';
                  $actions .= Auth::user()->hasRole('Administrador') ? '<a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,' . $file->supplies_id .',' . $file->files_id .',2' . ')"><i class="fa fa-trash"></i></a>' : '';
                 return $actions;
@@ -353,7 +353,7 @@ class InboxController extends Controller
                 ->withErrors('Acción no autorizada.')->render()
             ]);*/
 
-        if(!$request->has('file') && empty($request->url))
+        if((!$request->has('file') || empty($request->has('file'))) && empty($request->url))
             return response()->json(
                 ['errors' => true,
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
@@ -393,6 +393,7 @@ class InboxController extends Controller
       return response()->json([
         'errors' => false, 
         'file' => $file,
+        'related_parts' => implode(',', $file->supplies->pluck('number')->toArray()),
         'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
         ->with('success_message', 'Archivo guardado correctamente.')->render()
       ]);
@@ -436,7 +437,9 @@ class InboxController extends Controller
                 return date('d/m/Y', strtotime($file->created_at));
               })
               ->addColumn('actions', function($file) {
-                $actions = '<a href="' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a><a href="' . config('app.url') . '/' . $file->path .'" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a>';
+                $actions = $file->url != null ? '<a href="' . $file->url . '" target="_blank" class="btn btn-circle btn-icon-only green"><i class="fa fa-link"></i></a>' : '';
+
+                $actions .= $file->path != null ? '<a href="' . config('app.url') . '/' . $file->path .'" class="btn btn-circle btn-icon-only default change-dealership" download><i class="fa fa-download"></i></a>' : '';
 
                 $actions .= Auth::user()->hasRole('Administrador') ? '<a class="btn btn-circle btn-icon-only default blue" onClick="detachFile(event,' . $file->supplies_id .',' . $file->files_id .',1' . ')"><i class="fa fa-trash"></i></a>' : '';
                 return $actions;

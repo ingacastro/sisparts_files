@@ -11,8 +11,8 @@ class LanguagesTableSeeder extends Seeder
      */
     public function run()
     {
-		$spanish_id = DB::table('languages')->insertGetId(['name' => 'Español']);
-		$english_id = DB::table('languages')->insertGetId(['name' => 'Inglés']);
-		$portuguese_id = DB::table('languages')->insertGetId(['name' => 'Portugués']);
+		$spanish_id = DB::table('languages')->insertGetId(['name' => 'Español', 'code' => 'ES']);
+		$english_id = DB::table('languages')->insertGetId(['name' => 'Inglés', 'code' => 'EN']);
+		$portuguese_id = DB::table('languages')->insertGetId(['name' => 'Portugués', 'code' => 'PT']);
     }
 }

@@ -86,7 +86,7 @@ class DocumentSync extends Command
         //Log::notice($conn->name . '  ' . $documentsTable);
         $siavcomDocuments = DB::connection($conn->name)->table($documentsTable)
         ->where('tdo_tdo', $quotation_acronym)
-        ->whereIn('ndo_doc', [201,1068,1082,2096,5233,2468,3370,3389,2865,5399])
+        //->whereIn('ndo_doc', [201,1068,1082,2096,5233,2468,3370,3389,2865,5399])
         ->get();
         foreach($siavcomDocuments as $siavcomDocument) {
             if($this->createUpdateDocument($siavcomDocument, $conn) == false) continue;

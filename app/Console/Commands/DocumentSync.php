@@ -54,7 +54,11 @@ class DocumentSync extends Command
         $sync_connections = DB::table('sync_connections')->where('name', 'like', 'pgsql_%')->get();
         foreach($sync_connections as $conn) {
             //if($conn->name == 'pgsql_zukaely') continue;
-            $this->connectAndSync($conn);
+            try {
+                $this->connectAndSync($conn);
+            } catch (\Exception $e) {
+                Log::notice($e->getMessage());
+            }
         }
     }
     

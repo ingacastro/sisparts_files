@@ -1143,6 +1143,9 @@ class InboxController extends Controller
                 $ctz_number = $last_siavcom_ctz_ndo_doc->ndo_doc + 1;
             }
 
+            DB::beginTransaction();
+            $conn_name = $conn->name;
+            DB::connection($conn_name)->beginTransaction();
             foreach($supplies_sets as $supply_set) {
 
                 $customer = $supply_set->document->customer;
@@ -1165,33 +1168,34 @@ class InboxController extends Controller
                     'documents_id' => $document->id,
                 ];
 
-                DB::transaction(function() use($set_binnacle_data, $supply_set, $conn, $ctz_number) {
-                    $supply_set->fill(['status' => 9, 'completed_date' => Carbon::now()->toDateTimeString()])
-                    ->update();
+                $supply_set->fill(['status' => 9, 'completed_date' => Carbon::now()->toDateTimeString()])
+                ->update();
 
-                    Binnacle::create($set_binnacle_data);
+                Binnacle::create($set_binnacle_data);
 
-                    //$this->createSiavcomCTZSet($supply_set, $conn, $ctz_number);
-                });
+                $this->createSiavcomCTZSet($supply_set, $conn, $ctz_number);
             }
 
             //Create CTZ on siavcom DB (zukaely, pavan or mxmro)
-            DB::transaction(function() use($document, $conn, $ctz_number) {            
-                if($document->siavcom_ctz == 0) {
-                    $this->createSiavcomCTZ($document, $conn, $ctz_number);
-                    $document->fill(['siavcom_ctz' => 1, 'siavcom_ctz_number' => $ctz_number])
-                    ->update();
-                }
+            if($document->siavcom_ctz == 0) {
+                $this->createSiavcomCTZ($document, $conn, $ctz_number);
+                $document->fill(['siavcom_ctz' => 1, 'siavcom_ctz_number' => $ctz_number])
+                ->update();
+            }
 
-                $this->turnPCTtoCTZ($document);
-            });
+            $this->turnPCTtoCTZ($document);
+
             $document->touch();
+            DB::commit();
+            DB::connection($conn_name)->commit();
             return response()->json([
                 'errors' => false,
                 'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
                 ->with('success_message', 'Partidas convertidas a CTZ correctamente.')->render()]); 
 
         } catch(\Exception $e) {
+            DB::rollback();
+            DB::connection($conn_name)->rollback();
             return response()->json(
                 ['errors' => true,
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
@@ -1248,11 +1252,7 @@ class InboxController extends Controller
             'key_pri' => $last_siavcom_ctz_set_key_pri->key_pri + 1,//GREEN Last comemov key_pri + 1
             'im0_mov' => 0//YELLOW 0
         ];
-        try {
-            DB::connection($conn->name)->table('comemov')->insert($data);
-        } catch(\Exception $e) {
-            throw new \Exception($e->getMessage(), 1);
-        }
+        DB::connection($conn->name)->table('comemov')->insert($data);
     }
 
     private function createSiavcomCTZ(Document $document, $conn, $ctz_number) 

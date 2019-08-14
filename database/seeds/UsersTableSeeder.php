@@ -38,7 +38,7 @@ class UsersTableSeeder extends Seeder
         Employee::create([
             'users_id' => $quoter->id,
             'number' => '999999',
-            'buyer_number' => '999999'
+            'buyer_number' => '999'
         ]);
     }
 }

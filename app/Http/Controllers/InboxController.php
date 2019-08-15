@@ -18,6 +18,7 @@ use IParts\Rejection;
 use IParts\Customer;
 use IParts\Employee;
 use IParts\UtilityPercentage;
+use IParts\Alert;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Validator;
@@ -27,6 +28,7 @@ use Storage;
 use Mail;
 use File as LaravelFile;
 use Carbon\Carbon;
+use IParts\Http\Helper;
 
 class InboxController extends Controller
 {
@@ -867,6 +869,9 @@ class InboxController extends Controller
                 $doc->fill(['status' => 2])->update();
             }
 
+            $alert = Alert::where('type', 2)->where('set_status', 2)->first();
+            Helper::sendMail($alert->recipients, $alert->subject, $alert->message, 'admin@admin.com', null);
+
         } catch(\Exception $e) {
             return response()->json(
                 ['errors' => true,
@@ -914,23 +919,12 @@ class InboxController extends Controller
 
             $subject = $subject . ' PCT '  . $document_number . ' ' . $document_reference;
 
-            $this->sendMail($email, $subject, $dealership_email, $dealership_email);
+            Helper::sendMail($email, $subject, $message, $dealership_email, $dealership_email);
 
         } catch(\Exception $e) {
             Log::notice($e);
             throw new \Exception("Error al enviar el correo.", 1);
         }
-    }
-
-    private function sendEmail($recipients, $subject, $message, $from, $reply_to)
-    {
-        $headers = '';
-        $headers .= !is_null($from) ? ('From: ' . $dealership_email . "\r\n") : '';
-        $headers .= !is_null($reply_to) ? ('Reply-To: ' . $dealership_email . "\r\n") : '';
-        $headers .= 'X-Mailer: PHP/' . phpversion() . "\r\n" . 
-                    "Content-type: text/html\r\n";
-                    
-        mail($recipients, $subject, $message, $headers);
     }
 
     private function registerQuotationEmailBinnacle($email, $data, SupplySet $set)

@@ -24,9 +24,9 @@
                 'id' => 'elapsed_days']) !!}
             </div>
             <div class="form-group" id="condition_type_status_change" style="display: none">
-                <label class="control-label" for="supplies_sets_status_id"><span class="required">* </span>Estatus de partida</label>
-                {!! Form::select('supplies_sets_status_id', $set_status, $model->supplies_sets_status_id, 
-                ['placeholder' => 'Seleccionar...', 'class' => 'form-control', 'id' => 'supplies_sets_status_id']) !!}
+                <label class="control-label" for="set_status"><span class="required">* </span>Estatus de partida</label>
+                {!! Form::select('set_status', $set_status, $model->set_status, 
+                ['placeholder' => 'Seleccionar...', 'class' => 'form-control', 'id' => 'set_status']) !!}
             </div>
         </div>
     </div>

@@ -56,7 +56,15 @@ class AlertController extends Controller
             1 => 'Cantidad de días desde solicitud PCT',
             2 => 'Una partida cambia de estatus a:'
         ];
-        $set_status = DB::table('supplies_sets_status')->pluck('name', 'id');
+        $set_status = [
+          1 => 'No solicitado',
+          2 => 'Solicitado automáticamente',
+          3 => 'Solicitado manualmente',
+          4 => 'Confirmado por el proveedor',
+          5 => 'Presupuesto capturado',
+          6 => 'En Autorización',
+          7 => 'Rechazado'
+        ];
         return view('alert.create_edit', compact('model', 'types', 'set_status'));
     }
 
@@ -109,7 +117,7 @@ class AlertController extends Controller
             'message.required' => 'El campo mensaje es requerido.',
             'type.required' => 'El campo tipo es requerido.',
             'elapsed_days.required' => 'El campo cantidad de días es requerido.',
-            'supplies_sets_status_id.required' => 'El campo estatus de partida es requerido.'
+            'set_status.required' => 'El campo estatus de partida es requerido.'
         ];
         
         $validator = Validator::make($data, [
@@ -124,7 +132,7 @@ class AlertController extends Controller
         $validator->sometimes('elapsed_days', 'required', function($data){
             return $data['type'] == 1;
         });
-        $validator->sometimes('supplies_sets_status_id', 'required', function($data){
+        $validator->sometimes('set_status', 'required', function($data){
             return $data['type'] == 2;
         });
 
@@ -154,7 +162,15 @@ class AlertController extends Controller
             1 => 'Cantidad de días desde solicitud PCT',
             2 => 'Una partida cambia de estatus a:'
         ];
-        $set_status = DB::table('supplies_sets_status')->pluck('name', 'id');
+        $set_status = [
+          1 => 'No solicitado',
+          2 => 'Solicitado automáticamente',
+          3 => 'Solicitado manualmente',
+          4 => 'Confirmado por el proveedor',
+          5 => 'Presupuesto capturado',
+          6 => 'En Autorización',
+          7 => 'Rechazado'
+        ];
         return view('alert.create_edit', compact('model', 'types', 'set_status'));
     }
 

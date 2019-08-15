@@ -122,26 +122,27 @@ class DashboardController extends Controller
         $supply_sets_amount = SupplySet::count();
         $rejected_ppas_percentage = ($supply_sets_amount > 0) ? $stats['rejected_ppas'] / $supply_sets_amount : $stats['rejected_ppas'];
 
+        Log::notice($stats);
         return [
             'daily_pcts' => [
                 'amount' => $stats['daily_ctz_pcts'],
                 /*'expected' => $daily_pcts,*/
-                'percentage' => number_format(($stats['daily_ctz_pcts'] / $daily_pcts) * 100, 2),
+                'percentage' => $daily_pcts == 0 ? 0 : number_format(($stats['daily_ctz_pcts'] / $daily_pcts) * 100, 2),
             ],
             'daily_items' => [
                 'amount' => $stats['daily_ctz_items'],
                 /*'expected' => $daily_items,*/
-                'percentage' => number_format(($stats['daily_ctz_items'] / $daily_items) * 100, 2),
+                'percentage' => $daily_items == 0 ? 0 : number_format(($stats['daily_ctz_items'] / $daily_items) * 100, 2),
             ],
             'monthly_pcts' => [
                 'amount' => $stats['monthly_ctz_pcts'],
                 /*'expected' => $monthly,*/
-                'percentage' => number_format(($stats['monthly_ctz_pcts'] / $monthly) * 100, 2),
+                'percentage' => $monthly == 0 ? 0 : number_format(($stats['monthly_ctz_pcts'] / $monthly) * 100, 2),
             ],
             'monthly_items' => [
                 'amount' => $stats['monthly_ctz_items'],
                 /*'expected' => $monthly_items,*/
-                'percentage' => number_format(($stats['monthly_ctz_items'] / $monthly_items) * 100, 2),
+                'percentage' => $monthly_items == 0 ? 0 : number_format(($stats['monthly_ctz_items'] / $monthly_items) * 100, 2),
             ],
             'pending_ppas' => $stats['pending_ppas'],
             'rejected_ppas' => $stats['rejected_ppas'],

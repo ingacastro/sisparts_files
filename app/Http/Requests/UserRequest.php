@@ -41,7 +41,6 @@ class UserRequest extends FormRequest
         if($this->isMethod('put')) {
             $rules['user.password'] = 'nullable|confirmed|min:6';
             $rules['user.email'] = ['required', 'email'];
-            $rules['employee.buyer_number'] = 'required';
         }
 
         return $rules;

@@ -912,18 +912,25 @@ class InboxController extends Controller
             });*/
             $dealership_email = Auth::user()->email;
 
-            //$from = "gmessoft@gmail.com";
-            $to = $email;
             $subject = $subject . ' PCT '  . $document_number . ' ' . $document_reference;
-            $headers = 'From: ' . $dealership_email . "\r\n". 
-              'Reply-To: ' . $dealership_email . "\r\n" . 
-              'X-Mailer: PHP/' . phpversion() . "\r\n" . 
-              "Content-type: text/html\r\n";
-            mail($to, $subject, $message, $headers);
+
+            $this->sendMail($email, $subject, $dealership_email, $dealership_email);
+
         } catch(\Exception $e) {
             Log::notice($e);
             throw new \Exception("Error al enviar el correo.", 1);
         }
+    }
+
+    private function sendEmail($recipients, $subject, $message, $from, $reply_to)
+    {
+        $headers = '';
+        $headers .= !is_null($from) ? ('From: ' . $dealership_email . "\r\n") : '';
+        $headers .= !is_null($reply_to) ? ('Reply-To: ' . $dealership_email . "\r\n") : '';
+        $headers .= 'X-Mailer: PHP/' . phpversion() . "\r\n" . 
+                    "Content-type: text/html\r\n";
+                    
+        mail($recipients, $subject, $message, $headers);
     }
 
     private function registerQuotationEmailBinnacle($email, $data, SupplySet $set)

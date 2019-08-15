@@ -17,6 +17,6 @@ class SuppliesSetsStatusTableSeeder extends Seeder
         DB::table('supplies_sets_status')->insert(['id' => 4, 'name' => 'Confirmado por el proveedor']);
         DB::table('supplies_sets_status')->insert(['id' => 5, 'name' => 'Presupuesto capturado']);
         DB::table('supplies_sets_status')->insert(['id' => 6, 'name' => 'En Autorización']);
-        DB::table('supplies_sets_status')->insert(['id' => 7, 'name' => 'Rechazado.']);
+        DB::table('supplies_sets_status')->insert(['id' => 7, 'name' => 'Rechazado']);
     }
 }

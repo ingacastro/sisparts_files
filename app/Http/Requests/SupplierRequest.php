@@ -26,7 +26,6 @@ class SupplierRequest extends FormRequest
         $rules = [
               'trade_name' => 'required',
               'countries_id' => 'required',
-              'type' => 'required',
               'languages_id' => 'required'
             ];
 
@@ -47,7 +46,8 @@ class SupplierRequest extends FormRequest
               //'suburb' => 'required',
               'credit_amount' => 'nullable|numeric',
               'email' => 'required|email',
-              'landline' => 'required|max:15'
+              'landline' => 'required|max:15',
+              'type' => 'required'
         ];
 
         //only for no marketplace suppliers

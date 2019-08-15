@@ -62,6 +62,7 @@
 <script src="/metronic-assets/global/plugins/bootstrap-tagsinput/bootstrap-tagsinput.min.js" type="text/javascript"></script>
 
 <script type="text/javascript">
+var root_url = $('#root_url').attr('content');
 $(document).ready(function(){
     $('#sidebar_configuration').addClass('active');
     applyFieldsMasks();
@@ -100,7 +101,7 @@ $('#alert_form').submit(function(e){
             if(response.errors)
                 $('#error_messages').html(response.errors_fragment);
             else
-                location.href = '/alert';
+                location.href = root_url + '/alert';
         }
     });
 });

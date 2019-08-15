@@ -100,30 +100,30 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-2 measurements-weight-fields" style="padding-left: 15px">
                         <div class="form-group">
                             <label for="measurement_length'">Largo</label>
                             {!! Form::text('measurement[length]', $measurement->length, ['class' => 'form-control numeric-mask', 
                             'id' => 'measurement_length']) !!}
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2 measurements-weight-fields">
                         <div class="form-group">
                             <label for="measurement_width']">Ancho</label>
                             {!! Form::text('measurement[width]', $measurement->width, ['class' => 'form-control numeric-mask', 
                             'id' => 'measurement_width']) !!}
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2 measurements-weight-fields">
                         <div class="form-group">
                             <label for="measurement_height">Alto</label>
                             {!! Form::text('measurement[height]', $measurement->height, ['class' => 'form-control numeric-mask', 
                             'id' => 'measurement_height']) !!}
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6" style="width: 40%">
                         <div class="form-group">
-                            <label for="measurement_vol_weight">Peso volumétrico</label>
+                            <label for="measurement_vol_weight">Peso volumétrico (Kg)</label>
                             {!! Form::text(null, $measurement->weight, ['class' => 'form-control numeric-mask', 
                             'id' => 'measurement_vol_weight', 'disabled']) !!}
                             <input type="hidden" name="measurement[weight]" id="measurement_vol_weight_hidden">
@@ -133,7 +133,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label for="real_weight">Peso real</label>
+                            <label for="real_weight">Peso real (Kg)</label>
                             {!! Form::text('measurement[real_weight]', $measurement->real_weight, ['class' => 'form-control', 'id' => 'real_weight']) !!}
                         </div>
                     </div>

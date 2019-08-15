@@ -767,9 +767,9 @@ class InboxController extends Controller
         
         //getting length, width and height always in cm
         $unit = $measurement_data['unit'];
-        $length = ($unit == 1) ? $measurement_data['length'] : ($measurement_data['length'] * $cm_in);
-        $width = ($unit == 1) ? $measurement_data['width'] : ($measurement_data['width'] * $cm_in);
-        $height = ($unit == 1) ? $measurement_data['height'] : ($measurement_data['height'] * $cm_in);
+        $length = str_replace(',', '', ($unit == 1) ? $measurement_data['length'] : ($measurement_data['length'] * $cm_in));
+        $width = str_replace(',', '', ($unit == 1) ? $measurement_data['width'] : ($measurement_data['width'] * $cm_in));
+        $height = str_replace(',', '', ($unit == 1) ? $measurement_data['height'] : ($measurement_data['height'] * $cm_in));
 
         //Applying volumetric weight formula
         $volumetric_weight = ($length * $width * $height) / 5000;
@@ -853,7 +853,7 @@ class InboxController extends Controller
             $reference = $document->reference;
             $number = $document->number;
             foreach($data['emails'] as $email) {
-                $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $document->dealership);
+                $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $document->dealership, $set);
                 $this->registerQuotationEmailBinnacle($email, $data, $set);
             }
             
@@ -878,7 +878,7 @@ class InboxController extends Controller
         return response()->json(['errors' => false]);
     }
 
-    private function sendSupplierQuotationEmail($email, $data, $document_number, $document_reference, Employee $dealership)
+    private function sendSupplierQuotationEmail($email, $data, $document_number, $document_reference, Employee $dealership, SupplySet $set)
     {   
         //Spanish as default, cause we have custom emails in addition to registered suppliers
         $message = DB::table('messages_languages')
@@ -894,11 +894,15 @@ class InboxController extends Controller
         }
         $subject = $message->subject;
         $dealership_user = $dealership->user;
-        $body = $message->body . '<div>' . $data['manufacturer'] . '</div>' .
+        $message = $message->body . '<div>Número de parte: ' . $set->supply->number . '</div>' .
+        '<div>Descripción larga: ' . $set->supply->large_description . '</div>' .
+        '<div>' . $data['manufacturer'] . '</div>' .
+        '<div>Cantidad: ' . number_format($set->products_amount, 2, '.', ',') . '</div>' .
         '<div>Partes: ' . implode(', ', $data['supplies_names']) . '</div>' .
-        '<div>' . $dealership_user->name . '</div>' .
-        '<div>' . $dealership_user->email . '</div>' . 
-        '<div>' . $dealership->ext . '</div>';
+        '<div>-----------------------------------------</div>' .
+        '<div>Cotizador: ' . $dealership_user->name . '</div>' .
+        '<div>Correo de cotizador: ' . $dealership_user->email . '</div>' . 
+        '<div>Teléfono de cotizador:' . $dealership->ext . '</div>';
         try {            
 /*            Mail::send([], [], function($m) use ($email, $subject, $body) {
                 $m->from(Auth::user()->email);
@@ -910,8 +914,7 @@ class InboxController extends Controller
 
             //$from = "gmessoft@gmail.com";
             $to = $email;
-            $subject = $subject . ' ' . $document_number . ' ' . $document_reference;
-            $message = $body;
+            $subject = $subject . ' PCT '  . $document_number . ' ' . $document_reference;
             $headers = 'From: ' . $dealership_email . "\r\n". 
               'Reply-To: ' . $dealership_email . "\r\n" . 
               'X-Mailer: PHP/' . phpversion() . "\r\n" . 

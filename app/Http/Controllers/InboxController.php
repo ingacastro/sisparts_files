@@ -1128,6 +1128,7 @@ class InboxController extends Controller
 
             if($document->siavcom_ctz == 0) {
                 $last_siavcom_ctz_ndo_doc = DB::connection($conn->name)->table($this->siavcomDocumentsTable)
+                ->where('tdo_tdo', 'CTZ')
                 ->OrderBy('ndo_doc', 'desc')
                 ->first();
                 $ctz_number = $last_siavcom_ctz_ndo_doc->ndo_doc + 1;
@@ -1271,7 +1272,7 @@ class InboxController extends Controller
             'im3_doc' => $subtotal * $document->customer->getIVA(),  //GREEN IVA del documento
             'im4_doc' => $document->im4_doc,  //YELLOW
             'im5_doc' => $document->im5_doc,  //YELLOW
-            'ven_ven' => null,  //GREEN SABE
+            'ven_ven' => $document->seller_number,  //GREEN SABE
             'com_doc' => $document->com_doc,  //YELLOW
             'sta_doc' => 'P',  //GREEN Estado del documento, este debería indicar la P
             'mon_doc' => $document->mon_doc,  //GREEN Código de moneda del documento

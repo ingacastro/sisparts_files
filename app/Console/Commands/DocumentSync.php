@@ -12,6 +12,7 @@ use IParts\Employee;
 use IParts\Binnacle;
 use DB;
 use Mail;
+use IParts\Http\Helper;
 
 class DocumentSync extends Command
 {
@@ -363,6 +364,7 @@ class DocumentSync extends Command
 
     private function sendQuotationEmail($email, $manufacturer, $supplies, Document $document)
     {
+        Log::notice("Supplier found, sending email to $email");
         //Spanish as default, cause we have custom emails in addition to registered suppliers
         $message = DB::table('messages_languages')
         ->join('languages', 'languages.id', 'messages_languages.languages_id')
@@ -373,11 +375,12 @@ class DocumentSync extends Command
         '<div>Partes: ' . $supplies . '</div>';
 
         try {            
-            Mail::send([], [], function($m) use ($email, $subject, $body) {
+/*            Mail::send([], [], function($m) use ($email, $subject, $body) {
                 $m->to($email);
                 $m->subject($subject);
                 $m->setBody($body, 'text/html');
-            });
+            });*/
+            Helper::sendMail($email,  $subject, $body, 'admin@admin.com', null);
         } catch(\Exception $e) {
             throw new \Exception("Error al enviar el correo.", 1);
         }

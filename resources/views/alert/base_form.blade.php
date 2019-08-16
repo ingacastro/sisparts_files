@@ -50,7 +50,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="form-group">
-                <label class="control-label" for="message">Mensaje del correo</label>
+                <label class="control-label" for="message"><span class="required">* </span>Mensaje del correo</label>
                 {!! Form::textarea('message', $model->message, ['class' => 'form-control', 'autocomplete' => 'off',
                 'style' => 'resize: vertical; height: 180px',]) !!}
             </div>

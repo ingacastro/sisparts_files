@@ -324,15 +324,18 @@ class DocumentSync extends Command
     {
         $key_xmd = $siavcom_manufacturer->key_xmd;
         $manufacturer = Manufacturer::where('siavcom_key_xmd', $key_xmd)->first();
+        $siavcom_manufacturer_name = simplexml_load_string($siavcom_manufacturer->xml_xmd)->data[0]->attributes()['FABRICANTE'];
         $manufacturer_data = [
-            'name' => simplexml_load_string($siavcom_manufacturer->xml_xmd)->data[0]->attributes()['FABRICANTE'] ?? null,
+            'name' => $siavcom_manufacturer_name ?? null,
             'document_type' => $siavcom_manufacturer->xml_xmd,
             'siavcom_key_xmd' => $key_xmd
         ];
-        if(isset($manufacturer))
-            $manufacturer->fill($manufacturer_data)->update();
-        else
-            $manufacturer = Manufacturer::create($manufacturer_data);
+
+        if($manufacturer) $manufacturer->fill($manufacturer_data)->update();
+        else {
+            $manufacturer = Manufacturer::where('name', $siavcom_manufacturer_name)->first();
+            if(!$manufacturer) $manufacturer = Manufacturer::create($manufacturer_data);
+        }
 
         $this->sendSuppliersQuotations($manufacturer, $document);
 

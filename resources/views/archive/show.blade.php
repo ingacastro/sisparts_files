@@ -93,8 +93,9 @@
                                     <span><span class="detail-title">Razón social: </span>{{ $document->sync_connection->display_name }}</span>
                                 </td>
                                 <td>
-                                    <span><span class="detail-title">Número requerimiento: </span>{{ $document->customer_requirement_number }}</span>
+                                    <span><span class="detail-title">RFQ: </span>{{ $document->reference }}</span>
                                 </td>
+                                <td></td>
                             </tr>
                             <tr>
                                 <td>
@@ -107,8 +108,27 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <span><span class="detail-title">Cliente: </span>{{ $document->customer->trade_name }}</span>
+                                    <span><span class="detail-title">Vendedor: </span>{{ $document->seller_number }}</span>
                                 </td>
+                                <td>
+                                    <span><span class="detail-title">Moneda: </span>{{ $document->currency->name }}</span>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span><span class="detail-title">Número CTZ: </span>{{ $document->siavcom_ctz_number }}</span>
+                                </td>
+                                <td>
+                                    <span>
+                                        <span class="detail-title">Fecha última actualización: </span>
+                                        {{ $document->supply_sets->where('status', 9)->count() > 0 
+                                        ? date('d/m/Y', strtotime($document->updated_at)) : null }}
+                                    </span>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
                                 <td>
                                     <?php $dealership = $document->dealership; ?>
                                     <span>
@@ -116,15 +136,21 @@
                                         {{ $dealership->number }} - {{ $dealership->user->name }}
                                     </span>
                                 </td>
+                                <td>
+                                    @role('Administrador')
+                                    <span><span class="detail-title">Cliente: </span>{{ $document->customer->trade_name }}</span>
+                                    @endrole
+                                </td>
                                 <td></td>
                             </tr>
                             <tr>
                                 <td>
-                                    <span><span class="detail-title">Vendedor: </span>{{ $document->seller_number }}</span>
+                                    <span>
+                                        <span class="detail-title">Ubicación del cliente: </span>
+                                        {{ $document->customer->country }} - {{ $document->customer->post_code }}
+                                    </span>
                                 </td>
-                                <td>
-                                    <span><span class="detail-title">Moneda: </span>{{ $document->currency->name }}</span>
-                                </td>
+                                <td></td>
                                 <td></td>
                             </tr>
                         </tbody>
@@ -196,7 +222,7 @@
 <script type="text/javascript">
 var root_url = $('#root_url').attr('content');
 $(document).ready(function(){
-    $('#sidebar_inbox').addClass('active');
+    $('#sidebar_archive').addClass('active');
     
     $('#supplies_table').DataTable({
         serverSide: true,

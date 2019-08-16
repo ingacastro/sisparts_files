@@ -637,28 +637,14 @@ class InboxController extends Controller
             
             $data['measurement']['weight'] = $this->getVolumetricWeight($request, 1, false);
             DB::table('measurements')->where('id', $document_supply->id)->update($data['measurement']);
+            $alert = Alert::where('type', 2)->where('set_status', 5)->first();
+            Helper::sendMail($alert->recipients, $alert->subject, $alert->message, 'admin@admin.com', null);
         } catch(\Exception $e) {
             return response()->json(
                 ['errors' => true,
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
                 ->withErrors($e->getMessage())->render()]);
         }
-
-/*            $currency = ' ' . $updated_set->currency->name;
-            $total_cost = ($updated_set->sale_unit_cost * $updated_set->products_amount) + 
-                    ($updated_set->importation_cost + $updated_set->warehouse_shipment_cost + 
-                    $updated_set->customer_shipment_cost + $updated_set->extra_charges);
-            
-            $utility_percentage = ($updated_set->utility_percentage) ? $updated_set->utility_percentage->percentage 
-                                : $updated_set->custom_utility_percentage;
-
-            $total_price = $this->calculateTotalPrice($total_cost, $utility_percentage);
-            $budget_data = [
-                'total_cost' => number_format($total_cost, 2, '.', ',') . $currency,
-                'total_price' => number_format($total_price, 2, '.', ',') . $currency,
-                'unit_price' => number_format(($total_price / $updated_set->products_amount), 2, '.', ',') . $currency,
-                'total_profit' => number_format(($total_price - $total_cost), 2, '.', ',') . $currency
-            ];*/
         
         return response()->json([
             'errors' => false,
@@ -970,7 +956,6 @@ class InboxController extends Controller
 
     public function changeSetStatus(Request $request)
     {
-        
         if(!$request->ajax())
             return response()->json([
                 'errors' => true, 
@@ -1035,6 +1020,8 @@ class InboxController extends Controller
         try {
             DB::table('checklist')->where('id', $request->set_id)->update(['material_specifications' => null, 'quoted_amounts' => null, 'quotation_currency' => null, 'unit_price' => null, 'delivery_time' => null, 'delivery_conditions' => null, 'product_condition' => null, 'entrance_shipment_costs' => null, 'weight_calculation' => null, 'material_origin' => null, 'incoterm' => null, 'minimum_purchase' => null, 'extra_charges' => null]);
             Binnacle::create($set_binnacle_data);
+            $alert = Alert::where('type', 2)->where('set_status', 6)->first();
+            Helper::sendMail($alert->recipients, $alert->subject, $alert->message, 'admin@admin.com', null);
         }catch(\Exception $e) {
             Log::notice($e);
             return redirect()->back()->withErrors($e->getMessage());
@@ -1088,6 +1075,8 @@ class InboxController extends Controller
 
                 $supply_set->update(['status' => 7, 'rejected_date' => Carbon::now()]);
             });
+            $alert = Alert::where('type', 2)->where('set_status', 7)->first();
+            Helper::sendMail($alert->recipients, $alert->subject, $alert->message, 'admin@admin.com', null);
         } catch(\Exception $e) {
             Log::notice($e);
             return response()->json(

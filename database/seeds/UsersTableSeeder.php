@@ -26,17 +26,17 @@ class UsersTableSeeder extends Seeder
          
         $user->assignRole($admin_role);
 
-        //Default quoter
-        $quoter = User::create([
+        //Default dealership
+        $dealership = User::create([
             'name' => 'Cotizador genérico',
             'email' => 'cotizador_gral@siavcom.com',
-            'password' => bcrypt(str_random(8))
+            'password' => bcrypt('123456789')
         ]);
 
-        $quoter->assignRole('Cotizador');
+        $dealership->assignRole('Cotizador');
 
         Employee::create([
-            'users_id' => $quoter->id,
+            'users_id' => $dealership->id,
             'number' => '999999',
             'buyer_number' => '999'
         ]);

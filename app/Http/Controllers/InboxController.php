@@ -146,9 +146,7 @@ class InboxController extends Controller
                 }
                 else {
                     $actions = '<a href="' . config('app.url') . '/archive/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';
-                    if($document->is_canceled == 1) { //$logged_user->hasRole('Administrador') && 
-                        $actions .= $document->siavcom_ctz != 1 ? '<a class="btn btn-circle btn-icon-only default green-meadow" onClick="unlockDocument(event, ' . $document->id . ')"><i class="fa fa-unlock"></i></a>' : '';
-                    }
+                    $actions .= $document->siavcom_ctz != 1 ? '<a class="btn btn-circle btn-icon-only default green-meadow" onClick="unlockDocument(event, ' . $document->id . ')"><i class="fa fa-unlock"></i></a>' : '';
                 }
                 return $actions;
               })
@@ -847,7 +845,7 @@ class InboxController extends Controller
             
             //Quotation request sent
             if($set->status < 2)
-                $set->fill(['status' => 2])->update();
+                $set->fill(['status' => 2, 'quotation_request_date' => date('Y-m-d H:i:s')])->update();
 
             //Document/PCT in process
             if($set->document->status < 2) {

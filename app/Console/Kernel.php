@@ -26,6 +26,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('siavcom:sync')
                   ->daily(); //at midnight
+        $schedule->command('quotation-request:elapsed-days-alert')
+                  ->everyMinute();
     }
 
     /**

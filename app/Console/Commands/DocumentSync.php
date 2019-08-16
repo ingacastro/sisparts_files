@@ -380,7 +380,7 @@ class DocumentSync extends Command
                 $m->subject($subject);
                 $m->setBody($body, 'text/html');
             });*/
-            Helper::sendMail($email,  $subject, $body, 'admin@admin.com', null);
+            Helper::sendMail($email, $subject, $body, 'admin@admin.com', null);
         } catch(\Exception $e) {
             throw new \Exception("Error al enviar el correo.", 1);
         }

@@ -1106,7 +1106,6 @@ class InboxController extends Controller
     /*Turns a supply set into CTZ*/
     public function setsTurnCTZ(Request $request)
     {
-        Log::notice($request);
         if(!$request->ajax())
             return response()->json([
                 'errors' => true,

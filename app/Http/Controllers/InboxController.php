@@ -1209,39 +1209,52 @@ class InboxController extends Controller
         ->OrderBy('key_pri', 'desc')
         ->first();
         $data = [
-            'tdo_tdo' => 'CTZ',//GREEN CTZ  
-            'ndo_doc' => $ctz_number,//GREEN Número de documento (ctz en siavcom) al que pertenece la partida
-            'mov_mov' => $supply_set->set,//GREEN Número de partida supply_set->set
-            'ens_mov' => 0,//YELLOW 0
-            'inv_tdo' => 'N',//YELLOW N
-            'cla_isu' => $supply_set->supply->number,//GREEN Clave de insumo supply->number
-            'dse_mov' => $supply_set->supply->large_description,//GREEN supply_set->supply->short/large_description
-            'dga_pro' => 0,//YELLOW 0
-            'can_mov' => $supply_set->products_amount,//GREEN supply_set->products_amount
-            'med_mov' => $supply_set->measurement_unit_code,//GREEN supply_set->measurement_unit_code
-            'pve_mov' => $supply_set->sale_unit_cost,//GREEN supply_set->sale_unit_cost
-            'de1_mov' => 0,//YELLOW 0
-            'de2_mov' => 0,//YELLOW 0
-            'de3_mov' => 0,//YELLOW 0
-            'de4_mov' => 0,//YELLOW 0
-            'de5_mov' => 0,//YELLOW 0
-            'im1_mov' => 0,//YELLOW 0
-            'im2_mov' => 0,//YELLOW 0
-            'im3_mov' => $supply_set->document->customer->getIVA() * 100,//GREEN supply_set->document->customer->getIVA()
-            'im4_mov' => 0,//YELLOW 0 
-            'im5_mov' => 0,//YELLOW 0
-            'mon_mov' => $supply_set->currencies_id,//GREEN supply_set->currency / supply_set->document->currency
-            'adv_tar' => 0,//YELLOW 0
-            'cuo_tar' => 0,//YELLOW 0
-            'fec_mov' => $supply_set->created_at,//GREEN supply_set->created_at
-            'fme_mov' => date('Y-m-d H:i:s', strtotime($supply_set->created_at . ' + 15 days')),//GREEN supply_set->created_at + 15 days
-            'npe_mov' => 0,//YELLOW 0
-            'mpe_mov' => 0,//YELLOW 00
-            'cen_mov' => 0,//YELLOW 0
-            'est_mov' => 'A',//YELLOW A
-            'usu_usu' => $supply_set->usu_usu,//GREEN supply_set->usu_usu
-            'key_pri' => $last_siavcom_ctz_set_key_pri->key_pri + 1,//GREEN Last comemov key_pri + 1
-            'im0_mov' => 0//YELLOW 0
+            'suc_pge' => '',
+            'tdo_tdo' => 'CTZ',
+            'ndo_doc' => $ctz_number,
+            'mov_mov' => $supply_set->set,
+            'ens_mov' => 0,
+            'inv_tdo' => 'N',
+            'cla_isu' => $supply_set->supply->number,
+            'dse_mov' => $supply_set->supply->large_description . ' ' . $supply_set->condition->description,
+            'ser_mov' => '',
+            'dga_pro' => 0,
+            'ped_ped' => '',
+            'can_mov' => $supply_set->products_amount,
+            'med_mov' => $supply_set->measurement_unit_code,
+            'pve_mov' => $supply_set->sale_unit_cost,
+            'de1_mov' => 0,
+            'de2_mov' => 0,
+            'de3_mov' => 0,
+            'de4_mov' => 0,
+            'de5_mov' => 0,
+            'im1_mov' => 0,
+            'im2_mov' => 0,
+            'im3_mov' => $supply_set->document->customer->getIVA() * 100,
+            'im4_mov' => 0,
+            'im5_mov' => 0,
+            'tba_tba' => '',
+            'pga_pga' => '',
+            'mon_mov' => $supply_set->currencies_id,
+            'adv_tar' => 0,
+            'cuo_tar' => 0,
+            'cpu_tar' => '',
+            'fec_mov' => $supply_set->created_at,
+            'fme_mov' => date('Y-m-d H:i:s', strtotime($supply_set->created_at . ' + 15 days')),
+            'dpe_mov' => '',
+            'npe_mov' => 0,
+            'mpe_mov' => 0,
+            'alm_tda' => '',
+            'spi_mov' => '',
+            'sns_mov' => '',
+            'cen_mov' => 0,
+            'tpe_mov' => '',
+            'est_mov' => 'A',
+            'usu_usu' => $supply_set->usu_usu,
+            /*'tie_uac' => '',*/
+            'key_pri' => $last_siavcom_ctz_set_key_pri->key_pri + 1,
+            'im0_mov' => 0,
+            'obs_mov' => ''
         ];
         DB::connection($conn->name)->table('comemov')->insert($data);
     }
@@ -1257,68 +1270,71 @@ class InboxController extends Controller
         $key_pri = $last_siavcom_ctz_key_pri->key_pri + 1;
 
         $data = [
-            'tdo_tdo' => 'CTZ',  //GREEN CTZ
-            'ndo_doc' => $ctz_number,  //GREEN last siavcom  ctz plus 1
-            'ref_doc' => $document->reference,  //GREEN PCT reference
-            'cop_nom' => $document->cop_nom,  //YELLOW
-            'cod_nom' => $document->customer->code,  //YELLOW
-            'con_con' => $document->con_con,  //YELLOW
-            'fel_doc' => $document->fel_doc,  //YELLOW
-            'fec_doc' => $document->fec_doc,  //YELLOW
-            'fve_doc' => date('Y-m-d H:i:s', strtotime($document->created_at . ' + 15 days')),  //GREEN 15 days from pct created_at
-            'imp_doc' => $subtotal,  //GREEN Importe (subtotal) del documento
-            'im1_doc' => $document->im1_doc,  //YELLOW
-            'im2_doc' => $document->im2_doc,  //YELLOW
-            'im3_doc' => $subtotal * $document->customer->getIVA(),  //GREEN IVA del documento
-            'im4_doc' => $document->im4_doc,  //YELLOW
-            'im5_doc' => $document->im5_doc,  //YELLOW
-            'ven_ven' => $document->seller_number,  //GREEN SABE
-            'com_doc' => $document->com_doc,  //YELLOW
-            'sta_doc' => 'P',  //GREEN Estado del documento, este debería indicar la P
-            'mon_doc' => $document->mon_doc,  //GREEN Código de moneda del documento
-            'vmo_doc' => $document->vmo_doc,  //GREEN MXN tipo de cambio con relación a la moneda del documento
-            'vm2_doc' => $document->vm2_doc,  //GREEN USD tipo de cambio con relación a la moneda del documento
-            'vm3_doc' => $document->vm3_doc,  //GREEN EUR tipo de cambio con relación a la moneda del documento
-            'vm4_doc' => $document->vm4_doc,  //YELLOW
-            'vm5_doc' => $document->vm5_doc,  //YELLOW
-            'sal_doc' => $document->sal_doc,  //YELLOW 
-
-
-            'ob1_doc' => $document->ob1_doc,  //YELLOW
-            'ob2_doc' => $document->dealership->user->name,  //GREEN Nombre del cotizador
-
-
-            'sau_doc' => $document->sau_doc,  //YELLOW
-            'fau_doc' => $document->fau_doc,  //YELLOW
-
-
-            'hrs_doc' => date('H:i:s'),  //GREEN Hora del registro
-            'rut_rut' => $document->rut_rut,  //YELLOW
-            'num_pry' => $document->num_pry,  //YELLOW
-            'tcd_tcd' => $document->dealership->buyer_number, //GREEN Número de cotizador/comprador
-
-
-            'che_doc' => $document->che_doc,  //YELLOW 
-            'usu_usu' => $document->usu_usu,  //YELLOW
-            'tie_uac' => null,  //RED
-            'key_pri' => $key_pri,  //Llave primaria (autoincremental con relación a la tabla documentos)
-            'tor_doc' => $document->tor_doc,  // YELLOW
-            'nor_doc' => $document->nor_doc,  // YELLOW
-
-
-            'im0_doc' => $document->im0_doc,  // YELLOW
-            'mov_doc' => $document->mov_doc,  // YELLOW
-            'fip_doc' => $document->fip_doc,  // YELLOW
-            'tpa_doc' => $document->tpa_doc,  // YELLOW
-            'rpa_doc' => $document->rpa_doc,  // YELLOW
-            'tip_tdn' => $document->tip_tdn,  // YELLOW
-            'npa_doc' => $document->npa_doc,  // YELLOW
-            'mpa_sat' => $document->mpa_sat,  // YELLOW
-            'fpa_sat' => $document->fpa_sat,  // YELLOW
-            'uso_sat' => $document->uso_sat,  // YELLOW
-
-            'ndr_doc' => $document->ndr_doc,  // YELLOW
-            'dto_doc' => $document->dto_doc  //YELLOW
+            'suc_pge' => '',
+            'tdo_tdo' => 'CTZ',
+            'ndo_doc' => $ctz_number,
+            'ref_doc' => $document->reference,
+            'cop_nom' => $document->cop_nom,
+            'cod_nom' => $document->customer->code,
+            'con_con' => $document->con_con,
+            'fel_doc' => $document->fel_doc,
+            'fec_doc' => $document->fec_doc,
+            'fve_doc' => date('Y-m-d H:i:s', strtotime($document->created_at . ' + 15 days')),
+            'imp_doc' => $subtotal,
+            'im1_doc' => $document->im1_doc,
+            'im2_doc' => $document->im2_doc,
+            'im3_doc' => $subtotal * $document->customer->getIVA(),
+            'im4_doc' => $document->im4_doc,
+            'im5_doc' => $document->im5_doc,
+            'ven_ven' => $document->seller_number,
+            'com_doc' => $document->com_doc,
+            'sta_doc' => 'P',
+            'mon_doc' => $document->mon_doc,
+            'vmo_doc' => $document->vmo_doc,
+            'vm2_doc' => $document->vm2_doc,
+            'vm3_doc' => $document->vm3_doc,
+            'vm4_doc' => $document->vm4_doc,
+            'vm5_doc' => $document->vm5_doc,
+            'sal_doc' => $document->sal_doc,
+            'ale_doc' => '',
+            'als_doc' => '',
+            'ob1_doc' => $document->ob1_doc,
+            'ob2_doc' => $document->dealership->user->name,
+            'ob3_doc' => '',
+            'aut_doc' => '',
+            'sau_doc' => $document->sau_doc,
+            'fau_doc' => $document->fau_doc,
+            'ped_ped' => '',
+            'hrs_doc' => date("H:i:s"),
+            'rut_rut' => $document->rut_rut,
+            'num_pry' => $document->num_pry,
+            'tcd_tcd' => $document->dealership->buyer_number,
+            //'via_via' => '',
+            'pga_pga' => '',
+            'tba_tba' => '',
+            /*'cba_cba' => '',*/
+            'che_doc' => $document->che_doc,
+            'usu_usu' => $document->usu_usu,
+            //'tie_uac' => '',
+            'key_pri' => $key_pri,
+            'tor_doc' => $document->tor_doc,
+            'nor_doc' => $document->nor_doc,
+            'tde_doc' => '',
+            //'nde_doc' => '',
+            'im0_doc' => $document->im0_doc,
+            'mov_doc' => $document->mov_doc,
+            'fip_doc' => $document->fip_doc,
+            'tpa_doc' => $document->tpa_doc,
+            'rpa_doc' => $document->rpa_doc,
+            'tip_tdn' => $document->tip_tdn,
+            'npa_doc' => $document->npa_doc,
+            'mpa_sat' => $document->mpa_sat,
+            'fpa_sat' => $document->fpa_sat,
+            'uso_sat' => $document->uso_sat,
+            'tre_sat' => '',
+            'tdr_doc' => '',
+            'ndr_doc' => $document->ndr_doc,
+            'dto_doc' => $document->dto_doc
         ];
         try {
             DB::connection($conn->name)->table('comedoc')->insert($data);

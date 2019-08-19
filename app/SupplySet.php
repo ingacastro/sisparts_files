@@ -36,5 +36,10 @@ class SupplySet extends Model
     {
         return $this->hasOne('IParts\UtilityPercentage', 'id', 'utility_percentages_id');
     }
+
+    public function condition()
+    {
+        return $this->hasOne('IParts\SupplySetCondition', 'id', 'id');
+    }
 }
 

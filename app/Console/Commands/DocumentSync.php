@@ -84,7 +84,6 @@ class DocumentSync extends Command
     {
         $documentsTable = config('siavcom_sync.siavcom_documents');
         $quotation_acronym = config('siavcom_sync.acr_quotation');
-        //Log::notice($conn->name . '  ' . $documentsTable);
         $siavcomDocuments = DB::connection($conn->name)->table($documentsTable)
         ->where('tdo_tdo', $quotation_acronym)
         //->whereIn('ndo_doc', [201,1068,1082,2096,5233,2468,3370,3389,2865,5399])
@@ -226,7 +225,9 @@ class DocumentSync extends Command
         DB::beginTransaction();
         try {    
             $manufacturer_id = null;
-            if(isset($siavcom_manufacturer)) $manufacturer_id = $this->getManufacturer($siavcom_manufacturer, $document)->id;
+
+            if(isset($siavcom_manufacturer)) 
+                $manufacturer_id = $this->getManufacturer($siavcom_manufacturer, $document, $pivot, $siavcom_supply)->id;
 
             $supply = $this->getSupply($siavcom_supply, $manufacturer_id);
             $this->insertDocumentSupply($pivot, $document, $supply);
@@ -321,7 +322,7 @@ class DocumentSync extends Command
     }
 
     //Creates a new manufacturer if it doesn't exist
-    private function getManufacturer(\stdClass $siavcom_manufacturer, Document $document)
+    private function getManufacturer(\stdClass $siavcom_manufacturer, Document $document, \stdClass $siavcom_set, \stdClass $siavcom_supply)
     {
         $key_xmd = $siavcom_manufacturer->key_xmd;
         $manufacturer = Manufacturer::where('siavcom_key_xmd', $key_xmd)->first();
@@ -338,13 +339,13 @@ class DocumentSync extends Command
             if(!$manufacturer) $manufacturer = Manufacturer::create($manufacturer_data);
         }
 
-        $this->sendSuppliersQuotations($manufacturer, $document);
+        $this->sendSuppliersQuotations($manufacturer, $document, $siavcom_set, $siavcom_supply);
 
         return $manufacturer;
     }
 
     //Send quotation email to every supplier selling the brand/manufacturer specified
-    private function sendSuppliersQuotations(Manufacturer $manufacturer, Document $document)
+    private function sendSuppliersQuotations(Manufacturer $manufacturer, Document $document, \stdClass $siavcom_set, \stdClass $siavcom_supply)
     {
         $suppliers = $manufacturer->suppliers;
         $supplies = $manufacturer->supplies;
@@ -355,24 +356,40 @@ class DocumentSync extends Command
 
         try {        
             foreach($suppliers as $supplier) {
-                $this->sendQuotationEmail($supplier->email, $manufacturer->name, $supplies, $document);
+                $this->sendQuotationEmail($supplier->email, $manufacturer->name, $supplies, $document, $siavcom_set, $siavcom_supply);
             }
         } catch(\Exception $e) {
             Log::notice($e->getMessage());
         }
     }
 
-    private function sendQuotationEmail($email, $manufacturer, $supplies, Document $document)
+    private function sendQuotationEmail($email, $manufacturer, $supplies, Document $document, \stdClass $siavcom_set, \stdClass $siavcom_supply)
     {
-        Log::notice("Supplier found, sending email to $email");
+        //Log::notice("Supplier found, sending email to $email");
         //Spanish as default, cause we have custom emails in addition to registered suppliers
         $message = DB::table('messages_languages')
         ->join('languages', 'languages.id', 'messages_languages.languages_id')
         ->where('languages.name', 'Español')->first();
 
-        $subject = $message->subject;
-        $body = $message->body . '<div>Fabricante: <strong>' . $manufacturer . '</strong></div>' .
-        '<div>Partes: ' . $supplies . '</div>';
+        $dealership_name = null;
+        $dealership_email = null;
+        $dealership_ext = null;
+        if($document->dealership) {
+            $dealership_name = $document->dealership->user->name;
+            $dealership_email = $document->dealership->user->email;
+            $dealership_ext = $document->dealership->ext;
+        }
+
+        $subject = $message->subject . ' PCT '  . $document->number . ' ' . $document->reference;
+        $body = $message->body . '<div>Número de parte: ' . $siavcom_supply->cla_isu . '</div>' .
+        '<div>Descripción larga: ' . $siavcom_supply->dea_isu . '</div>' .
+        '<div>Fabricante: ' . $manufacturer . '</div>' .
+        '<div>Cantidad: ' . number_format($siavcom_set->can_mov, 2, '.', ',') . '</div>' .
+        '<div>Partes: ' . $supplies . '</div>' .
+        '<div>-----------------------------------------</div>' .
+        '<div>Cotizador: ' . $dealership_name . '</div>' .
+        '<div>Correo de cotizador: ' . $dealership_email . '</div>' . 
+        '<div>Teléfono de cotizador:' . $dealership_ext . '</div>';
 
         try {            
 /*            Mail::send([], [], function($m) use ($email, $subject, $body) {

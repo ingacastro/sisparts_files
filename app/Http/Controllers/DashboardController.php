@@ -122,7 +122,6 @@ class DashboardController extends Controller
         $supply_sets_amount = SupplySet::count();
         $rejected_ppas_percentage = ($supply_sets_amount > 0) ? $stats['rejected_ppas'] / $supply_sets_amount : $stats['rejected_ppas'];
 
-        Log::notice($stats);
         return [
             'daily_pcts' => [
                 'amount' => $stats['daily_ctz_pcts'],

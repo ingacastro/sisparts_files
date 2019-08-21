@@ -380,7 +380,7 @@ class DocumentSync extends Command
             $dealership_ext = $document->dealership->ext;
         }
 
-        $subject = $message->subject . ' PCT '  . $document->number . ' ' . $document->reference;
+        $subject = $message->subject . ' PCT'  . $document->number . ' ' . $document->reference;
         $body = $message->body . '<div>Número de parte: ' . $siavcom_supply->cla_isu . '</div>' .
         '<div>Descripción larga: ' . $siavcom_supply->dea_isu . '</div>' .
         '<div>Fabricante: ' . $manufacturer . '</div>' .

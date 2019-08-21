@@ -45,10 +45,12 @@ class QuotationRequestElapsedDaysAlert extends Command
         $quotation_request_sets = SupplySet::whereIn('status', [2, 3])->get();
         $alerts = Alert::where('type', 1)->orderBy('elapsed_days', 'DESC')->get();
         foreach($quotation_request_sets as $set) {
+            $document = $set->document;
             foreach($alerts as $alert) {
                 $elapsed_days = Helper::diffBusinessDays($set->quotation_request_date);
                 if($elapsed_days == $alert->elapsed_days) 
-                    Helper::sendMail($alert->recipients, $alert->subject, $alert->message, 'admin@admin.com', null);
+                    $subject = $alert->subject . ' PCT'  . $document->number . ' ' . $document->reference;
+                    Helper::sendMail($alert->recipients, $subject, $alert->message, 'admin@admin.com', null);
             }
         }
     }

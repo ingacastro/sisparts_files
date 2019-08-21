@@ -525,10 +525,12 @@ class InboxController extends Controller
                 data-total_profit="' . '$' . number_format($total_profit, 2, '.', ',') . $currency . '"
                 data-set_number=" ' . $supplies_set->set . '"
                 data-supply_number=" ' . $supplies_set->number . '"><i class="fa fa-edit"></i></a>
-                <a data-target="#quotation_request_modal" data-toggle="modal" class="btn btn-circle yellow-crusta btn-icon-only default quotation-request"
+                <a data-target="#quotation_request_modal" data-toggle="modal" class="btn btn-circle 
+                yellow-crusta btn-icon-only default quotation-request"
                 data-manufacturer="' . $supplies_set->manufacturer . '"
                 data-manufacturer_id="' . $supplies_set->manufacturers_id . '"
-                data-id="' . $supplies_set->id . '"><i class="fa fa-envelope"></i></a>
+                data-id="' . $supplies_set->id . '"
+                data-documents_id="' . $supplies_set->documents_id . '"><i class="fa fa-envelope"></i></a>
                 <a class="btn btn-circle btn-icon-only default blue set-file-attachment" href="#set_file_attachment_modal" data-target="#set_file_attachment_modal" data-toggle="modal"
                 data-supply_id="' . $supplies_set->supplies_id . '"><i class="fa fa-paperclip"></i></a>'
                 : null;
@@ -579,12 +581,13 @@ class InboxController extends Controller
         return $total_cost / ((100 - $utility_percentage) / 100);
     }
 
-    public function getManufacturerSuppliersAndSupplies($manufacturer_id)
+    public function getManufacturerSuppliersAndSupplies($document_id, $manufacturer_id)
     {
         $manufacturer = Manufacturer::find($manufacturer_id);
+        $supplies = Document::find($document_id)->supplies;
         return response()->json([
             'suppliers' => $manufacturer->suppliers,
-            'supplies' => $manufacturer->supplies
+            'supplies' => $supplies
         ]);
     }
 
@@ -636,7 +639,18 @@ class InboxController extends Controller
             $data['measurement']['weight'] = $this->getVolumetricWeight($request, 1, false);
             DB::table('measurements')->where('id', $document_supply->id)->update($data['measurement']);
             $alert = Alert::where('type', 2)->where('set_status', 5)->first();
-            if($alert) Helper::sendMail($alert->recipients, $alert->subject, $alert->message, 'admin@admin.com', null);
+            
+            if(!$alert) 
+                return response()->json(
+                    ['errors' => true,
+                    'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                    ->withErrors('Presupuesto correctamente actualizado. No se ha enviado notificación por que no existe la alerta.')
+                    ->render()]);
+
+            $document = $document_supply->document;
+            $subject = $alert->subject . ' PCT'  . $document->number . ' ' . $document->reference;
+            Helper::sendMail($alert->recipients, $subject, $alert->message, 'admin@admin.com', null);
+
         } catch(\Exception $e) {
             return response()->json(
                 ['errors' => true,
@@ -836,8 +850,8 @@ class InboxController extends Controller
         try {
             $set = SupplySet::find($data['documents_supplies_id']);
             $document = $set->document;
-            $reference = $document->reference;
             $number = $document->number;
+            $reference = $document->reference;
             foreach($data['emails'] as $email) {
                 $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $document->dealership, $set);
                 $this->registerQuotationEmailBinnacle($email, $data, $set);
@@ -848,13 +862,22 @@ class InboxController extends Controller
                 $set->fill(['status' => 2, 'quotation_request_date' => date('Y-m-d H:i:s')])->update();
 
             //Document/PCT in process
-            if($set->document->status < 2) {
+            if($document->status < 2) {
                 $doc = Document::find($set->documents_id);
                 $doc->fill(['status' => 2])->update();
             }
 
             $alert = Alert::where('type', 2)->where('set_status', 2)->first();
-            if($alert) Helper::sendMail($alert->recipients, $alert->subject, $alert->message, 'admin@admin.com', null);
+            
+            if(!$alert) 
+                return response()->json(
+                    ['errors' => true,
+                    'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                    ->withErrors('Solicitud de cotización correctamente enviada. No se ha enviado notificación por que no existe la alerta.')
+                    ->render()]);
+
+            $subject = $alert->subject . ' PCT'  . $number . ' ' . $reference;
+            Helper::sendMail($alert->recipients, $subject, $alert->message, 'admin@admin.com', null);
 
         } catch(\Exception $e) {
             return response()->json(
@@ -901,7 +924,7 @@ class InboxController extends Controller
             });*/
             $dealership_email = Auth::user()->email;
 
-            $subject = $subject . ' PCT '  . $document_number . ' ' . $document_reference;
+            $subject = $subject . ' PCT'  . $document_number . ' ' . $document_reference;
 
             Helper::sendMail($email, $subject, $message, $dealership_email, $dealership_email);
 
@@ -1018,8 +1041,19 @@ class InboxController extends Controller
         try {
             DB::table('checklist')->where('id', $request->set_id)->update(['material_specifications' => null, 'quoted_amounts' => null, 'quotation_currency' => null, 'unit_price' => null, 'delivery_time' => null, 'delivery_conditions' => null, 'product_condition' => null, 'entrance_shipment_costs' => null, 'weight_calculation' => null, 'material_origin' => null, 'incoterm' => null, 'minimum_purchase' => null, 'extra_charges' => null]);
             Binnacle::create($set_binnacle_data);
-            $alert = Alert::where('type', 2)->where('set_status', 6)->first();
-            if($alert) Helper::sendMail($alert->recipients, $alert->subject, $alert->message, 'admin@admin.com', null);
+
+            $alert = Alert::where('type', 2)->where('set_status', $status)->first();
+            if(!$alert) 
+                return response()->json(
+                    ['errors' => true,
+                    'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                    ->withErrors($message . ' No se ha enviado notificación por que no existe la alerta.')
+                    ->render()]);
+
+            $document = $supply_set->document;
+            $subject = $alert->subject . ' PCT'  . $document->number . ' ' . $document->reference;
+            Helper::sendMail($alert->recipients, $subject, $alert->message, 'admin@admin.com', null);
+
         }catch(\Exception $e) {
             Log::notice($e);
             return redirect()->back()->withErrors($e->getMessage());
@@ -1073,8 +1107,19 @@ class InboxController extends Controller
 
                 $supply_set->update(['status' => 7, 'rejected_date' => Carbon::now()]);
             });
+
             $alert = Alert::where('type', 2)->where('set_status', 7)->first();
-            if($alert) Helper::sendMail($alert->recipients, $alert->subject, $alert->message, 'admin@admin.com', null);
+            if(!$alert) 
+                return response()->json(
+                    ['errors' => true,
+                    'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                    ->withErrors('Partida rechazada correctamente. No se ha enviado notificación por que no existe la alerta.')
+                    ->render()]);
+
+            $document = $supply_set->document;
+            $subject = $alert->subject . ' PCT'  . $document->number . ' ' . $document->reference;
+            Helper::sendMail($alert->recipients, $subject, $alert->message, 'admin@admin.com', null);
+
         } catch(\Exception $e) {
             Log::notice($e);
             return response()->json(

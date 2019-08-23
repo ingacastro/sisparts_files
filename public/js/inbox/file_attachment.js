@@ -1,4 +1,4 @@
- var root_url = $('#root_url').attr('content');
+var root_url = $('#root_url').attr('content');
 $('#file_attachment').click(function(){
 
     $('#sets_select2').select2({

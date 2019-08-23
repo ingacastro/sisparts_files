@@ -67,13 +67,13 @@ class ReportController extends Controller
                 $query->where('documents.created_at', '>=', date('Y-m-d H:i:s', strtotime($request->start_date . ' 00:00:00')));
             if(isset($request->end_date))
                 $query->where('documents.created_at', '<=', date('Y-m-d H:i:s', strtotime($request->end_date . ' 23:59:59')));
-            if(isset($request->sync_connection))
+            if(isset($request->sync_connection) && $request->sync_connection != 0)
                 $query->where('documents.sync_connections_id', $request->sync_connection);
-            if(isset($request->status))
+            if(isset($request->status) && $request->status != 0)
                 $query->where('documents.status', $request->status);
-            if(isset($request->dealer_ship))
+            if(isset($request->dealer_ship) && $request->dealer_ship != 0)
                 $query->where('documents.employees_users_id', $request->dealer_ship);
-            if(isset($request->customer))
+            if(isset($request->customer) && $request->customer != 0)
                 $query->where('documents.customers_id', $request->customer);
 
         $datatable = DataTables::of($query->get())

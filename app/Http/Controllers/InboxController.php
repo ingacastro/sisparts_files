@@ -858,8 +858,8 @@ class InboxController extends Controller
             }
             
             //Quotation request sent
-            if($set->status < 2)
-                $set->fill(['status' => 2, 'quotation_request_date' => date('Y-m-d H:i:s')])->update();
+            if($set->status < 3)
+                $set->fill(['status' => 3, 'quotation_request_date' => date('Y-m-d H:i:s')])->update();
 
             //Document/PCT in process
             if($document->status < 2) {
@@ -867,7 +867,7 @@ class InboxController extends Controller
                 $doc->fill(['status' => 2])->update();
             }
 
-            $alert = Alert::where('type', 2)->where('set_status', 2)->first();
+            $alert = Alert::where('type', 2)->where('set_status', 3)->first();
             
             if(!$alert) 
                 return response()->json(
@@ -907,10 +907,10 @@ class InboxController extends Controller
         $subject = $message->subject;
         $dealership_user = $dealership->user;
         $message = $message->body . '<div>Número de parte: ' . $set->supply->number . '</div>' .
-        '<div>Descripción larga: ' . $set->supply->large_description . '</div>' .
+        '<div>Descripción: ' . $set->supply->large_description . '</div>' .
         '<div>' . $data['manufacturer'] . '</div>' .
         '<div>Cantidad: ' . number_format($set->products_amount, 2, '.', ',') . '</div>' .
-        '<div>Partes: ' . implode(', ', $data['supplies_names']) . '</div>' .
+        '<div>' . implode(', ', $data['supplies_names']) . '</div>' .
         '<div>-----------------------------------------</div>' .
         '<div>Cotizador: ' . $dealership_user->name . '</div>' .
         '<div>Correo de cotizador: ' . $dealership_user->email . '</div>' . 

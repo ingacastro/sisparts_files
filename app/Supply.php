@@ -10,7 +10,7 @@ class Supply extends Model
 
     public function manufacturer()
     {
-    	return $this->hasOne('Iparts\Manufacturer', 'manufacturers_id');
+    	return $this->hasOne('Iparts\Manufacturer', 'id', 'manufacturers_id');
     }
 /*    public function files()
     {

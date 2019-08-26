@@ -584,10 +584,14 @@ class InboxController extends Controller
     public function getManufacturerSuppliersAndSupplies($document_id, $manufacturer_id)
     {
         $manufacturer = Manufacturer::find($manufacturer_id);
+        $supplies_sets = Document::find($document_id)->supply_sets;
         $supplies = Document::find($document_id)->supplies;
+
         return response()->json([
             'suppliers' => $manufacturer->suppliers,
-            'supplies' => $supplies
+            'supplies' => $supplies,
+            'sets' => $supplies_sets,
+            'manufacturer_name' => $manufacturer->name
         ]);
     }
 
@@ -829,7 +833,7 @@ class InboxController extends Controller
     }
 
     public function sendSuppliersQuotation(Request $request)
-    {        
+    {  
         $data = $request->all();
 
         $data['emails'] = [];
@@ -854,7 +858,7 @@ class InboxController extends Controller
             $reference = $document->reference;
             foreach($data['emails'] as $email) {
                 $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $document->dealership, $set);
-                $this->registerQuotationEmailBinnacle($email, $data, $set);
+                $this->registerQuotationEmailBinnacle($email, $set);
             }
             
             //Quotation request sent
@@ -906,15 +910,24 @@ class InboxController extends Controller
         }
         $subject = $message->subject;
         $dealership_user = $dealership->user;
-        $message = $message->body . '<div>Número de parte: ' . $set->supply->number . '</div>' .
-        '<div>Descripción: ' . $set->supply->large_description . '</div>' .
-        '<div>' . $data['manufacturer'] . '</div>' .
-        '<div>Cantidad: ' . number_format($set->products_amount, 2, '.', ',') . '</div>' .
-        '<div>' . implode(', ', $data['supplies_names']) . '</div>' .
-        '<div>-----------------------------------------</div>' .
+
+        $message = $message->body . '<table>';
+        foreach($data['sets'] as $set) {
+            $set = json_decode($set);
+            $message .= '<tr>' .
+            '<td><div>Número de parte: ' . $set->number . '</div>' .
+            '<div>Descripción: ' . $set->description . '</div>' .
+            '<div>Fabricante: ' . $set->manufacturer . '</div>' .
+            '<div>Cantidad: ' . ((int)$set->quantity) . ' pzs</div></td></tr>';
+        }
+
+        $message .= '</table>';
+        
+        $message .= '<div>-----------------------------------------</div>' .
         '<div>Cotizador: ' . $dealership_user->name . '</div>' .
         '<div>Correo de cotizador: ' . $dealership_user->email . '</div>' . 
         '<div>Teléfono de cotizador:' . $dealership->ext . '</div>';
+
         try {            
 /*            Mail::send([], [], function($m) use ($email, $subject, $body) {
                 $m->from(Auth::user()->email);
@@ -934,7 +947,7 @@ class InboxController extends Controller
         }
     }
 
-    private function registerQuotationEmailBinnacle($email, $data, SupplySet $set)
+    private function registerQuotationEmailBinnacle($email, SupplySet $set)
     {
         try {        
 
@@ -961,14 +974,14 @@ class InboxController extends Controller
         $messages = [
             'emails.required' => 'No se ha especificado ninguna dirección de correo de proveedor.',
             'custom_emails.*.email' => 'El formato en una o más direcciones de correo es incorrecto.',
-            'supplies_names.required' => 'No se ha seleccionado ninguna de las partes.',
+            'sets.required' => 'No se ha seleccionado ninguna de las partes.',
             'message_id.required' => 'No se ha especificado un mensaje.'
         ];
         
         $validator = Validator::make($data, [
             'emails' => 'required',
             'custom_emails.*' => 'nullable|email',
-            'supplies_names' => 'required',
+            'sets' => 'required|array|min:1',
             'message_id' => 'required'
         ], $messages);
 

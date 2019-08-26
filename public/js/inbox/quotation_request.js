@@ -3,14 +3,16 @@ $(document).on('click', '.quotation-request', function(){
 
 	cleanQuotationRequestMessages();
 	let item = $(this);
-	
-	let manufacturer_title = 'Fabricante: <strong>' + item.attr('data-manufacturer') + '</strong>';
+	var manufacturer_name = item.attr('data-manufacturer');
+
+	let manufacturer_title = 'Fabricante: <strong>' + manufacturer_name + '</strong>';
 	$('#quotation_request_manufacturer').html(manufacturer_title);
 	$('#quotation_request_manufacturer_hidden').val(manufacturer_title);
 	$('#documents_supplies_id').val(item.attr('data-id'));
 
 	$.get(root_url + '/inbox/get-manufacturer-suppliers-and-supplies/' + item.attr('data-documents_id') + '/' + item.attr('data-manufacturer_id'), 
 		function(response){
+			console.log(response.manufacturer_name);
 		$('#left_suppliers').html('');
 		$('#right_suppliers').html('');
 		$('#left_supplies').html('');
@@ -23,11 +25,17 @@ $(document).on('click', '.quotation-request', function(){
 			'</label>';
 			$('#' + side).append(item);
 		});
-		$.each(response.supplies, function(key, supp) {
+		let sets = response.sets;
+		$.each(response.supplies, function(key, supply) {
+
+			var set_obj = { number: supply.number, description: sets[key].product_description, 
+			manufacturer: response.manufacturer_name, quantity: sets[key].products_amount };
+			let set =  "'" + JSON.stringify(set_obj) +  "'";
+			
 			let side = (key != 0 && key % 2 != 0) ? 'right_supplies' : 'left_supplies';
 			let item = '<label>' +
-			'<input class="material-specifications" style="margin-right: 5px" type="checkbox" name="supplies_names[]" value="' + supp.number + '">' +
-			supp.number +
+			'<input class="material-specifications" style="margin-right: 5px" type="checkbox" name="sets[]" value=' + set + '>' +
+			supply.number +
 			'</label>';
 			$('#' + side).append(item);
 		});

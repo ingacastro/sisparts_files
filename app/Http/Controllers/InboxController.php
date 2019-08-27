@@ -585,13 +585,15 @@ class InboxController extends Controller
     {
         $manufacturer = Manufacturer::find($manufacturer_id);
         $supplies_sets = Document::find($document_id)->supply_sets;
-        $supplies = Document::find($document_id)->supplies;
+        $document = Document::find($document_id);
+        $supplies = $document->supplies;
 
         return response()->json([
             'suppliers' => $manufacturer->suppliers,
             'supplies' => $supplies,
             'sets' => $supplies_sets,
-            'manufacturer_name' => $manufacturer->name
+            'manufacturer_name' => $manufacturer->name,
+            'document_status' => $document->status
         ]);
     }
 
@@ -857,14 +859,14 @@ class InboxController extends Controller
             $number = $document->number;
             $reference = $document->reference;
 
-            $emailed_sets_ids = [];
+            $result['emailed_sets_ids'] = [];
             foreach($data['emails'] as $email) {
-                $emailed_sets_ids = $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $document->dealership, $set);
-                $this->registerQuotationEmailBinnacle($email, $set);
+                $result = $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $document->dealership, $set);
+                $this->registerQuotationEmailBinnacle($result['supplier_email'], $data['sets']);
             }
-            Log::notice($emailed_sets_ids);
+
             //Update all of the sets selected
-            SupplySet::whereIn('id', $emailed_sets_ids)->update(['status' => 3, 'quotation_request_date' => date('Y-m-d H:i:s')]);
+            SupplySet::whereIn('id', $result['emailed_sets_ids'])->update(['status' => 3, 'quotation_request_date' => date('Y-m-d H:i:s')]);
 
             //Document/PCT in process
             if($document->status < 2) {
@@ -943,7 +945,7 @@ class InboxController extends Controller
             $subject = $subject . ' PCT'  . $document_number . ' ' . $document_reference;
 
             Helper::sendMail($email, $subject, $message, $dealership_email, $dealership_email);
-            return $emailed_sets_ids;
+            return ['emailed_sets_ids' => $emailed_sets_ids, 'supplier_email' => $email];
 
         } catch(\Exception $e) {
             Log::notice($e);
@@ -951,23 +953,24 @@ class InboxController extends Controller
         }
     }
 
-    private function registerQuotationEmailBinnacle($email, SupplySet $set)
+    private function registerQuotationEmailBinnacle($email, Array $sets)
     {
         try {        
 
-            $doc = $set->document;
+            foreach($sets as $set) {
+                $set = json_decode($set);
+                $binnacle_data = [
+                    'entity' => 2, //SupplySet
+                    'pct_status' => $set->document_status, //In process
+                    'comments' => 'Solicitud de cotización enviada al proveedor ' . $email,
+                    'users_id' => Auth::user()->id,
+                    'type' => 2, //Just a silly number that means nothing
+                    'documents_id' => $set->document_id,
+                    'documents_supplies_id' => $set->id
+                ];
 
-            $binnacle_data = [
-                'entity' => 2, //SupplySet
-                'pct_status' => $doc->status, //In process
-                'comments' => 'Solicitud de cotización enviada al proveedor ' . $email,
-                'users_id' => Auth::user()->id,
-                'type' => 2, //Just a silly number that means nothing
-                'documents_id' => $doc->id,
-                'documents_supplies_id' => $set->id
-            ];
-
-            Binnacle::create($binnacle_data);
+                Binnacle::create($binnacle_data);
+            }
         } catch(\Exception $e) {
             throw new \Exception($e->getMessage(), 1);
         }

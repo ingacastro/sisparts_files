@@ -28,8 +28,9 @@ $(document).on('click', '.quotation-request', function(){
 		let sets = response.sets;
 		$.each(response.supplies, function(key, supply) {
 
-			var set_obj = { id: sets[key].id, number: supply.number, description: sets[key].product_description, 
-			manufacturer: response.manufacturer_name, quantity: sets[key].products_amount };
+			var set_obj = { id: sets[key].id, document_id: sets[key].documents_id, document_status: response.document_status,
+			 number: supply.number, description: sets[key].product_description, manufacturer: response.manufacturer_name, 
+			 quantity: sets[key].products_amount };
 			let set =  "'" + JSON.stringify(set_obj) +  "'";
 			
 			let side = (key != 0 && key % 2 != 0) ? 'right_supplies' : 'left_supplies';

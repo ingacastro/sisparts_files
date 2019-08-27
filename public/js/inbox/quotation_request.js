@@ -28,7 +28,7 @@ $(document).on('click', '.quotation-request', function(){
 		let sets = response.sets;
 		$.each(response.supplies, function(key, supply) {
 
-			var set_obj = { number: supply.number, description: sets[key].product_description, 
+			var set_obj = { id: sets[key].id, number: supply.number, description: sets[key].product_description, 
 			manufacturer: response.manufacturer_name, quantity: sets[key].products_amount };
 			let set =  "'" + JSON.stringify(set_obj) +  "'";
 			

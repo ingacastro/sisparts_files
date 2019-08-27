@@ -856,14 +856,15 @@ class InboxController extends Controller
             $document = $set->document;
             $number = $document->number;
             $reference = $document->reference;
+
+            $emailed_sets_ids = [];
             foreach($data['emails'] as $email) {
-                $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $document->dealership, $set);
+                $emailed_sets_ids = $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $document->dealership, $set);
                 $this->registerQuotationEmailBinnacle($email, $set);
             }
-            
-            //Quotation request sent
-            if($set->status < 3)
-                $set->fill(['status' => 3, 'quotation_request_date' => date('Y-m-d H:i:s')])->update();
+            Log::notice($emailed_sets_ids);
+            //Update all of the sets selected
+            SupplySet::whereIn('id', $emailed_sets_ids)->update(['status' => 3, 'quotation_request_date' => date('Y-m-d H:i:s')]);
 
             //Document/PCT in process
             if($document->status < 2) {
@@ -912,6 +913,7 @@ class InboxController extends Controller
         $dealership_user = $dealership->user;
 
         $message = $message->body . '<table>';
+        $emailed_sets_ids = [];
         foreach($data['sets'] as $set) {
             $set = json_decode($set);
             $message .= '<tr>' .
@@ -919,6 +921,7 @@ class InboxController extends Controller
             '<div>Descripción: ' . $set->description . '</div>' .
             '<div>Fabricante: ' . $set->manufacturer . '</div>' .
             '<div>Cantidad: ' . ((int)$set->quantity) . ' pzs</div></td></tr>';
+            $emailed_sets_ids[] = $set->id;
         }
 
         $message .= '</table>';
@@ -940,6 +943,7 @@ class InboxController extends Controller
             $subject = $subject . ' PCT'  . $document_number . ' ' . $document_reference;
 
             Helper::sendMail($email, $subject, $message, $dealership_email, $dealership_email);
+            return $emailed_sets_ids;
 
         } catch(\Exception $e) {
             Log::notice($e);

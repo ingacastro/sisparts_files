@@ -185,6 +185,7 @@ $('#filters_form').submit(function(e){
             { data: "created_at", name: "created_at" },
             { data: "sync_connection", name: "sync_connection" },
             { data: "number", name: "number" },
+            { data: "reference", name: "reference" },
             { data: "buyer", name: "buyer" },
             @if($logged_user_role == 'Administrador'){ data: "customer", name: "customer" },@endif
             { data: "semaphore", name: "semaphore" },

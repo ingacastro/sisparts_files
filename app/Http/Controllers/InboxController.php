@@ -1274,6 +1274,9 @@ class InboxController extends Controller
         $last_siavcom_ctz_set_key_pri = DB::connection($conn->name)->table($this->siavcomDocumentsSuppliesTable)
         ->OrderBy('key_pri', 'desc')
         ->first();
+        $condition = $supply_set->condition;
+        $sale_conditions = $condition->previous_sale . $condition->valid_prices . $condition->replacement . $condition->factory_replacement .
+        $condition->condition . $condition->minimum_purchase . $condition->exworks . $condition->description;
         $data = [
             'suc_pge' => '',
             'tdo_tdo' => 'CTZ',
@@ -1282,7 +1285,7 @@ class InboxController extends Controller
             'ens_mov' => 0,
             'inv_tdo' => 'N',
             'cla_isu' => $supply_set->supply->number,
-            'dse_mov' => $supply_set->supply->large_description . ' ' . $supply_set->condition->description,
+            'dse_mov' => $supply_set->supply->large_description . ' ' . $sale_conditions,
             'ser_mov' => '',
             'dga_pro' => 0,
             'ped_ped' => '',

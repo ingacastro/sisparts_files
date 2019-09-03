@@ -92,7 +92,6 @@ class ReportController extends Controller
 
     public function downloadPCTSExcel(Request $request)
     {
-
         $pcts = json_decode($request->get('data'));
 
         try {
@@ -103,11 +102,10 @@ class ReportController extends Controller
     }
     public function downloadPCTSPDF(Request $request)
     {
-
         $pcts = json_decode($request->get('data'));
         try {
             $matrix = $this->matrix;
-            $pdf = PDF::loadView('report.exports.pdf', compact('pcts', 'matrix'))->setPaper('a4', 'landscape');
+            $pdf = PDF::loadView('report.exports.pdf', compact('pcts', 'matrix'))->setPaper('a4')->setOrientation('landscape');
             return $pdf->download('reporte_pcts.pdf');
         }catch(\Exception $e) {
             return redirect()->back()->withErrors($e->getMessage());

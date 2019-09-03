@@ -1285,7 +1285,8 @@ class InboxController extends Controller
             'ens_mov' => 0,
             'inv_tdo' => 'N',
             'cla_isu' => $supply_set->supply->number,
-            'dse_mov' => $supply_set->supply->large_description . ' ' . $sale_conditions,
+            'dse_mov' => $supply_set->product_description . '\n' . $sale_conditions,
+            /*'dse_mov' => $supply_set->supply->large_description . '\n' . $sale_conditions,*/
             'ser_mov' => '',
             'dga_pro' => 0,
             'ped_ped' => '',

@@ -1276,7 +1276,7 @@ class InboxController extends Controller
         ->first();
         $condition = $supply_set->condition;
         $sale_conditions = $condition->previous_sale . $condition->valid_prices . $condition->replacement . $condition->factory_replacement .
-        $condition->condition . $condition->minimum_purchase . $condition->exworks . $condition->description;
+        $condition->condition . $condition->minimum_purchase . $condition->exworks;
         $data = [
             'suc_pge' => '',
             'tdo_tdo' => 'CTZ',

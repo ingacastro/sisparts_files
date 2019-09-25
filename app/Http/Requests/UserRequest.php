@@ -35,8 +35,12 @@ class UserRequest extends FormRequest
 
         $role = DB::table('roles')->find($this->role_id);
         
-        if($role && $role->name == 'Cotizador')
-            $rules['employee.buyer_number'] = 'required|unique:employees,buyer_number';
+	if($this->isMethod('post')) {
+		if($role && $role->name == 'Cotizador')
+            		$rules['employee.buyer_number'] = 'required|unique:employees,buyer_number';
+	}
+
+        
 
         if($this->isMethod('put')) {
             $rules['user.password'] = 'nullable|confirmed|min:6';

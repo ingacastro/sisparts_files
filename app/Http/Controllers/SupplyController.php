@@ -69,7 +69,7 @@ class SupplyController extends Controller
         if($request->ajax()) {
 
             $documents = Document::select('documents.id', 'documents.created_at', 'documents.number',
-            DB::raw('"RFQ" as rfq'), 'documents_supplies.products_amount', 'documents_supplies.sale_unit_cost',
+            'documents.reference as rfq', 'documents_supplies.products_amount', 'documents_supplies.sale_unit_cost',
             DB::raw('documents_supplies.sale_unit_cost * documents_supplies.products_amount + documents_supplies.importation_cost
             + documents_supplies.warehouse_shipment_cost + documents_supplies.customer_shipment_cost + documents_supplies.extra_charges as total_cost'),
             DB::raw('CASE WHEN documents_supplies.utility_percentages_id IS NOT null THEN utility_percentages.percentage

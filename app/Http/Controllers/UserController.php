@@ -3,6 +3,8 @@
 namespace IParts\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use IParts\User;
 use IParts\Employee;
 use Illuminate\Support\Facades\Log;
@@ -136,29 +138,43 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, $id)
     {
-        $user_data = $request->get('user');
+	$user_data = $request->get('user');
 
-        if(empty($user_data['password']))
-            unset($user_data['password']);
-        else
-            $user_data['password'] = bcrypt($user_data['password']);
-        
-        $role_name = Role::find($request->get('role_id'))->name;
-        $employee_data = $request->get('employee');
+	if(empty($user_data['password']))
+	    unset($user_data['password']);
+	else
+	    $user_data['password'] = bcrypt($user_data['password']);
+	
+	$role_name = Role::find($request->get('role_id'))->name;
+	$employee_data = $request->get('employee');
+ 
 
-        try {
-            $user = User::find($id);
-            DB::transaction(function() use ($user_data, $role_name, $employee_data, $user) {
-                $user->fill($user_data)->update();
-                $user->syncRoles([$role_name]);
-                $user->employee->fill($employee_data)->update();
-            });
-            $request->session()->flash('message', 'Usuario actualizado correctamente.');
-        } catch(\Exception $e) {
-            return redirect()->back()->WithErrors($e->getMessage());
-        }
+	$v = Validator::make($request->all(), [
+    		'buyer_number' => ['',
+    		Rule::unique('employees.users_id')->ignore($employee_data['buyer_number'])]
+	]);
+	
+	if ($v->fails()) {
+		return redirect()->back()->WithErrors($v->messages()->first());
+               
+        }else{
+		
+		try {
+		    $user = User::find($id);
+		    DB::transaction(function() use ($user_data, $role_name, $employee_data, $user) {
+		        $user->fill($user_data)->update();
+		        $user->syncRoles([$role_name]);
+		        $user->employee->fill($employee_data)->update();
+		    });
+		    $request->session()->flash('message', 'Usuario actualizado correctamente.');
+		} catch(\Exception $e) {
+			
+		    return redirect()->back()->WithErrors($e->getMessage());
+		}
 
-        return redirect()->route('user.index');
+		return redirect()->route('user.index');
+
+	}
     }
 
     /**

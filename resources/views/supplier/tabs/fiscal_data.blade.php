@@ -19,7 +19,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label">Estado</label>
-                {!! Form::select('states_id', [], $model->states_id, ['class' => 'form-control', 'id' => 'states_id',
+                {!! Form::select('states_id', $states, $model->states_id, ['class' => 'form-control', 'id' => 'states_id',
                 'placeholder' => 'Seleccionar...', 'style' => 'display: none', 'disabled']) !!}
                 {!! Form::text('state', $model->state, ['class' => 'form-control', 'style' => 'display: none',
                 'id' => 'state_name', 'autocomplete' => 'off', 'disabled']) !!}

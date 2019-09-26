@@ -68,9 +68,10 @@ class SupplierController extends Controller
     public function create()
     {
         $model = new Supplier();
+        $states = [];
         $selects_options = $this->formSelectsOptions();
         return view('supplier.create_update', compact(
-            'model', 'selects_options'));
+            'model', 'selects_options', 'states'));
     }
 
     private function formSelectsOptions()
@@ -124,9 +125,10 @@ class SupplierController extends Controller
     public function edit($id)
     {
         $model = Supplier::find($id);
+        $states = DB::table('states')->pluck('name', 'id');
         $selects_options = $this->formSelectsOptions();
         return view('supplier.create_update', compact(
-            'model', 'selects_options'));
+            'model', 'selects_options', 'states'));
     }
 
     public function getModelBrands(Request $request, $id)

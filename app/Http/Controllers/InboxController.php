@@ -629,7 +629,7 @@ class InboxController extends Controller
             $utility_percentage_amount = UtilityPercentage::find($utility_percent_arr[0])->percentage;
         }
 
-
+        DB::beginTransaction();
         try {
 
             $document_supply = SupplySet::where('documents_id', $set_id[0])
@@ -640,9 +640,10 @@ class InboxController extends Controller
 
             $data['set']['unit_price'] = $budget_data['unit_price'];
             $data['set']['status'] = 5; //Budget resgistered
-            //$document_supply = SupplySet::where('documents_id', $set_id[0])->where('supplies_id', $set_id[1])->first();
-            $document_supply->update($data['set']);
             
+            $document_supply->update($data['set']);
+            $document_supply->document->fill(['status' => 2])->update();
+
             $data['measurement']['weight'] = $this->getVolumetricWeight($request, 1, false);
             DB::table('measurements')->where('id', $document_supply->id)->update($data['measurement']);
             $alert = Alert::where('type', 2)->where('set_status', 5)->first();
@@ -657,8 +658,9 @@ class InboxController extends Controller
             $document = $document_supply->document;
             $subject = $alert->subject . ' PCT'  . $document->number . ' ' . $document->reference;
             Helper::sendMail($alert->recipients, $subject, $alert->message, 'admin@admin.com', null);
-
+            DB::commit();
         } catch(\Exception $e) {
+            DB::rollback();
             return response()->json(
                 ['errors' => true,
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')

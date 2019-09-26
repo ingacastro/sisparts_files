@@ -291,7 +291,8 @@ class DocumentSync extends Command
 
             DB::table('checklist')->insert(['id' => $document_supply_id]);
             DB::table('measurements')->insert(['id' => $document_supply_id]);
-            DB::table('documents_supplies_conditions')->insert(['id' => $document_supply_id]);
+            DB::table('documents_supplies_conditions')->insert(
+                ['id' => $document_supply_id, 'description' => $supply->large_description]);
         }
     }
 
@@ -389,7 +390,7 @@ class DocumentSync extends Command
 
     private function sendQuotationEmail($email, $supply_sets, Document $document)
     {
-        Log::notice("Supplier found, sending email to $email");
+        //Log::notice("Supplier found, sending email to $email");
         //Spanish as default, cause we have custom emails in addition to registered suppliers
         $message = DB::table('messages_languages')
         ->join('languages', 'languages.id', 'messages_languages.languages_id')

@@ -85,9 +85,9 @@ class InboxController extends Controller
             $query->where('documents.status', $status);
         else {        
             if($route == 'inbox')
-                $query->where('documents.status', '!=', 4);
+                $query->where('documents.status', '<', 3); //No finished or archived PCTs only
             if($route == 'archive')
-                $query->where('documents.status', 4);
+                $query->where('documents.status', '>', 2); //Finished and archived
         }
 
         $logged_user = Auth::user();
@@ -100,8 +100,6 @@ class InboxController extends Controller
 
          $documents = $query->get($fields);
          return $this->buildInboxDataTable($documents, $route, $logged_user);
-        
-        
     }
 
     private function diffBusinessDays($start_date)
@@ -271,7 +269,7 @@ class InboxController extends Controller
     public function show($id)
     {
         $document = Document::find($id);
-        
+
         $document_supplies = $document->supplies->pluck('number', 'id');
 
         $messages = DB::table('messages')

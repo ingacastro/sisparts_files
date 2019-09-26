@@ -271,6 +271,9 @@ class InboxController extends Controller
     public function show($id)
     {
         $document = Document::find($id);
+        //Id was manually written in the url and doesn't belong to the logged user
+        $logged_user = Auth::user();
+        if(!$logged_user->hasRole('Administrador') && $logged_user->id != $document->employees_users_id) abort(403, 'Unauthorized action');
         $document_supplies = $document->supplies->pluck('number', 'id');
 
         $messages = DB::table('messages')

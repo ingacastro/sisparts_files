@@ -647,12 +647,13 @@ class InboxController extends Controller
             DB::table('measurements')->where('id', $document_supply->id)->update($data['measurement']);
             $alert = Alert::where('type', 2)->where('set_status', 5)->first();
             
-            if(!$alert) 
-                return response()->json(
-                    ['errors' => true,
-                    'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
-                    ->withErrors('Presupuesto correctamente actualizado. No se ha enviado notificación por que no existe la alerta.')
-                    ->render()]);
+            if(!$alert)
+                return response()->json([
+                    'errors' => false,
+                    'budget_data' => $budget_data,
+                    'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
+                    ->with('success_message', 'Presupuesto correctamente actualizado. No se ha enviado notificación por que no existe la alerta.')->render()
+                ]);
 
             $document = $document_supply->document;
             $subject = $alert->subject . ' PCT'  . $document->number . ' ' . $document->reference;
@@ -878,12 +879,10 @@ class InboxController extends Controller
 
             $alert = Alert::where('type', 2)->where('set_status', 3)->first();
             
-            if(!$alert) 
-                return response()->json(
-                    ['errors' => true,
-                    'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
-                    ->withErrors('Solicitud de cotización correctamente enviada. No se ha enviado notificación por que no existe la alerta.')
-                    ->render()]);
+            if(!$alert) {
+                $request->session()->flash('message', 'Solicitud de cotización correctamente enviada. No se ha enviado notificación por que no existe la alerta.');
+                return response()->json(['errors' => false]);
+            }
 
             $subject = $alert->subject . ' PCT'  . $number . ' ' . $reference;
             Helper::sendMail($alert->recipients, $subject, $alert->message, 'admin@admin.com', null);
@@ -1065,12 +1064,12 @@ class InboxController extends Controller
             Binnacle::create($set_binnacle_data);
 
             $alert = Alert::where('type', 2)->where('set_status', $status)->first();
-            if(!$alert) 
-                return response()->json(
-                    ['errors' => true,
-                    'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
-                    ->withErrors($message . ' No se ha enviado notificación por que no existe la alerta.')
-                    ->render()]);
+            if(!$alert)
+                return response()->json([
+                    'errors' => false,
+                    'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
+                    ->with('success_message', $message . ' No se ha enviado notificación por que no existe la alerta.')->render()
+                ]);
 
             $document = $supply_set->document;
             $subject = $alert->subject . ' PCT'  . $document->number . ' ' . $document->reference;
@@ -1080,7 +1079,6 @@ class InboxController extends Controller
             Log::notice($e);
             return redirect()->back()->withErrors($e->getMessage());
         }
-
 
         return response()->json([
             'errors' => false,
@@ -1132,11 +1130,11 @@ class InboxController extends Controller
 
             $alert = Alert::where('type', 2)->where('set_status', 7)->first();
             if(!$alert) 
-                return response()->json(
-                    ['errors' => true,
-                    'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
-                    ->withErrors('Partida rechazada correctamente. No se ha enviado notificación por que no existe la alerta.')
-                    ->render()]);
+                return response()->json([
+                    'errors' => false,
+                    'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
+                    ->with('success_message', 'Partida rechazada correctamente. No se ha enviado notificación por que no existe la alerta.')->render()
+                ]); 
 
             $document = $supply_set->document;
             $subject = $alert->subject . ' PCT'  . $document->number . ' ' . $document->reference;

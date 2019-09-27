@@ -80,7 +80,7 @@
             style="display: {{ Auth::user()->hasRole('Cotizador') && ($set->status == 5 || $set->status == 7) ? 'inline-block' : 'none' }}">Enviar a autorización</button>
 
             @role('Administrador')
-            <div id="authorization_btns_container" style="display: {{ $set->status == 6 ? 'block' : 'none' }}">
+            <div id="authorization_btns_container" style="display: {{ $set->status == 6 ? 'block' : 'none'}}">
                 <button type="submit" class="btn btn-circle btn-sm green-meadow set-status-change" data-set_id="{{$set->id}}" 
                     data-status="8" data-document_id="{{ $doc_id }}">Autorizar</button>
                 <button type="button" class="btn btn-circle btn-sm yellow set-rejection" data-set_id="{{$set->id}}" 

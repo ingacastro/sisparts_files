@@ -264,7 +264,7 @@
 var root_url = $('#root_url').attr('content');
 $(document).ready(function(){
     $('#sidebar_inbox').addClass('active');
-    initSupplySetsTable();
+    initSupplySetsTable(); //pct_edit.js function
     $('#binnacle_table').DataTable({
         serverSide: true,
         ajax: root_url + '/inbox/document-binnacle/{{ $document->id }}',
@@ -281,40 +281,6 @@ $(document).ready(function(){
             "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
         }, 
     });
-});
-
-function initSupplySetsTable() {
-    $('#supplies_table').DataTable({
-        serverSide: true,
-        ajax: {
-            url: root_url + '/inbox/document-supplies',
-            data: {
-                'document_id': '{{ $document->id }}',
-                'route': 'inbox'
-            }
-        },
-        bSort: true,
-        destroy: true,
-        columns: [
-            { data: "number", name: "number" },
-            { data: "supplier", name: "supplier" },
-            { data: "manufacturer", name: "manufacturer" },
-            { data: "products_amount", name: "products_amount" },
-            { data: "measurement_unit_code", name: "measurement_unit_code" },
-            { data: "total_cost", name: "total_cost" },
-            { data: "total_price", name: "total_price" },
-            { data: "unit_price", name: "unit_price" },
-            { data: "status", name: "status" },
-            { data: 'actions', name: 'actions', orderable: false, searchable: false }
-        ],
-        language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
-        }, 
-    });
-}
-
-$(document).on('click', '#close_set_edition_modal', function() {
-    initSupplySetsTable();
 });
 
 $(document).on('click', '#calculate_volumetric_weight', function() {

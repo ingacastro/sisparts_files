@@ -54,6 +54,38 @@ $(document).on('click', '.edit-set', function() {
     });
 });
 
+function initSupplySetsTable() {
+    let document_id = $('#document_id').attr('content');
+    $('#supplies_table').DataTable({
+        serverSide: true,
+        ajax: {
+            url: root_url + '/inbox/document-supplies',
+            data: {
+                'document_id': document_id,
+                'route': 'inbox'
+            }
+        },
+        bSort: true,
+        destroy: true,
+        columns: [
+            { data: "number", name: "number" },
+            { data: "supplier", name: "supplier" },
+            { data: "manufacturer", name: "manufacturer" },
+            { data: "products_amount", name: "products_amount" },
+            { data: "measurement_unit_code", name: "measurement_unit_code" },
+            { data: "total_cost", name: "total_cost" },
+            { data: "total_price", name: "total_price" },
+            { data: "unit_price", name: "unit_price" },
+            { data: "status", name: "status" },
+            { data: 'actions', name: 'actions', orderable: false, searchable: false }
+        ],
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+        }, 
+    });
+}
+
+
 /*Budget form*/
 $(document).on('submit', '#edit_budget_form', function(e){
     e.preventDefault();
@@ -85,10 +117,10 @@ $(document).on('submit', '#edit_budget_form', function(e){
                 $('#budget_unit_price').html(response.budget_data.unit_price);
                 $('#budget_total_profit').html(response.budget_data.total_profit);
                 $('#pct_edit_modal_success_message').html(response.success_fragment);
+                initSupplySetsTable();
             }
         }
     });
-    
 });
 
 $(document).on('click', '.set-checklist', function(){
@@ -142,7 +174,9 @@ $(document).on('click', '.set-status-change', function() {
                 $('#pct_edit_modal_error_messages').html(response.errors_fragment);
             else {
                 $('#pct_edit_modal_success_message').html(response.success_fragment);
+                //console.log("Buttons hiding");
                 $('#authorization_btns_container').hide();
+                initSupplySetsTable();
 /*                if(status == 6) {
                     $('#in_authorization_btn').hide();
                     $('#authorization_btns_container').css('display', 'block');

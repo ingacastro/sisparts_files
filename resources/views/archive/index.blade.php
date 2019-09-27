@@ -79,6 +79,7 @@
                             <th>Fecha</th>
                             <th>Empresa</th>
                             <th>Folio</th>
+                            <th>RFQ</th>
                             <th>Asignado</th>
                             @if($logged_user_role == 'Administrador')<th>Cliente</th>@endif
                             <th>Estatus</th>
@@ -149,6 +150,7 @@ $(document).ready(function(){
             { data: "created_at", name: "created_at" },
             { data: "sync_connection", name: "sync_connection" },
             { data: "number", name: "number" },
+            { data: "reference", name: "reference" },
             { data: "buyer", name: "buyer" },
             @if($logged_user_role == 'Administrador'){ data: "customer", name: "customer" },@endif
             { data: "status", name: "status" },

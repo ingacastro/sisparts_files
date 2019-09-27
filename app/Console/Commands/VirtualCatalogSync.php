@@ -10,6 +10,8 @@ use IParts\Supply;
 use IParts\Supplier;
 use IParts\File;
 use IParts\SyncConnection;
+use IParts\Replacement;
+use IParts\Observation;
 use DB;
 use Storage;
 
@@ -53,8 +55,9 @@ class VirtualCatalogSync extends Command
     private function main()
     {
         $virtual_cat_sets = DB::connection($this->virtual_cat_conn_name)->table('cotizacion')
-        ->where('rfq', '!=', null)
-        ->get();
+        ->get(); //->where('rfq', '!=', null)
+
+        Log::notice(count($virtual_cat_sets));
 
         foreach($virtual_cat_sets as $virtual_cat_set) {
 
@@ -82,18 +85,19 @@ class VirtualCatalogSync extends Command
 
         $proveedor = $virtual_cat_set->proveedor;
         $suppliers_id = null;
+
         if(!empty($proveedor)) {
-             $supplier = Supplier::create(['trade_name' => $proveedor, 'marketplace' => 0]);
+             $supplier = Supplier::where('trade_name', $proveedor)->first() ?? 
+             Supplier::create(['trade_name' => $proveedor, 'marketplace' => 0]);
              $suppliers_id = $supplier->id;
          }
-
+         
         SupplySet::create([
             'documents_id' => $document->id,
             'supplies_id' => $supply->id,
             'status' => 1, //Solicitud de cotización no enviada
             'suppliers_id' => $suppliers_id
         ]);
-
     }
 
     private function createSupply($proveedor, $number)
@@ -168,7 +172,7 @@ class VirtualCatalogSync extends Command
         ->where('num_parte', $supply->number)->get();
 
         foreach($replacements as $replacement) {
-            Replacement::create(['supplies_id' => $supply->id, 'description' => $observation->observacion]); 
+            Replacement::create(['supplies_id' => $supply->id, 'description' => $replacement->reemplazo]); 
         }       
     }
 }

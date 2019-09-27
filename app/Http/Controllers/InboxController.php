@@ -1274,8 +1274,9 @@ class InboxController extends Controller
         ->OrderBy('key_pri', 'desc')
         ->first();
         $condition = $supply_set->condition;
-        $sale_conditions = $condition->previous_sale . $condition->valid_prices . $condition->replacement . $condition->factory_replacement .
-        $condition->condition . $condition->minimum_purchase . $condition->exworks;
+        $sale_conditions = $condition->previous_sale . '\n' . $condition->valid_prices . '\n' . $condition->replacement . 
+        '\n' . $condition->factory_replacement . '\n' . $condition->condition . '\n' . $condition->minimum_purchase . 
+        '\n' . $condition->exworks;
         $data = [
             'suc_pge' => '',
             'tdo_tdo' => 'CTZ',

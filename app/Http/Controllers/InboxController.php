@@ -678,9 +678,11 @@ class InboxController extends Controller
     private function calculateBudget($set, $set_data, $utility_percentage)
     {
         $currency = ' ' . $set->currency->name;
-        $total_cost = ($set_data['sale_unit_cost'] * $set->products_amount) + 
+/*        $total_cost = ($set_data['sale_unit_cost'] * $set->products_amount) + 
                 ($set_data['importation_cost'] + $set_data['warehouse_shipment_cost'] + 
-                $set_data['customer_shipment_cost'] + $set_data['extra_charges']);
+                $set_data['customer_shipment_cost'] + $set_data['extra_charges']);*/
+        $total_cost = $this->calculateTotalCost($set_data['sale_unit_cost'], $set->products_amount, $set_data['importation_cost'],
+        $set_data['warehouse_shipment_cost'], $set_data['customer_shipment_cost'], $set_data['extra_charges']);
 
         $total_price = $this->calculateTotalPrice($total_cost, $utility_percentage);
         return [
@@ -689,6 +691,13 @@ class InboxController extends Controller
             'unit_price' => number_format(($total_price / $set->products_amount), 2, '.', ',') . $currency,
             'total_profit' => number_format(($total_price - $total_cost), 2, '.', ',') . $currency
         ];
+    }
+
+    private function calculateTotalCost($sale_unit_cost, $products_amount, $importation_cost, 
+        $warehouse_shipment_cost, $customer_shipment_cost, $extra_charges) {
+        return ($sale_unit_cost * $products_amount) + 
+                ($importation_cost + $warehouse_shipment_cost + 
+                $customer_shipment_cost + $extra_charges);
     }
 
     private function budgetValidations($data)
@@ -1277,6 +1286,15 @@ class InboxController extends Controller
         $sale_conditions = $condition->previous_sale . '\n' . $condition->valid_prices . '\n' . $condition->replacement . 
         '\n' . $condition->factory_replacement . '\n' . $condition->condition . '\n' . $condition->minimum_purchase . 
         '\n' . $condition->exworks;
+
+        $total_cost = $this->calculateTotalCost($supply_set->sale_unit_cost, $supply_set->products_amount, $supply_set->importation_cost, 
+        $supply_set->warehouse_shipment_cost, $supply_set->customer_shipment_cost, $supply_set->extra_charges);
+        $utility_percentage = $supply_set->utility_percentage 
+                            ? $supply_set->utility_percentage->percentage 
+                            : $supply_set->custom_utility_percentage;
+        $total_price = $this->calculateTotalPrice($total_cost, $utility_percentage);
+        $unit_price = number_format(($total_price / $supply_set->products_amount), 2, '.', ',');
+
         $data = [
             'suc_pge' => '',
             'tdo_tdo' => 'CTZ',
@@ -1292,7 +1310,7 @@ class InboxController extends Controller
             'ped_ped' => '',
             'can_mov' => $supply_set->products_amount,
             'med_mov' => $supply_set->measurement_unit_code,
-            'pve_mov' => $supply_set->sale_unit_cost,
+            'pve_mov' => $unit_price,
             'de1_mov' => 0,
             'de2_mov' => 0,
             'de3_mov' => 0,

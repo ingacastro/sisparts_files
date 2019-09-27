@@ -63,7 +63,7 @@ class DashboardController extends Controller
         ->whereMonth('documents_supplies.completed_date', '=', $now->month);
 
         //PPAs
-        $pending_ppas_base_query = SupplySet::where('documents_supplies.status', 1);
+        $pending_ppas_base_query = SupplySet::where('documents_supplies.status', 6);
         $rejected_ppas_base_query = SupplySet::where('documents_supplies.status', 7);
         $monthly_rejected_ppas_base_query = SupplySet::where('documents_supplies.status', 7)
         ->whereMonth('documents_supplies.rejected_date', '=', $now->month);

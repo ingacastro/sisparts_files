@@ -1286,6 +1286,7 @@ class InboxController extends Controller
         $sale_conditions = $condition->previous_sale . '\n' . $condition->valid_prices . '\n' . $condition->replacement . 
         '\n' . $condition->factory_replacement . '\n' . $condition->condition . '\n' . $condition->minimum_purchase . 
         '\n' . $condition->exworks;
+        $sale_conditions = pg_escape_string($sale_conditions);
 
         $total_cost = $this->calculateTotalCost($supply_set->sale_unit_cost, $supply_set->products_amount, $supply_set->importation_cost, 
         $supply_set->warehouse_shipment_cost, $supply_set->customer_shipment_cost, $supply_set->extra_charges);
@@ -1303,7 +1304,7 @@ class InboxController extends Controller
             'ens_mov' => 0,
             'inv_tdo' => 'N',
             'cla_isu' => $supply_set->supply->number,
-            'dse_mov' => $supply_set->product_description . '\n' . $sale_conditions,
+            'dse_mov' => pg_escape_string($supply_set->product_description . '\n' . $sale_conditions),
             /*'dse_mov' => $supply_set->supply->large_description . '\n' . $sale_conditions,*/
             'ser_mov' => '',
             'dga_pro' => 0,

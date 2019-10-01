@@ -45,6 +45,14 @@ class InboxController extends Controller
      */
     public function index()
     {
+/*        DB::connection('pgsql_mxmro')->table('comemov')->where('ndo_doc', 2817)->update([
+            'dse_mov' => 'Modelo: EM3613T
+ Descripcion: 5 3600 EM3613T TEFC 230/460 184T
+ Marca: BALDOR
+ 
+ TIEMPO DE ENTREGA: 4 A 5 SEMANAS' . '
+ ' . 'Line1' . '\nLine2']);*/
+
         $logged_user_role = Auth::user()->roles()->first()->name;
         $sync_connections = DB::table('sync_connections')->where('name', '!=', 'mysql_catalogo_virtual')
         ->pluck('display_name', 'id')->prepend('TODAS', 0);
@@ -1285,9 +1293,13 @@ class InboxController extends Controller
         ->OrderBy('key_pri', 'desc')
         ->first();
         $condition = $supply_set->condition;
-        $sale_conditions = $condition->previous_sale . '\n' . $condition->valid_prices . '\n' . $condition->replacement . 
-        '\n' . $condition->factory_replacement . '\n' . $condition->condition . '\n' . $condition->minimum_purchase . 
-        '\n' . $condition->exworks;
+        $sale_conditions = $condition->previous_sale . '
+        ' . $condition->valid_prices . '
+        ' . $condition->replacement . '
+        ' . $condition->factory_replacement . '
+        ' . $condition->condition . '
+        ' . $condition->minimum_purchase . '
+        ' . $condition->exworks;
 
         $total_cost = $this->calculateTotalCost($supply_set->sale_unit_cost, $supply_set->products_amount, $supply_set->importation_cost, 
         $supply_set->warehouse_shipment_cost, $supply_set->customer_shipment_cost, $supply_set->extra_charges);
@@ -1305,7 +1317,8 @@ class InboxController extends Controller
             'ens_mov' => 0,
             'inv_tdo' => 'N',
             'cla_isu' => $supply_set->supply->number,
-            'dse_mov' => pg_escape_string($supply_set->product_description . '\n' . $sale_conditions),
+            'dse_mov' => $supply_set->product_description . '
+                ' . $sale_conditions,
             /*'dse_mov' => $supply_set->supply->large_description . '\n' . $sale_conditions,*/
             'ser_mov' => '',
             'dga_pro' => 0,

@@ -45,13 +45,13 @@ class InboxController extends Controller
      */
     public function index()
     {
-/*        DB::connection('pgsql_mxmro')->table('comemov')->where('ndo_doc', 2817)->update([
-            'dse_mov' => 'Modelo: EM3613T
- Descripcion: 5 3600 EM3613T TEFC 230/460 184T
- Marca: BALDOR
- 
- TIEMPO DE ENTREGA: 4 A 5 SEMANAS' . '
- ' . 'Line1' . '\nLine2']);*/
+/*        DB::connection('pgsql_mxmro')->table('comemov')->where('ndo_doc', 2819)->update([
+            'dse_mov' => 'BATERIA CSB HR 1234W 12V 34W 9AH MED 151 X 65 X 99 MM 
+Terminal F2
+
+**T.E. 6-15 DIAS HABILES , SALVO PREVIA VENTA, COSTO EN LA COMPRA DE TODOS LOS ITEMS**' . '
+' . 'Salvo Previa venta' . '
+' . 'Precios válidos']);*/
 
         $logged_user_role = Auth::user()->roles()->first()->name;
         $sync_connections = DB::table('sync_connections')->where('name', '!=', 'mysql_catalogo_virtual')
@@ -1293,7 +1293,8 @@ class InboxController extends Controller
         ->OrderBy('key_pri', 'desc')
         ->first();
         $condition = $supply_set->condition;
-        $sale_conditions = $condition->previous_sale . '
+        $sale_conditions = $supply_set->product_description . '
+        ' . $condition->previous_sale . '
         ' . $condition->valid_prices . '
         ' . $condition->replacement . '
         ' . $condition->factory_replacement . '
@@ -1317,8 +1318,7 @@ class InboxController extends Controller
             'ens_mov' => 0,
             'inv_tdo' => 'N',
             'cla_isu' => $supply_set->supply->number,
-            'dse_mov' => $supply_set->product_description . '
-                ' . $sale_conditions,
+            'dse_mov' => $sale_conditions,
             /*'dse_mov' => $supply_set->supply->large_description . '\n' . $sale_conditions,*/
             'ser_mov' => '',
             'dga_pro' => 0,

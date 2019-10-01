@@ -1288,7 +1288,6 @@ class InboxController extends Controller
         $sale_conditions = $condition->previous_sale . '\n' . $condition->valid_prices . '\n' . $condition->replacement . 
         '\n' . $condition->factory_replacement . '\n' . $condition->condition . '\n' . $condition->minimum_purchase . 
         '\n' . $condition->exworks;
-        $sale_conditions = pg_escape_string($sale_conditions);
 
         $total_cost = $this->calculateTotalCost($supply_set->sale_unit_cost, $supply_set->products_amount, $supply_set->importation_cost, 
         $supply_set->warehouse_shipment_cost, $supply_set->customer_shipment_cost, $supply_set->extra_charges);

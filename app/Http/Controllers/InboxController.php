@@ -45,14 +45,6 @@ class InboxController extends Controller
      */
     public function index()
     {
-/*        DB::connection('pgsql_mxmro')->table('comemov')->where('ndo_doc', 2819)->update([
-            'dse_mov' => 'BATERIA CSB HR 1234W 12V 34W 9AH MED 151 X 65 X 99 MM 
-Terminal F2
-
-**T.E. 6-15 DIAS HABILES , SALVO PREVIA VENTA, COSTO EN LA COMPRA DE TODOS LOS ITEMS**' . '
-' . 'Salvo Previa venta' . '
-' . 'Precios válidos']);*/
-
         $logged_user_role = Auth::user()->roles()->first()->name;
         $sync_connections = DB::table('sync_connections')->where('name', '!=', 'mysql_catalogo_virtual')
         ->pluck('display_name', 'id')->prepend('TODAS', 0);
@@ -1293,14 +1285,14 @@ Terminal F2
         ->OrderBy('key_pri', 'desc')
         ->first();
         $condition = $supply_set->condition;
-        $sale_conditions = $supply_set->product_description . '
-        ' . $condition->previous_sale . '
-        ' . $condition->valid_prices . '
-        ' . $condition->replacement . '
-        ' . $condition->factory_replacement . '
-        ' . $condition->condition . '
-        ' . $condition->minimum_purchase . '
-        ' . $condition->exworks;
+$sale_conditions = $supply_set->product_description . '
+' . $condition->previous_sale . '
+' . $condition->valid_prices . '
+' . $condition->replacement . '
+' . $condition->factory_replacement . '
+' . $condition->condition . '
+' . $condition->minimum_purchase . '
+' . $condition->exworks;
 
         $total_cost = $this->calculateTotalCost($supply_set->sale_unit_cost, $supply_set->products_amount, $supply_set->importation_cost, 
         $supply_set->warehouse_shipment_cost, $supply_set->customer_shipment_cost, $supply_set->extra_charges);

@@ -647,17 +647,19 @@ class InboxController extends Controller
             DB::table('measurements')->where('id', $document_supply->id)->update($data['measurement']);
             $alert = Alert::where('type', 2)->where('set_status', 5)->first();
             
-
-            $document = $document_supply->document;
-            $subject = $alert->subject . ' PCT'  . $document->number . ' ' . $document->reference;
-            Helper::sendMail($alert->recipients, $subject, $alert->message, 'admin@admin.com', null);
-            if(!$alert)
+            if(!$alert) {
+                DB::commit();
                 return response()->json([
                     'errors' => false,
                     'budget_data' => $budget_data,
                     'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
                     ->with('success_message', 'Presupuesto correctamente actualizado. No se ha enviado notificación por que no existe la alerta.')->render()
                 ]);
+            }
+
+            $document = $document_supply->document;
+            $subject = $alert->subject . ' PCT'  . $document->number . ' ' . $document->reference;
+            Helper::sendMail($alert->recipients, $subject, $alert->message, 'admin@admin.com', null);
             DB::commit();
         } catch(\Exception $e) {
             DB::rollback();

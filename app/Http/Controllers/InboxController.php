@@ -1182,6 +1182,7 @@ class InboxController extends Controller
     /*Turns a supply set into CTZ*/
     public function setsTurnCTZ(Request $request)
     {
+
         if(!$request->ajax())
             return response()->json([
                 'errors' => true,
@@ -1300,7 +1301,7 @@ $sale_conditions = $supply_set->product_description . '
                             ? $supply_set->utility_percentage->percentage 
                             : $supply_set->custom_utility_percentage;
         $total_price = $this->calculateTotalPrice($total_cost, $utility_percentage);
-        $unit_price = number_format(($total_price / $supply_set->products_amount), 2, '.', ',');
+        $unit_price = $total_price / $supply_set->products_amount;
 
         $data = [
             'suc_pge' => '',

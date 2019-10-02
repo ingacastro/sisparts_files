@@ -33,35 +33,34 @@ class SupplyController extends Controller
 
     public function getList(Request $request)
     {    
-        if($request->ajax()) {
+        if(!$request->ajax()) abort(403, 'Unauthorized action');
 
-            $supplies = Supply::select('supplies.id', 'supplies.number', 'manufacturers.name as manufacturer',
-            'supplies.short_description', 'supplies.large_description',
-            DB::raw('GROUP_CONCAT(CASE WHEN documents_supplies.status > 1 THEN CONCAT(suppliers.trade_name, " " ,"(Cotizado)")
-            WHEN documents_supplies.id is null THEN suppliers.trade_name END) as suppliers'),
-            DB::raw('GROUP_CONCAT(files.path) as files'))
-            ->leftJoin('manufacturers', 'manufacturers.id', 'supplies.manufacturers_id')
-            ->leftJoin('suppliers_manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
-            ->leftJoin('suppliers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
-            ->leftJoin('documents_supplies', 'documents_supplies.suppliers_id', 'suppliers.id')
-            ->leftJoin('supplies_files', 'supplies_files.supplies_id', 'supplies.id')
-            ->leftJoin('files', 'supplies_files.files_id', 'files.id')
-            ->groupBy('supplies.id')
-            ->get();
+          $supplies = Supply::leftJoin('manufacturers', 'manufacturers.id', 'supplies.manufacturers_id')
+          ->leftJoin('suppliers_manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
+          ->leftJoin('suppliers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
+          ->leftJoin('documents_supplies', 'documents_supplies.suppliers_id', 'suppliers.id')
+          ->leftJoin('supplies_files', 'supplies_files.supplies_id', 'supplies.id')
+          ->leftJoin('files', 'supplies_files.files_id', 'files.id')
+          ->select('supplies.id', 'supplies.number', 'manufacturers.name as manufacturer',
+          'supplies.short_description', 'supplies.large_description',
+          DB::raw('GROUP_CONCAT(CASE WHEN documents_supplies.status > 1 THEN CONCAT(suppliers.trade_name, " " ,"(Cotizado)")
+          WHEN documents_supplies.id is null THEN suppliers.trade_name END) as suppliers'),
+          DB::raw('GROUP_CONCAT(files.path) as files'))
+          ->groupBy('supplies.id');
 
-            return Datatables::of($supplies)
-                  ->addColumn('actions', function($supply) {
-                        return '<a href="#replacement_observation_modal" class="btn btn-circle btn-icon-only blue replacement-observation" data-toggle="modal" data-target="#replacement_observation_modal" 
-                            data-supply_id="' . $supply->id . '" data-type="1" data-number="' . $supply->number . '"><i class="fa fa-refresh"></i></a>
-                        <a href="#replacement_observation_modal" class="btn btn-circle btn-icon-only yellow-crusta replacement-observation" data-toggle="modal" data-target="#replacement_observation_modal" data-number="' . $supply->number . '" data-supply_id="' . $supply->id . '" data-type="2"><i class="fa fa-clipboard"></i></a>
-                        <a href="#pcts_modal" class="btn btn-circle btn-icon-only default pcts" data-toggle="modal" data-target="#pcts_modal" data-number="' . $supply->number . '" data-supply_id="' . $supply->id . '"><i class="fa fa-list"></i></a>
-                        <a href="#suppliy_binnacle_modal" class="btn btn-circle btn-icon-only green-meadow supply-binnacle" data-toggle="modal" data-target="#supply_binnacle_modal" data-supply_id="' . $supply->id . '"
-                        data-number="' . $supply->number . '"><i class="fa fa-list"></i></a>';
-                  })
-                  ->rawColumns(['actions' => 'actions'])
-                  ->make(true);
-        }
-        abort(403, 'Unauthorized action');
+        return Datatables::of($supplies)
+              ->addColumn('actions', function($supply) {
+                    return '<a href="#replacement_observation_modal" class="btn btn-circle btn-icon-only blue replacement-observation" data-toggle="modal" data-target="#replacement_observation_modal" 
+                        data-supply_id="' . $supply->id . '" data-type="1" data-number="' . $supply->number . '"><i class="fa fa-refresh"></i></a>
+                    <a href="#replacement_observation_modal" class="btn btn-circle btn-icon-only yellow-crusta replacement-observation" data-toggle="modal" data-target="#replacement_observation_modal" data-number="' . $supply->number . '" data-supply_id="' . $supply->id . '" data-type="2"><i class="fa fa-clipboard"></i></a>
+                    <a href="#pcts_modal" class="btn btn-circle btn-icon-only default pcts" data-toggle="modal" data-target="#pcts_modal" data-number="' . $supply->number . '" data-supply_id="' . $supply->id . '"><i class="fa fa-list"></i></a>
+                    <a href="#suppliy_binnacle_modal" class="btn btn-circle btn-icon-only green-meadow supply-binnacle" data-toggle="modal" data-target="#supply_binnacle_modal" data-supply_id="' . $supply->id . '"
+                    data-number="' . $supply->number . '"><i class="fa fa-list"></i></a>';
+              })
+              ->rawColumns(['actions' => 'actions'])
+              ->make(true);
+
+        
     }
 
     public function getPcts(Request $request, $supply_id)

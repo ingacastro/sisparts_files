@@ -325,36 +325,27 @@ class DocumentSync extends Command
         return $supply;
     }
 
-    //Creates a new manufacturer if it doesn't exist
+    //Gets an existent manufacturer or creates a new one
     private function getManufacturer(\stdClass $siavcom_manufacturer, Document $document, \stdClass $siavcom_set, \stdClass $siavcom_supply)
     {
         $key_xmd = $siavcom_manufacturer->key_xmd;
-
-        $manufacturer = Manufacturer::where('siavcom_key_xmd', $key_xmd)
-        ->first();
 
         $siavcom_manufacturer_name = simplexml_load_string($siavcom_manufacturer->xml_xmd)->data[0]->attributes()['FABRICANTE'];
 
         $siavcom_manufacturer_name = trim($siavcom_manufacturer_name);
 
-        $manufacturer_data = [
-            'name' => $siavcom_manufacturer_name ?? null,
-            'document_type' => $siavcom_manufacturer->xml_xmd
-        ];
+        $manufacturer = Manufacturer::where('name', $siavcom_manufacturer_name)->first()
 
-        if($manufacturer) {
-            $manufacturer_by_name = Manufacturer::where('name', $siavcom_manufacturer_name)->first();
-            //If no manufacturer with this siavcom name was found update
-            if(!$manufacturer_by_name) 
-                $manufacturer->fill($manufacturer_data)->update();
-        } else {
-            $manufacturer = Manufacturer::where('name', $siavcom_manufacturer_name)->first();
-            
-            if(!$manufacturer) {
-                $manufacturer_data['siavcom_key_xmd'] = $key_xmd;
-                $manufacturer = Manufacturer::create($manufacturer_data);
-            }
-        }
+        //If no manufacturer with this name was found, create
+        if(!$manufacturer) {
+            $manufacturer_data = [
+                'name' => $siavcom_manufacturer_name ?? null,
+                'document_type' => $siavcom_manufacturer->xml_xmd
+            ];
+            //$manufacturer_data['siavcom_key_xmd'] = $key_xmd;
+            $manufacturer = Manufacturer::create($manufacturer_data);
+        } 
+
         return $manufacturer;
     }
 

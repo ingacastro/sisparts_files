@@ -334,7 +334,7 @@ class DocumentSync extends Command
 
         $siavcom_manufacturer_name = trim($siavcom_manufacturer_name);
 
-        $manufacturer = Manufacturer::where('name', $siavcom_manufacturer_name)->first()
+        $manufacturer = Manufacturer::where('name', $siavcom_manufacturer_name)->first();
 
         //If no manufacturer with this name was found, create
         if(!$manufacturer) {

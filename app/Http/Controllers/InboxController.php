@@ -546,7 +546,10 @@ class InboxController extends Controller
                 return '$' .  number_format($total_price, 2, '.', ',') . ' ' . $supplies_set->currency;
               })
               ->editColumn('unit_price', function($supplies_set) {
-                return '$' .  number_format($supplies_set->unit_price, 2, '.', ',') . ' ' . $supplies_set->currency;
+                $total_price = $this->calculateTotalPrice($supplies_set->total_cost, $supplies_set->utility_percentage);
+                $unit_price = $total_price / $supplies_set->products_amount;
+                $total_price .= ' ' . $supplies_set->currency;
+                return '$' .  number_format($unit_price, 2, '.', ',') . ' ' . $supplies_set->currency;
               })
               ->rawColumns(['number' => 'number', 'actions' => 'actions', 'total_cost' => 'total_cost', 
                 'total_price' => 'total_price', 'checkbox' => 'checkbox'])

@@ -1289,7 +1289,7 @@ class InboxController extends Controller
         ->OrderBy('key_pri', 'desc')
         ->first();
         $condition = $supply_set->condition;
-$sale_conditions = $supply_set->product_description . '
+$sale_conditions = $condition->description . '
 ' . $condition->previous_sale . '
 ' . $condition->valid_prices . '
 ' . $condition->replacement . '

@@ -214,7 +214,9 @@
         </div>
         <div class="modal-footer" style="text-align: center;">
             <button type="button" class="btn btn-circle default" id="close_set_edition_modal" data-dismiss="modal">Cerrar</button>
+            @if(Auth::user()->hasRole('Cotizador') || Auth::user()->hasRole('Administrador') && !$set->status == 8)
             <button type="submit" class="btn btn-circle blue">Guardar</button>
+            @endif
         </div>
         {!! Form::close() !!}
     </div>

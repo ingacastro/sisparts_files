@@ -35,6 +35,8 @@ class SupplyController extends Controller
     {    
         if(!$request->ajax()) abort(403, 'Unauthorized action');
 
+          $start = microtime(true);
+
           $supplies = Supply::leftJoin('manufacturers', 'manufacturers.id', 'supplies.manufacturers_id')
           ->leftJoin('suppliers_manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
           ->leftJoin('suppliers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
@@ -47,6 +49,8 @@ class SupplyController extends Controller
           WHEN documents_supplies.id is null THEN suppliers.trade_name END) as suppliers'),
           DB::raw('GROUP_CONCAT(files.path) as files'))
           ->groupBy('supplies.id');
+         
+         Log::notice(microtime(true) - $start);
 
         return Datatables::of($supplies)
               ->addColumn('actions', function($supply) {
@@ -59,8 +63,6 @@ class SupplyController extends Controller
               })
               ->rawColumns(['actions' => 'actions'])
               ->make(true);
-
-        
     }
 
     public function getPcts(Request $request, $supply_id)

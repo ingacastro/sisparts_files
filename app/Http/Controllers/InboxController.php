@@ -475,7 +475,7 @@ class InboxController extends Controller
 
         $query = Document::select('documents_supplies.id', 'documents_supplies.set', 'supplies.manufacturers_id', 'supplies.number', 'suppliers.trade_name as supplier', 
         DB::raw('CAST(documents_supplies.products_amount as UNSIGNED) as products_amount'),
-        DB::raw('CASE WHEN documents_supplies.measurement_unit_code = 1 THEN "Pieza" ELSE "Caja" END AS measurement_unit_code'), 
+        'supplies.measurement_unit', 
         DB::raw('documents_supplies.sale_unit_cost * documents_supplies.products_amount + documents_supplies.importation_cost
         + documents_supplies.warehouse_shipment_cost + documents_supplies.customer_shipment_cost + documents_supplies.extra_charges as total_cost'), 
         'currencies.name as currency', 'documents_supplies.unit_price',
@@ -1317,7 +1317,7 @@ $sale_conditions = $supply_set->product_description . '
             'dga_pro' => 0,
             'ped_ped' => '',
             'can_mov' => $supply_set->products_amount,
-            'med_mov' => $supply_set->measurement_unit_code,
+            'med_mov' => $supply_set->supply->measurement_unit,
             'pve_mov' => $unit_price,
             'de1_mov' => 0,
             'de2_mov' => 0,

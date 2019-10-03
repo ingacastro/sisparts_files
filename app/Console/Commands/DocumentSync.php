@@ -251,7 +251,6 @@ class DocumentSync extends Command
             'set' => $pivot->mov_mov,
             'product_description' => $pivot->dse_mov,
             'products_amount' => $pivot->can_mov,
-            'measurement_unit_code' => $pivot->med_mov,
             'sale_unit_cost' => $pivot->pve_mov,
             'type' => $pivot->tdo_tdo,
             'currencies_id' => $currency->id ?? null,
@@ -313,7 +312,8 @@ class DocumentSync extends Command
             'manufacturers_id' => $manufacturer_id,
             'short_description' => $siavcom_supply->des_isu,
             'large_description' => $siavcom_supply->dea_isu,
-            'tax' => $tax
+            'tax' => $tax,
+            'measurement_unit' => $siavcom_supply->un1_isu
         ];
 
         $is_new_supply = true;

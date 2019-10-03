@@ -275,6 +275,7 @@ class DocumentSync extends Command
             'est_mov' => $pivot->est_mov,
             'im0_mov' => $pivot->im0_mov,
             'usu_usu' => $pivot->usu_usu,
+            'measurement_unit_code' => $pivot->med_mov
         ];
 
         $supply_id = $supply->id;

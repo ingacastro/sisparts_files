@@ -22,7 +22,7 @@ function initSetsCTZTable()
             { data: "number", name: "number" },
             { data: "supplier", name: "supplier" },
             { data: "products_amount", name: "products_amount" },
-            { data: "measurement_unit_code", name: "measurement_unit_code" },
+            { data: "measurement_unit", name: "measurement_unit" },
             { data: "total_cost", name: "total_cost" },
             { data: "total_price", name: "total_price" },
             { data: "status", name: "status" }

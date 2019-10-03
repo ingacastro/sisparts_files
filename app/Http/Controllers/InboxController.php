@@ -637,7 +637,7 @@ class InboxController extends Controller
 
             $budget_data = $this->calculateBudget($document_supply, $data['set'], $utility_percentage_amount);
 
-            $data['set']['unit_price'] = $budget_data['unit_price'];
+            $data['set']['unit_price'] = preg_replace('/[^0-9.]/', '', $budget_data['unit_price']);
             $data['set']['status'] = 5; //Budget resgistered
             
             $document_supply->update($data['set']);

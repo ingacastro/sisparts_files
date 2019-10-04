@@ -888,11 +888,9 @@ class InboxController extends Controller
             SupplySet::whereIn('id', $result['emailed_sets_ids'])->update(['status' => 3, 'quotation_request_date' => date('Y-m-d H:i:s')]);
 
              //QuotationsRequests inserts
-            if(!empty($data['suppliers_ids'])) {
-                foreach($result['emailed_sets_ids'] as $set_id) {
-                    $quotation_request = QuotationRequest::create(['documents_supplies_id' => $set_id]);
-                    $quotation_request->suppliers()->attach($data['suppliers_ids']);
-                }
+            foreach($result['emailed_sets_ids'] as $set_id) {
+                $quotation_request = QuotationRequest::create(['documents_supplies_id' => $set_id]);
+                $quotation_request->suppliers()->attach($data['suppliers_ids']);
             }
 
             //Document/PCT in process

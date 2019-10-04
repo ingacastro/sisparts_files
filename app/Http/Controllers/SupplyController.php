@@ -73,12 +73,13 @@ class SupplyController extends Controller
 
                 $suppliers_arr = [];
                 foreach($suppliers as $key => $supplier) {
+                  $trade_name = $supplier->trade_name;
                   $suppliers_arr[$key] = $supplier->trade_name;
                   $sets = SupplySet::where('supplies_id', $suppply->id)->get();
                   foreach($sets as $set) {
                     foreach($set->quotation_requests as $quotation_request) {
                       $quotation_supplier = $quotation_request->suppliers->where('id',  $supplier->id)->first();
-                      if($quotation_supplier) { $suppliers_arr[$key] .= ' (Cotizado)'; }
+                      if($quotation_supplier) { $suppliers_arr[$key] = $trade_name . ' (Cotizado)'; }
                     }
                   }
                 }

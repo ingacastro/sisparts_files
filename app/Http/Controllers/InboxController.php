@@ -1436,7 +1436,13 @@ $sale_conditions = $condition->description . '
             'dto_doc' => $document->dto_doc
         ];
         try {
-            DB::connection($conn->name)->table('comedoc')->insert($data);
+            //Inserts new CTZ
+            DB::connection($conn->name)->table('comedoc')->insert($data); 
+            //Update above CTZ related PCT
+            DB::connection($conn->name)->table('comedoc')
+            ->where('ndo_doc', $document->number)
+            ->where('tdo_tdo', 'PCT')
+            ->update(['tde_doc' => 'CTZ', 'nde_doc' => $ctz_number]);
         } catch(\Exception $e) {
             throw new \Exception($e->getMessage(), 1);            
         }

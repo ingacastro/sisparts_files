@@ -35,18 +35,26 @@ class SupplyController extends Controller
     {    
         if(!$request->ajax()) abort(403, 'Unauthorized action');
 
-          $supplies = Supply::leftJoin('manufacturers', 'manufacturers.id', 'supplies.manufacturers_id')
-          ->leftJoin('suppliers_manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
+          $start = microtime(true);
+          
+          $supplies = DB::table('supplies')
+          ->leftJoin('manufacturers', 'manufacturers.id', 'supplies.manufacturers_id')
+/*          ->leftJoin('suppliers_manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
           ->leftJoin('suppliers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
-          ->leftJoin('documents_supplies', 'documents_supplies.suppliers_id', 'suppliers.id')
+          ->leftJoin('documents_supplies', 'documents_supplies.suppliers_id', 'suppliers.id')*/
           ->leftJoin('supplies_files', 'supplies_files.supplies_id', 'supplies.id')
           ->leftJoin('files', 'supplies_files.files_id', 'files.id')
           ->select('supplies.id', 'supplies.number', 'manufacturers.name as manufacturer',
           'supplies.short_description', 'supplies.large_description',
-          DB::raw('GROUP_CONCAT(CASE WHEN documents_supplies.status > 1 THEN CONCAT(suppliers.trade_name, " " ,"(Cotizado)")
-          WHEN documents_supplies.id is null THEN suppliers.trade_name END) as suppliers'),
+          //DB::raw('GROUP_CONCAT(suppliers.trade_name) as suppliers'),
           DB::raw('GROUP_CONCAT(files.path) as files'))
           ->groupBy('supplies.id');
+
+          $end = microtime(true);
+          Log::notice('Elapsed seconds: ' .  ($end - $start));
+
+          /*CASE WHEN documents_supplies.status > 1 THEN CONCAT(suppliers.trade_name, " " ,"(Cotizado)")
+          WHEN documents_supplies.id is null THEN suppliers.trade_name END*/
 
         return Datatables::of($supplies)
               ->addColumn('actions', function($supply) {
@@ -57,9 +65,46 @@ class SupplyController extends Controller
                     <a href="#suppliy_binnacle_modal" class="btn btn-circle btn-icon-only green-meadow supply-binnacle" data-toggle="modal" data-target="#supply_binnacle_modal" data-supply_id="' . $supply->id . '"
                     data-number="' . $supply->number . '"><i class="fa fa-list"></i></a>';
               })
-              ->rawColumns(['actions' => 'actions'])
-              ->make(true);
+              ->addColumn('suppliers', function($supply) {
+                $suppply = Supply::find($supply->id);
+       
+                //$sets = $suppply->sets->where('status', '>', 1); 
+                $suppliers = $suppply->manufacturer->suppliers;
+
+                $suppliers_arr = [];
+                foreach($suppliers as $key => $supplier) {
+                  $suppliers_arr[$key] = $supplier->trade_name;
+                  $sets = SupplySet::where('supplies_id', $suppply->id)->get();
+                  foreach($sets as $set) {
+                    foreach($set->quotation_requests as $quotation_request) {
+                      $quotation_supplier = $quotation_request->suppliers->where('id',  $supplier->id)->first();
+                      if($quotation_supplier) { $suppliers_arr[$key] .= ' (Cotizado)'; }
+                    }
+                  }
+                }
+                return implode("</br>", $suppliers_arr);
+              })
+              ->rawColumns(['actions' => 'actions', 'suppliers' => 'suppliers'])
+              ->make();
     }
+
+/*    public function supplierHasAQuotationRequestWithSupplier()
+    {
+                $suppply = Supply::find($supply->id);
+                $sets = $suppply->sets->where('status', '>', 1); 
+
+                $suppliers_str = '';
+
+                foreach($sets as $key => $set) {
+                  foreach($set->quotation_requests as $quotation_request) {
+                    $suppliers_str .= implode('</br>', $quotation_request->suppliers->toArray());
+                  }
+                  $suppliers_arr[$key] = $supplier->trade_name;
+                  if($sets->count() > 0) $suppliers_arr[$key] = $supplier->trade_name . '(Cotizado)';
+                }
+
+                return $suppliers_str;
+    }*/
 
     public function getPcts(Request $request, $supply_id)
     {

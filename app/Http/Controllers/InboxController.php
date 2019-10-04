@@ -17,6 +17,7 @@ use IParts\SupplySet;
 use IParts\Rejection;
 use IParts\Customer;
 use IParts\Employee;
+use IParts\QuotationRequest;
 use IParts\UtilityPercentage;
 use IParts\Alert;
 use Illuminate\Support\Facades\Log;
@@ -870,6 +871,7 @@ class InboxController extends Controller
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
                 ->withErrors($validator)->render()]);
 
+            DB::beginTransaction();
         try {
             $set = SupplySet::find($data['documents_supplies_id']);
             $document = $set->document;
@@ -885,12 +887,21 @@ class InboxController extends Controller
             //Update all of the sets selected
             SupplySet::whereIn('id', $result['emailed_sets_ids'])->update(['status' => 3, 'quotation_request_date' => date('Y-m-d H:i:s')]);
 
+             //QuotationsRequests inserts, pisbly unnecesary
+/*            if(!empty($data['suppliers_ids'])) {
+                foreach($result['emailed_sets_ids'] as $set_id) {
+                    $quotation_request = QuotationRequest::create(['documents_supplies_id' => $set_id]);
+                    $quotation_request->suppliers()->attach($data['suppliers_ids']);
+                }
+            }*/
+
             //Document/PCT in process
             if($document->status < 2) {
                 $doc = Document::find($set->documents_id);
                 $doc->fill(['status' => 2])->update();
             }
 
+            DB::commit();
             $alert = Alert::where('type', 2)->where('set_status', 3)->first();
             
             if(!$alert) {
@@ -902,6 +913,7 @@ class InboxController extends Controller
             Helper::sendMail($alert->recipients, $subject, $alert->message, 'admin@admin.com', null);
 
         } catch(\Exception $e) {
+            DB::rollback();
             return response()->json(
                 ['errors' => true,
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')

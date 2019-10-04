@@ -20,13 +20,11 @@ class SupplySet extends Model
     {
     	return $this->hasOne('IParts\Supply', 'id', 'supplies_id');
     }
-
     public function rejections()
     {
         return $this->belongsToMany('IParts\RejectionReason', 'rejections', 'documents_supplies_id', 'rejection_reasons_id');
         //->withPivot('comments');
     }
-
     public function currency()
     {
         return $this->hasOne('IParts\Currency', 'id', 'currencies_id');
@@ -40,6 +38,11 @@ class SupplySet extends Model
     public function condition()
     {
         return $this->hasOne('IParts\SupplySetCondition', 'id', 'id');
+    }
+
+    public function quotation_requests()
+    {
+        return $this->hasMany('IParts\QuotationRequest', 'documents_supplies_id');
     }
 }
 

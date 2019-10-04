@@ -95,14 +95,15 @@
             bSort: true,
             columns: [
                 { data: "number", name: "number" },
-                { data: "manufacturer", name: "manufacturer" },
-                { data: "short_description", name: "short_description" },
-                { data: "large_description", name: "large_description" },
+                { data: "manufacturer", name: "supplies.manufacturers_id" },
+                { data: "short_description", name: "short_description", orderable: false},
+                { data: "large_description", name: "large_description", orderable: false},
                 {
                     data: 'suppliers',
                     render: function(data, type, row){
                         return data == null ? '' : data.split(',').join('</br>');
-                    }
+                    },
+                    orderable: false, searchable: false
                 },
                 { 
                     data: 'files',
@@ -117,7 +118,7 @@
                             });
                             return files.join('</br>');
                         }
-                    }
+                    }, orderable: false, searchable: false
                 },
                 { data: 'actions', name: 'actions', orderable: false, searchable: false }
             ],

@@ -10,8 +10,14 @@ class Supply extends Model
 
     public function manufacturer()
     {
-    	return $this->hasOne('Iparts\Manufacturer', 'id', 'manufacturers_id');
+    	return $this->hasOne('IParts\Manufacturer', 'id', 'manufacturers_id');
     }
+
+    public function sets()
+    {
+        return $this->hasMany('IParts\SupplySet', 'supplies_id');
+    }
+
 /*    public function files()
     {
 		return $this->belongsToMany('IParts\File', 'supplies_files', 'supplies_id', 'files_id');

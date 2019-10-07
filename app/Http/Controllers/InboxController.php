@@ -1375,7 +1375,18 @@ $sale_conditions = $condition->description . '
         ->OrderBy('key_pri', 'desc')
         ->first();
 
-        $subtotal = array_sum($document->supply_sets->pluck('sale_unit_cost')->toArray());
+        //$subtotal = array_sum($document->supply_sets->pluck('sale_unit_cost')->toArray());
+
+        $subtotal = 0;
+        foreach($document->supply_sets as $set) {
+            $total_cost = $this->calculateTotalCost($set->sale_unit_cost, $set->products_amount, $set->importation_cost, 
+            $set->warehouse_shipment_cost, $set->customer_shipment_cost, $set->extra_charges);
+            $utility_percentage = $set->utility_percentage 
+                                ? $set->utility_percentage->percentage 
+                                : $set->custom_utility_percentage;
+            $subtotal += $this->calculateTotalPrice($total_cost, $utility_percentage);
+        }
+
         $key_pri = $last_siavcom_ctz_key_pri->key_pri + 1;
 
         $data = [

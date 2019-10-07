@@ -17,7 +17,8 @@ class ArchiveController extends Controller
     public function index()
     {
         $logged_user_role = Auth::user()->roles()->first()->name;
-        $sync_connections = DB::table('sync_connections')->pluck('display_name', 'id')->prepend('TODAS', 0);
+        $sync_connections = DB::table('sync_connections')->where('name', '!=', 'mysql_catalogo_virtual')
+        ->pluck('display_name', 'id')->prepend('TODAS', 0);
         $dealerships = User::role('Cotizador')->pluck('name', 'id')->prepend('TODOS', 0);        
         return view('archive.index', compact('logged_user_role', 'dealerships', 'sync_connections', 'dealerships'));
     }

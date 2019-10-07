@@ -890,7 +890,7 @@ class InboxController extends Controller
              //QuotationsRequests inserts
             foreach($result['emailed_sets_ids'] as $set_id) {
                 $quotation_request = QuotationRequest::create(['documents_supplies_id' => $set_id]);
-                $quotation_request->suppliers()->attach($data['suppliers_ids']);
+                if(isset($data['suppliers_ids'])) $quotation_request->suppliers()->attach($data['suppliers_ids']);
             }
 
             //Document/PCT in process

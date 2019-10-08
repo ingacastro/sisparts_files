@@ -112,7 +112,7 @@ class DocumentSync extends Command
             'customer_code' => $customerCode,
             'seller_number' => $siavcomDocument->ven_ven,
             'state' => $siavcomDocument->sta_doc,
-            'status' => 1,
+            'status' => empty($siavcomDocument->tde_doc) ? 1 : 4,
             'currency_id' => $siavcomDocument->mon_doc,
             'mxn_currency_exchange_rate' => $siavcomDocument->vmo_doc,
             'customer_requirement_number' => $siavcomDocument->ob1_doc,
@@ -357,7 +357,6 @@ class DocumentSync extends Command
         $sets_ids = $supplies_sets->pluck('id');
         $supplies_ids = $supplies_sets->pluck('supplies_id');
         $supplies = Supply::whereIn('id', $supplies_ids);
-        //Log::notice($supplies);
         $supplies_ids = $supplies->pluck('id');
         $manufacturers_ids = $supplies->pluck('manufacturers_id');
 

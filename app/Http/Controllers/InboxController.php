@@ -100,7 +100,6 @@ class InboxController extends Controller
         }
 
         $query->select($fields);
-        Log::notice($query->toSql());
         return $this->buildInboxDataTable($query, $route, $logged_user);
     }
 

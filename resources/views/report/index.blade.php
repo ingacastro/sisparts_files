@@ -133,13 +133,17 @@
 <script src="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.min.js" type="text/javascript"></script>
 <script src="/metronic-assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
+<script src="/metronic-assets/global/plugins/bootstrap-datepicker/locales/bootstrap-datepicker.es.min.js" type="text/javascript"></script>
 <script src="https://cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js" type="text/javascript"></script>
 <script src="https://cdn.datatables.net/buttons/1.2.4/js/buttons.html5.min.js" type="text/javascript"></script>
 <script type="text/javascript">
      var root_url = $('#root_url').attr('content');
     $(document).ready(function(){
         $('#sidebar_report').addClass('active');
-        $('#report_date_ranges').datepicker();
+        $('#report_date_ranges').datepicker({ 
+            orientation: 'bottom',
+            language: 'es'
+        });
     });
 
     $('#filters_form').submit(function(e){

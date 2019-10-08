@@ -104,7 +104,7 @@ class DocumentSync extends Command
         //Default quoter
         if($dealer_ship == null)
             $dealer_ship = Employee::where('buyer_number', config('siavcom_sync.generic_quoter_buyer_num'))->first();
-         
+        //Log::notice(empty() ? 'vacío' : 'no vacío');
         $data = [
             'type' => $siavcomDocument->tdo_tdo,
             'number' => $siavcomDocument->ndo_doc,
@@ -112,7 +112,7 @@ class DocumentSync extends Command
             'customer_code' => $customerCode,
             'seller_number' => $siavcomDocument->ven_ven,
             'state' => $siavcomDocument->sta_doc,
-            'status' => empty($siavcomDocument->tde_doc) ? 1 : 4,
+            'status' => ctype_space($siavcomDocument->tde_doc) || empty($siavcomDocument->tde_doc) ? 1 : 4,
             'currency_id' => $siavcomDocument->mon_doc,
             'mxn_currency_exchange_rate' => $siavcomDocument->vmo_doc,
             'customer_requirement_number' => $siavcomDocument->ob1_doc,

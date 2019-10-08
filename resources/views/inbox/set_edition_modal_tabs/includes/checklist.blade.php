@@ -1,5 +1,8 @@
 @if(Auth::user()->hasRole('Cotizador') && $set->status == 7)
-<strong style="color: red">Motivo de rechazo: </strong>{{ $set->rejections->last()->title }}
+<?php $last_rejection = $set->rejections->last(); ?>
+
+<strong style="color: red">Motivo de rechazo: </strong>{{ $last_rejection->title }}</br>
+{{ $last_rejection->pivot->comments }}
 @endif
 <div class="row modal-content-border" style="background: #f1f4f7;">
     <div class="col-md-12 checklist-container">                            

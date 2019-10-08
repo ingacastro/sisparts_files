@@ -116,7 +116,7 @@
             columns: [
                 { data: "trade_name", name: "trade_name" },
                 { data: "business_name", name: "business_name" },
-                { data: "country", name: "country" },
+                { data: "country", name: "countries.name" },
                 { data: "rfc", name: "rfc" },
                 { data: "email", name: "email" },
                 { data: "landline", name: "landline" },
@@ -125,7 +125,7 @@
                     data: 'brands',
                     render: function(data, type, row){
                         return data == null ? '' : data.split(',').join('</br>');
-                    }
+                    }, name: 'manufacturers.name'
                 },
                 { data: 'actions', name: 'actions', orderable: false, searchable: false }
             ],

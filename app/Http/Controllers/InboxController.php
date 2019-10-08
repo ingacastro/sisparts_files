@@ -63,19 +63,19 @@ class InboxController extends Controller
         $status = $request->get('status') ?? 0;
         $dealer_ship = $request->get('dealer_ship') ?? 0;
 
-        $fields = ['documents.id', 'documents.is_canceled', 'documents.created_at', 
-        'sync_connections.display_name as sync_connection',
-        'users.name as buyer', 'documents.number', 'customers.trade_name as customer',
-         DB::raw('(CASE documents.status WHEN 1 THEN "Nueva"
-                  WHEN 2 THEN "En proceso"
-                  WHEN 3 THEN "Terminada"
-                  WHEN 4 THEN "Archivada"
-                  ELSE "Indefinido" END) as status'), 'documents.reference', 'documents.siavcom_ctz'];
         $query = DB::table('documents')
                      ->join('employees', 'employees.users_id', 'documents.employees_users_id')
                      ->join('users', 'users.id', 'employees.users_id')
                      ->join('customers', 'customers.id', 'documents.customers_id')
-                     ->join('sync_connections', 'documents.sync_connections_id', 'sync_connections.id');
+                     ->join('sync_connections', 'documents.sync_connections_id', 'sync_connections.id')
+                     ->select('documents.id', 'documents.is_canceled', 'documents.created_at', 
+                     'sync_connections.display_name as sync_connection',
+                     'users.name as buyer', 'documents.number', 'customers.trade_name as customer',
+                      DB::raw('(CASE documents.status WHEN 1 THEN "Nueva"
+                              WHEN 2 THEN "En proceso"
+                              WHEN 3 THEN "Terminada"
+                              WHEN 4 THEN "Archivada"
+                              ELSE "Indefinido" END) as status'), 'documents.reference', 'documents.siavcom_ctz');
                      //->where('documents.status', '!=', 4);
 
         if($sync_connection > 0)
@@ -99,25 +99,12 @@ class InboxController extends Controller
             unset($fields[6]); //customer removed 
         }
 
-         $documents = $query->get($fields);
-         return $this->buildInboxDataTable($documents, $route, $logged_user);
+         return $this->buildInboxDataTable($query, $route, $logged_user);
     }
 
-    private function diffBusinessDays($start_date)
+    private function buildInboxDataTable($query, $route, $logged_user)
     {
-        $start_date = new Carbon($start_date);
-        $end_date = Carbon::parse(DB::select('select now() as current')[0]->current);
-
-        $days = 0;
-        $days += $start_date->diffInDaysFiltered(function (Carbon $date) {
-            return $date->isWeekday() ? 1 : 0;
-        }, $end_date);
-        return $days;
-    }
-
-    private function buildInboxDataTable($documents, $route, $logged_user)
-    {
-        return Datatables::of($documents)
+        return Datatables::of($query)
               ->addColumn('semaphore', function($document) {
                 $days = $this->diffBusinessDays($document->created_at);
                 $color = DB::table('color_settings')->where('days', '<=', $days)
@@ -153,6 +140,19 @@ class InboxController extends Controller
               ->rawColumns(['semaphore' => 'semaphore', 'actions' => 'actions'])
               ->make(true);
     }   
+    
+    private function diffBusinessDays($start_date)
+    {
+        $start_date = new Carbon($start_date);
+        $end_date = Carbon::parse(DB::select('select now() as current')[0]->current);
+
+        $days = 0;
+        $days += $start_date->diffInDaysFiltered(function (Carbon $date) {
+            return $date->isWeekday() ? 1 : 0;
+        }, $end_date);
+        return $days;
+    }
+
     public function changeDealerShip(Request $request)
     {
         $data = $request->all();
@@ -747,7 +747,6 @@ class InboxController extends Controller
     /*Returns type = 1 returns array, type 2 returns validator obj*/
     private function volumetricWeightValidations($type, $data)
     {
-            //Log::notice($data);
             $validations['messages'] = [
                 'measurement.length.required' => 'El campo largo es requerido.',
                 'measurement.width.required' => 'El campo ancho es requerido.',

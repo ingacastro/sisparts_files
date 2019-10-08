@@ -138,28 +138,7 @@ var root_url = $('#root_url').attr('content');
 $(document).ready(function(){
     $('#sidebar_archive').addClass('active');
 
-    $('#inbox_table').DataTable({
-        serverSide: true,
-        ajax: { 
-            url: root_url + '/inbox/get-list',
-            data: {'route': 'archive'}
-        },
-        bSort: true,
-        destroy: true,
-        columns: [
-            { data: "created_at", name: "created_at" },
-            { data: "sync_connection", name: "sync_connection" },
-            { data: "number", name: "number" },
-            { data: "reference", name: "reference" },
-            { data: "buyer", name: "buyer" },
-            @if($logged_user_role == 'Administrador'){ data: "customer", name: "customer" },@endif
-            { data: "status", name: "status" },
-            { data: 'actions', name: 'actions', orderable: false, searchable: false }
-        ],
-        language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
-        }, 
-    });
+    buildDataTable({'route': 'archive'});
     
 });
 
@@ -170,22 +149,33 @@ $('#filters_form').submit(function(e){
     let status = $('#filters_status').val();
     let dealer_ship = $('#filters_dealer_ship').val();
 
+    ajaxData = {
+        'sync_connection': sync_connection, 
+        'status': status, 
+        'dealer_ship': dealer_ship, 
+        'route': 'archive'
+    };
+
+    buildDataTable(ajaxData);
+
+});
+
+function buildDataTable(ajaxData) {
     $('#inbox_table').DataTable({
         serverSide: true,
         destroy: true,
         ajax: {
             url: root_url + '/inbox/get-list',
-            data: {'sync_connection': sync_connection, 'status': status, 
-            'dealer_ship': dealer_ship, 'route': 'archive'}
+            data: ajaxData
         },
         bSort: true,
         columns: [
             { data: "created_at", name: "created_at" },
-            { data: "sync_connection", name: "sync_connection" },
+            { data: "sync_connection", name: "sync_connections.display_name" },
             { data: "number", name: "number" },
             { data: "reference", name: "reference" },
-            { data: "buyer", name: "buyer" },
-            @if($logged_user_role == 'Administrador'){ data: "customer", name: "customer" },@endif
+            { data: "buyer", name: "users.name" },
+            @if($logged_user_role == 'Administrador'){ data: "customer", name: "customers.trade_name" },@endif
             { data: "status", name: "status" },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }
         ],
@@ -193,6 +183,6 @@ $('#filters_form').submit(function(e){
             url: "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json",
         }, 
     });
-});
+}
 </script>
 @endpush

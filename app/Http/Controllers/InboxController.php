@@ -63,20 +63,20 @@ class InboxController extends Controller
         $status = $request->get('status') ?? 0;
         $dealer_ship = $request->get('dealer_ship') ?? 0;
 
-        $query = DB::table('documents')
-                     ->join('employees', 'employees.users_id', 'documents.employees_users_id')
-                     ->join('users', 'users.id', 'employees.users_id')
-                     ->join('customers', 'customers.id', 'documents.customers_id')
-                     ->join('sync_connections', 'documents.sync_connections_id', 'sync_connections.id')
-                     ->select('documents.id', 'documents.is_canceled', 'documents.created_at', 
+        $fields = ['documents.id', 'documents.is_canceled', 'documents.created_at', 
                      'sync_connections.display_name as sync_connection',
                      'users.name as buyer', 'documents.number', 'customers.trade_name as customer',
                       DB::raw('(CASE documents.status WHEN 1 THEN "Nueva"
                               WHEN 2 THEN "En proceso"
                               WHEN 3 THEN "Terminada"
                               WHEN 4 THEN "Archivada"
-                              ELSE "Indefinido" END) as status'), 'documents.reference', 'documents.siavcom_ctz');
-                     //->where('documents.status', '!=', 4);
+                              ELSE "Indefinido" END) as status'), 'documents.reference', 'documents.siavcom_ctz'];
+
+        $query = DB::table('documents')
+                     ->join('employees', 'employees.users_id', 'documents.employees_users_id')
+                     ->join('users', 'users.id', 'employees.users_id')
+                     ->join('customers', 'customers.id', 'documents.customers_id')
+                     ->join('sync_connections', 'documents.sync_connections_id', 'sync_connections.id');
 
         if($sync_connection > 0)
             $query->where('documents.sync_connections_id', $sync_connection);
@@ -95,11 +95,13 @@ class InboxController extends Controller
         //Dealership won't see customer
         if($logged_user->hasRole("Cotizador")) {
             $query->where('documents.employees_users_id', $logged_user->id);
-            $query->orWhereRaw('DATEDIFF(now(), documents.created_at) > 5');
+            $query->orWhereRaw('DATEDIFF(documents.created_at, now()) > 5');
             unset($fields[6]); //customer removed 
         }
 
-         return $this->buildInboxDataTable($query, $route, $logged_user);
+        $query->select($fields);
+        Log::notice($query->toSql());
+        return $this->buildInboxDataTable($query, $route, $logged_user);
     }
 
     private function buildInboxDataTable($query, $route, $logged_user)

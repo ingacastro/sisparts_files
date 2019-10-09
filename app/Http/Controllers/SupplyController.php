@@ -34,8 +34,6 @@ class SupplyController extends Controller
     public function getList(Request $request)
     {    
         if(!$request->ajax()) abort(403, 'Unauthorized action');
-
-          $start = microtime(true);
           
           $supplies = DB::table('supplies')
           ->leftJoin('manufacturers', 'manufacturers.id', 'supplies.manufacturers_id')
@@ -49,9 +47,6 @@ class SupplyController extends Controller
           //DB::raw('GROUP_CONCAT(suppliers.trade_name) as suppliers'),
           DB::raw('GROUP_CONCAT(files.path) as files'))
           ->groupBy('supplies.id');
-
-          $end = microtime(true);
-          Log::notice('Elapsed seconds: ' .  ($end - $start));
 
           /*CASE WHEN documents_supplies.status > 1 THEN CONCAT(suppliers.trade_name, " " ,"(Cotizado)")
           WHEN documents_supplies.id is null THEN suppliers.trade_name END*/
@@ -165,31 +160,30 @@ class SupplyController extends Controller
           return Datatables::of($binnacles)->make(true);
     }
 
+    /*Gets list replacements or observations*/
     public function getReplacementsObservations(Request $request, $supply_id, $type)
     {
-        if($request->ajax()) {
+        if(!$request->ajax()) abort(403, 'Unauthorized action');
 
-            $table = $type == 1 ? 'replacements' : 'observations';
-            $items = DB::table($table)->where('supplies_id', $supply_id)->get();
+        $table = $type == 1 ? 'replacements' : 'observations';
+        $items = DB::table($table)->where('supplies_id', $supply_id)->get();
 
-            return Datatables::of($items)
-                  ->addColumn('actions', function($item) use($type) {
-                        
-                        if(!Auth::user()->hasRole('Administrador')) return '';
+        return Datatables::of($items)
+              ->addColumn('actions', function($item) use($type) {
+                    
+                    if(!Auth::user()->hasRole('Administrador')) return '';
 
-                        //Only admin is able to edit and delete replacements and observations
-                        $actions = '<a class="btn btn-circle btn-icon-only red"
-                            onclick="deleteReplacementObservation(event,' . $item->id . ',' . $type . ')"><i class="fa fa-times"></i></a>';
-                        if($type == 1)
-                            $actions = '<a class="btn btn-circle btn-icon-only default replacement-edit" 
-                            data-description="' . $item->description . '" data-id="' . $item->id .'">
-                            <i class="fa fa-edit"></i></a>' . $actions;
-                        return $actions;
-                  })
-                  ->rawColumns(['actions' => 'actions'])
-                  ->make(true);
-        }
-        abort(403, 'Unauthorized action');
+                    //Only admin is able to edit and delete replacements and observations
+                    $actions = '<a class="btn btn-circle btn-icon-only red"
+                        onclick="deleteReplacementObservation(event,' . $item->id . ',' . $type . ')"><i class="fa fa-times"></i></a>';
+                    if($type == 1)
+                        $actions = '<a class="btn btn-circle btn-icon-only default replacement-edit" 
+                        data-description="' . $item->description . '" data-id="' . $item->id .'">
+                        <i class="fa fa-edit"></i></a>' . $actions;
+                    return $actions;
+              })
+              ->rawColumns(['actions' => 'actions'])
+              ->make(true);
     }
 
     /*Store and update replacement or store observation*/

@@ -57,10 +57,7 @@ class VirtualCatalogSync extends Command
         $virtual_cat_sets = DB::connection($this->virtual_cat_conn_name)->table('cotizacion')
         ->get(); //->where('rfq', '!=', null)
 
-        Log::notice(count($virtual_cat_sets));
-
         foreach($virtual_cat_sets as $virtual_cat_set) {
-
             DB::transaction(function() use ($virtual_cat_set) {            
                 $document = $this->createDocument($virtual_cat_set);
                 $this->createDocumentSupply($virtual_cat_set, $document);
@@ -81,9 +78,10 @@ class VirtualCatalogSync extends Command
 
     private function createDocumentSupply(\stdClass $virtual_cat_set, Document $document)
     {
-        $supply = $this->createSupply($virtual_cat_set->proveedor, $virtual_cat_set->num_parte);
-
         $proveedor = $virtual_cat_set->proveedor;
+        
+        $supply = $this->createSupply($proveedor, $virtual_cat_set->num_parte);
+
         $suppliers_id = null;
 
         if(!empty($proveedor)) {

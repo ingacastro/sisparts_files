@@ -37,6 +37,11 @@ class DashboardController extends Controller
         $dealerships_count = $dealerships_pairs->count();
         $dealerships_pairs->prepend('TODOS', 0);
         $dashboard_stats = $this->getUserStats($request, null, $dealerships_count);
+
+        $supplier = \IParts\Supplier::where('trade_name', 'ABSA')->first() ?? 'Creating FOO supplier';
+
+        Log::notice($supplier);
+
         return view('dashboard', compact('dashboard_stats', 'dealerships_pairs'));
     }
 

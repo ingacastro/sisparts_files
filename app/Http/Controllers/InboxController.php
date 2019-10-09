@@ -1316,6 +1316,12 @@ $sale_conditions = $condition->description . '
         $total_price = $this->calculateTotalPrice($total_cost, $utility_percentage);
         $unit_price = $total_price / $supply_set->products_amount;
 
+        $set_currency = $supply_set->currency->name;
+        $doc_currency = $supply_set->document->currency->name;
+
+        if($set_currency != $doc_currency)
+            $unit_price = $this->currencyExchange($unit_price, $set_currency, $doc_currency);
+
         $data = [
             'suc_pge' => '',
             'tdo_tdo' => 'CTZ',
@@ -1368,6 +1374,33 @@ $sale_conditions = $condition->description . '
         DB::connection($conn->name)->table('comemov')->insert($data);
     }
 
+    //Exchange to document's currency
+    private function currencyExchange($amount, $set_currency, $doc_currency)
+    {
+        $currency_exchange_rates = [
+            'USD' => 19,
+            'EUR' => 21
+        ];
+
+        if($set_currency == 'MXN') { //MXN to USD or EUR
+            $amount /= $currency_exchange_rates[$doc_currency];
+        }
+        else if($set_currency == 'USD') { //USD to MXN or EUR
+            if($doc_currency == 'MXN') { 
+                $amount *= $currency_exchange_rates[$set_currency]; 
+            }else { 
+                $amount /= $currency_exchange_rates[$doc_currency]; 
+            }
+        } 
+        else { //EUR to MXN or USD
+            $amount *= $currency_exchange_rates['MXN'];
+            if($doc_currency == 'USD') { 
+                $amount /= $currency_exchange_rates['USD']; 
+            }
+        }
+        return $amount;
+    }
+
     private function createSiavcomCTZ(Document $document, $conn, $ctz_number) 
     {
         $last_siavcom_ctz_key_pri = DB::connection($conn->name)->table($this->siavcomDocumentsTable)
@@ -1377,14 +1410,23 @@ $sale_conditions = $condition->description . '
 
         //$subtotal = array_sum($document->supply_sets->pluck('sale_unit_cost')->toArray());
 
+        $doc_currency = $document->currency->name;
         $subtotal = 0;
         foreach($document->supply_sets as $set) {
+            $set_currency = $set->currency->name;
             $total_cost = $this->calculateTotalCost($set->sale_unit_cost, $set->products_amount, $set->importation_cost, 
             $set->warehouse_shipment_cost, $set->customer_shipment_cost, $set->extra_charges);
             $utility_percentage = $set->utility_percentage 
                                 ? $set->utility_percentage->percentage 
                                 : $set->custom_utility_percentage;
-            $subtotal += $this->calculateTotalPrice($total_cost, $utility_percentage);
+
+
+            $total_price = $this->calculateTotalPrice($total_cost, $utility_percentage);
+            if($set_currency != $doc_currency) {
+               $total_price = $this->currencyExchange($total_price, $set_currency, $doc_currency);
+            }
+
+            $subtotal += $total_price;
         }
 
         $key_pri = $last_siavcom_ctz_key_pri->key_pri + 1;

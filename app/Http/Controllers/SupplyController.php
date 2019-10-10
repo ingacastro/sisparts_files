@@ -37,16 +37,20 @@ class SupplyController extends Controller
           
           $supplies = DB::table('supplies')
           ->leftJoin('manufacturers', 'manufacturers.id', 'supplies.manufacturers_id')
-/*          ->leftJoin('suppliers_manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
+          ->leftJoin('suppliers_manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
           ->leftJoin('suppliers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
-          ->leftJoin('documents_supplies', 'documents_supplies.suppliers_id', 'suppliers.id')*/
+          /*->leftJoin('documents_supplies', 'documents_supplies.suppliers_id', 'suppliers.id')*/
           ->leftJoin('supplies_files', 'supplies_files.supplies_id', 'supplies.id')
           ->leftJoin('files', 'supplies_files.files_id', 'files.id')
+          //->leftJoin('suppliers', 'supplies.')
           ->select('supplies.id', 'supplies.number', 'manufacturers.name as manufacturer',
           'supplies.short_description', 'supplies.large_description',
           //DB::raw('GROUP_CONCAT(suppliers.trade_name) as suppliers'),
           DB::raw('GROUP_CONCAT(files.path) as files'))
           ->groupBy('supplies.id');
+
+          Log::notice($supplies->toSql());
+          //Log::notice($supplies->where('supplies.id', 78617)->get());
 
           /*CASE WHEN documents_supplies.status > 1 THEN CONCAT(suppliers.trade_name, " " ,"(Cotizado)")
           WHEN documents_supplies.id is null THEN suppliers.trade_name END*/
@@ -60,7 +64,7 @@ class SupplyController extends Controller
                     <a href="#suppliy_binnacle_modal" class="btn btn-circle btn-icon-only green-meadow supply-binnacle" data-toggle="modal" data-target="#supply_binnacle_modal" data-supply_id="' . $supply->id . '"
                     data-number="' . $supply->number . '"><i class="fa fa-list"></i></a>';
               })
-              ->addColumn('suppliers', function($supply) {
+              ->editColumn('suppliers', function($supply) {
                 $suppply = Supply::find($supply->id);
        
                 //$sets = $suppply->sets->where('status', '>', 1); 

@@ -328,9 +328,10 @@ class InboxController extends Controller
         if(!$request->ajax()) abort(403, 'Unauthorized action');
 
         $files = DB::table('files')
+        ->select('files.*', 'supplies_files.supplies_id', 'supplies_files.files_id')
         ->join('supplies_files', 'supplies_files.files_id', 'files.id')
         ->join('supplies', 'supplies.id', 'supplies_files.supplies_id')
-        ->where('supplies.id', $set_supplies_id)->get();
+        ->where('supplies.id', $set_supplies_id);
 
         return Datatables::of($files)
               ->editColumn('created_at', function($file) {
@@ -475,12 +476,12 @@ class InboxController extends Controller
     {
         if(!$request->ajax()) abort(403, 'Unauthorized action');        
 
-        $query = Document::select('documents_supplies.id', 'documents_supplies.set', 'supplies.manufacturers_id', 'supplies.number', 'suppliers.trade_name as supplier', 
+        $query = Document::select('documents_supplies.id', 'documents_supplies.set', 'supplies.manufacturers_id', 
+        'supplies.number', 'suppliers.trade_name as supplier', 
         DB::raw('CAST(documents_supplies.products_amount as UNSIGNED) as products_amount'),
         'supplies.measurement_unit', 
         DB::raw('documents_supplies.sale_unit_cost * documents_supplies.products_amount + documents_supplies.importation_cost
-        + documents_supplies.warehouse_shipment_cost + documents_supplies.customer_shipment_cost + documents_supplies.extra_charges as total_cost'), 
-        'currencies.name as currency', 'documents_supplies.unit_price',
+        + documents_supplies.warehouse_shipment_cost + documents_supplies.customer_shipment_cost + documents_supplies.extra_charges as total_cost'),'currencies.name as currency', 'documents_supplies.unit_price',
         DB::raw('CASE WHEN documents_supplies.status = 1 THEN "No solicitado"
             WHEN documents_supplies.status = 2 THEN "Solicitado automáticamente"
             WHEN documents_supplies.status = 3 THEN "Solicitado manualmente"
@@ -500,14 +501,12 @@ class InboxController extends Controller
         ->leftjoin('suppliers', 'suppliers.id', 'documents_supplies.suppliers_id')
         ->leftJoin('currencies', 'currencies.id', 'documents_supplies.currencies_id')
         ->leftJoin('utility_percentages', 'utility_percentages.id', 'documents_supplies.utility_percentages_id')
-        ->where('documents.id', $request->document_id);
+        ->where('documents_supplies.documents_id', $request->document_id);
 
         if($request->has('status'))
             $query->where('documents_supplies.status', $request->status);
 
-        $supplies_sets = $query->get();
-
-        return Datatables::of($supplies_sets)
+        return Datatables::of($query)
               ->editColumn('number', function($document) {
                 return '<a href="' . url('supply') . '?number=' . $document->number . '">' . $document->number . '</a>';
               })

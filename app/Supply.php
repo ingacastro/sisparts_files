@@ -18,10 +18,10 @@ class Supply extends Model
         return $this->hasMany('IParts\SupplySet', 'supplies_id');
     }
 
-/*    public function files()
+    public function files()
     {
 		return $this->belongsToMany('IParts\File', 'supplies_files', 'supplies_id', 'files_id');
-    }*/
+    }
 
 /*    public function documents()
     {

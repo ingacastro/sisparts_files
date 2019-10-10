@@ -80,7 +80,7 @@ class DocumentSync extends Command
         });
     }*/
 
-    //TEST, ONLY 1 DB CONNECTION  
+    /*Connects and sync pcts from all of the siavcom connections*/
     private function connectAndSync(\stdClass $conn)
     {
         $documentsTable = config('siavcom_sync.siavcom_documents');
@@ -112,7 +112,6 @@ class DocumentSync extends Command
             'customer_code' => $customerCode,
             'seller_number' => $siavcomDocument->ven_ven,
             'state' => $siavcomDocument->sta_doc,
-            'status' => 1,
             'currency_id' => $siavcomDocument->mon_doc,
             'mxn_currency_exchange_rate' => $siavcomDocument->vmo_doc,
             'customer_requirement_number' => $siavcomDocument->ob1_doc,
@@ -161,8 +160,7 @@ class DocumentSync extends Command
         DB::beginTransaction();
         try {       
             //Document's customer   
-            $customer = $this->getCustomer($customerCode,
-             $conn);
+            $customer = $this->getCustomer($customerCode, $conn);
             if(!isset($customer)) { DB::rollback(); return; }
 
             //Document
@@ -170,9 +168,9 @@ class DocumentSync extends Command
             $document = Document::where('number',$documentNumber)
             ->where('sync_connections_id', $conn->id)->first();
 
-            if(isset($document))
-                $document->fill($data)->update();
+            if(isset($document)) $document->fill($data)->update();
             else {
+                $data['status'] = 1;
                 $data['sync_connections_id'] = $conn->id;
                 $document = Document::create($data);
             }

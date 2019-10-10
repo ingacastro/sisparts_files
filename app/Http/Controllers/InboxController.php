@@ -1319,8 +1319,14 @@ $sale_conditions = $condition->description . '
         $set_currency = $supply_set->currency->name;
         $doc_currency = $supply_set->document->currency->name;
 
-        if($set_currency != $doc_currency)
-            $unit_price = $this->currencyExchange($unit_price, $set_currency, $doc_currency);
+        if($set_currency != $doc_currency) {
+            try {
+                $unit_price = $this->currencyExchange($unit_price, $set_currency, $doc_currency);
+            } catch(\Exception $e) {
+                throw new \Exception($e->getMessage(), 1);
+                
+            }
+        }
 
         $data = [
             'suc_pge' => '',
@@ -1378,23 +1384,57 @@ $sale_conditions = $condition->description . '
     private function currencyExchange($amount, $set_currency, $doc_currency)
     {
         $currency_exchange_rates = [
-            'USD' => 19,
-            'EUR' => 21
+            'USD' => null,
+            'EUR' => null
         ];
 
+        $sie_api_response = file_get_contents(config('sie_api.url'));
+
+        if($sie_api_response === FALSE) {
+            $non_mxn_currencies = Currency::where('name', '!=', 'MXN')->get();
+            foreach($non_mxn_currencies as $currency) {
+               if($currency->name == 'USD')
+                $currency_exchange_rates['USD'] = $currency->mxn_exchange_rate;
+               else if($currency->name == 'EUR')
+                $currency_exchange_rates['EUR'] = $currency->mxn_exchange_rate;
+            }
+        } else {
+            $response_obj = json_decode($sie_api_response);
+            foreach($response_obj->bmx->series as $serie) {
+                if($serie->idSerie == config('sie_api.usd_serie')) {
+                    $currency_exchange_rates['USD'] = $serie->datos[0]->dato;
+                    Currency::where('name', 'USD')->update(['mxn_exchange_rate' => $serie->datos[0]->dato]);
+                }
+                else if($serie->idSerie == config('sie_api.eur_serie')) {
+                    $currency_exchange_rates['EUR'] = $serie->datos[0]->dato;
+                    Currency::where('name', 'EUR')->update(['mxn_exchange_rate' => $serie->datos[0]->dato]);
+                }
+            }
+        }
+
         if($set_currency == 'MXN') { //MXN to USD or EUR
+            if(empty($currency_exchange_rates[$doc_currency])) 
+                throw new \Exception("No se ha podido obtener el tipo de cambio.", 1);
             $amount /= $currency_exchange_rates[$doc_currency];
         }
         else if($set_currency == 'USD') { //USD to MXN or EUR
             if($doc_currency == 'MXN') { 
+                if(empty($currency_exchange_rates[$set_currency])) 
+                    throw new \Exception("No se ha podido obtener el tipo de cambio.", 1);
                 $amount *= $currency_exchange_rates[$set_currency]; 
             }else { 
+                if(empty($currency_exchange_rates[$doc_currency]))
+                    throw new \Exception("No se ha podido obtener el tipo de cambio.", 1);
                 $amount /= $currency_exchange_rates[$doc_currency]; 
             }
         } 
         else { //EUR to MXN or USD
-            $amount *= $currency_exchange_rates['MXN'];
+            if(empty($currency_exchange_rates['EUR']))
+                    throw new \Exception("No se ha podido obtener el tipo de cambio.", 1);
+            $amount *= $currency_exchange_rates['EUR'];
             if($doc_currency == 'USD') { 
+                if(empty($currency_exchange_rates['USD']))
+                    throw new \Exception("No se ha podido obtener el tipo de cambio.", 1);
                 $amount /= $currency_exchange_rates['USD']; 
             }
         }
@@ -1423,7 +1463,11 @@ $sale_conditions = $condition->description . '
 
             $total_price = $this->calculateTotalPrice($total_cost, $utility_percentage);
             if($set_currency != $doc_currency) {
-               $total_price = $this->currencyExchange($total_price, $set_currency, $doc_currency);
+               try {
+                   $total_price = $this->currencyExchange($total_price, $set_currency, $doc_currency);
+               } catch(\Exception $e) {
+                    throw new \Exception($e->getMessage(), 1);                    
+               }
             }
 
             $subtotal += $total_price;

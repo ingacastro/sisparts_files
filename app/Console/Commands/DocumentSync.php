@@ -168,9 +168,12 @@ class DocumentSync extends Command
             $document = Document::where('number',$documentNumber)
             ->where('sync_connections_id', $conn->id)->first();
 
-            if(isset($document)) $document->fill($data)->update();
+            if(isset($document)) {
+                $data['status'] = ctype_space($siavcomDocument->tde_doc) || empty($siavcomDocument->tde_doc) ? 1 : 4;
+                $document->fill($data)->update(); 
+            }
             else {
-                $data['status'] = 1;
+                $data['status'] = ctype_space($siavcomDocument->tde_doc) || empty($siavcomDocument->tde_doc) ? 1 : 4;
                 $data['sync_connections_id'] = $conn->id;
                 $document = Document::create($data);
             }

@@ -54,11 +54,11 @@ class SupplyController extends Controller
                     data-number="' . $supply->number . '"><i class="fa fa-list"></i></a>';
               })
               ->addColumn('manufacturer', function($supply) {
-                return $supply->manufacturer->name;
+                return $supply->manufacturer ? $supply->manufacturer->name : '';
               })
               ->addColumn('suppliers', function($supply){
                 $suppliers = [];
-                //Log::notice($supply->manufacturer->suppliers);
+                if(!$supply->manufacturer) return '';
                 foreach($supply->manufacturer->suppliers as $k => $supplier) {
                   $trade_name = $supplier->trade_name;
                   $suppliers[$k] = $trade_name;

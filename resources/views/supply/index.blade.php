@@ -99,13 +99,13 @@
                 { data: "short_description", name: "short_description", orderable: false},
                 { data: "large_description", name: "large_description", orderable: false},
                 {
-                    data: 'suppliers',
+                    data: 'suppliers'/*,
                     render: function(data, type, row){
                         return data == null ? '' : data.split(',').join('</br>');
-                    }, name: "suppliers", orderable: false, 
+                    }*/, name: "suppliers", orderable: false, 
                 },
                 { 
-                    data: 'files',
+                    data: 'files'/*,
                     render: function(data, type, row){
                         if(data == null)
                             return '';
@@ -117,7 +117,7 @@
                             });
                             return files.join('</br>');
                         }
-                    }, orderable: false, searchable: false
+                    }*/, orderable: false, searchable: false
                 },
                 { data: 'actions', name: 'actions', orderable: false, searchable: false }
             ],

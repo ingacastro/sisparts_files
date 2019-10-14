@@ -17,4 +17,9 @@ class Supplier extends Model
     {
     	return $this->hasOne('IParts\Country', 'id', 'countries_id');
     }
+
+    public function quotation_requests() 
+    {
+    	return $this->belongsToMany('IParts\QuotationRequest', 'quotations_requests_suppliers', 'suppliers_id', 'quotations_requests_id');
+    }
 }

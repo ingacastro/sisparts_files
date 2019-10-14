@@ -28,6 +28,7 @@ class SupplyController extends Controller
      */
     public function index()
     {
+        //Log::notice(Supply::find(78617)->files->pluck('path'));
         return view('supply.index');
     }
 
@@ -35,29 +36,7 @@ class SupplyController extends Controller
     {    
         if(!$request->ajax()) abort(403, 'Unauthorized action');
           
-          $supplies = DB::select(DB::raw('select `supplies`.`id`, `supplies`.`number`, `manufacturers`.`name` as `manufacturer`, `supplies`.`short_description`, `supplies`.`large_description`,
-            (
-            select group_concat(files.path)
-            FROM supplies_files 
-            JOIN files on files.id = supplies_files.files_id
-            where supplies_files.supplies_id = supplies.id
-            group by supplies_files.supplies_id
-            ) as files,
-            GROUP_CONCAT(suppliers.trade_name, "_", suppliers.id) as suppliers,
-            (select 
-            GROUP_CONCAT(suppliers.id)
-            from suppliers
-            left join quotations_requests_suppliers on quotations_requests_suppliers.suppliers_id = suppliers.id
-            left join quotations_requests on quotations_requests_suppliers.quotations_requests_id = quotations_requests.id
-            left join documents_supplies on documents_supplies.id = quotations_requests.documents_supplies_id
-            left join supplies as su on su.id = documents_supplies.supplies_id
-            where documents_supplies.supplies_id = supplies.id
-            group by documents_supplies.supplies_id) as quoted_suppliers_ids
-            from `supplies` 
-            left join `manufacturers` on `manufacturers`.`id` = `supplies`.`manufacturers_id` 
-            left join `suppliers_manufacturers` on `suppliers_manufacturers`.`manufacturers_id` = `manufacturers`.`id`
-            left join `suppliers` on `suppliers`.`id` = `suppliers_manufacturers`.`suppliers_id`
-            group by supplies.id'));
+          $supplies = Supply::query();
 
           //Log::notice($supplies->toSql());
           //Log::notice($supplies->where('supplies.id', 78617)->get());
@@ -74,7 +53,32 @@ class SupplyController extends Controller
                     <a href="#suppliy_binnacle_modal" class="btn btn-circle btn-icon-only green-meadow supply-binnacle" data-toggle="modal" data-target="#supply_binnacle_modal" data-supply_id="' . $supply->id . '"
                     data-number="' . $supply->number . '"><i class="fa fa-list"></i></a>';
               })
-              ->editColumn('suppliers', function($supply) {
+              ->addColumn('manufacturer', function($supply) {
+                return $supply->manufacturer->name;
+              })
+              ->addColumn('suppliers', function($supply){
+                $suppliers = [];
+                //Log::notice($supply->manufacturer->suppliers);
+                foreach($supply->manufacturer->suppliers as $k => $supplier) {
+                  $trade_name = $supplier->trade_name;
+                  $suppliers[$k] = $trade_name;
+                  //Log::notice($k);
+                  foreach($supplier->quotation_requests as $q_request) {
+                    if($q_request->document_supply->supply->id == $supply->id)
+                      $suppliers[$k] = $trade_name . ' (Cotizado)';
+                  }
+                }
+                return implode('</br>', $suppliers);
+              }) 
+              ->addColumn('files', function($supply){
+                $files = '';
+                //Log::notice($supply->files->count());
+                foreach($supply->files as $k => $file) {
+                  $files .= '<a href="' . config('app.url') . '/' . $file->path . '" download>Archivo ' . ($k + 1) . '</a></br>';
+                }
+                return $files;
+              })
+/*              ->editColumn('suppliers', function($supply) {
                 $quoted_suppliers = explode(',', $supply->quoted_suppliers_ids);
                 $suppliers = explode(',', $supply->suppliers);
                 $suppliers_result = [];
@@ -85,8 +89,8 @@ class SupplyController extends Controller
                   $suppliers_result[] = in_array($supplier[1], $quoted_suppliers) ? $supplier[0] . ' (Cotizado)' : $supplier[0];
                 }
                 return implode("</br>", $suppliers_result);
-              })
-              ->rawColumns(['actions' => 'actions', 'suppliers' => 'suppliers'])
+              })*/
+              ->rawColumns(['files' => 'files', 'actions' => 'actions', 'suppliers' => 'suppliers', ])
               ->make();
     }
 

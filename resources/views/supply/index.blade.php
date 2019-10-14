@@ -102,7 +102,7 @@
                     data: 'suppliers',
                     render: function(data, type, row){
                         return data == null ? '' : data.split(',').join('</br>');
-                    }, name: "suppliers.trade_name", orderable: false, 
+                    }, name: "suppliers", orderable: false, 
                 },
                 { 
                     data: 'files',

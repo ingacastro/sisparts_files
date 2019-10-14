@@ -932,8 +932,9 @@ class InboxController extends Controller
             $supplier = Supplier::find($email);
             $email = $supplier->email;
 
-            $message = DB::table('messages_languages')->where('messages_id', $data['message_id'])
-            ->where('languages_id', $supplier->languages_id)->first();
+            if(isset($supplier->$supplier->languages_id))
+                $message = DB::table('messages_languages')->where('messages_id', $data['message_id'])
+                ->where('languages_id', $supplier->languages_id)->first();
         }
         $subject = $message->subject;
         $dealership_user = $dealership->user;

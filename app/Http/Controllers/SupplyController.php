@@ -35,21 +35,31 @@ class SupplyController extends Controller
     {    
         if(!$request->ajax()) abort(403, 'Unauthorized action');
           
-          $supplies = DB::table('supplies')
-          ->leftJoin('manufacturers', 'manufacturers.id', 'supplies.manufacturers_id')
-          ->leftJoin('suppliers_manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
-          ->leftJoin('suppliers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
-          /*->leftJoin('documents_supplies', 'documents_supplies.suppliers_id', 'suppliers.id')*/
-          ->leftJoin('supplies_files', 'supplies_files.supplies_id', 'supplies.id')
-          ->leftJoin('files', 'supplies_files.files_id', 'files.id')
-          //->leftJoin('suppliers', 'supplies.')
-          ->select('supplies.id', 'supplies.number', 'manufacturers.name as manufacturer',
-          'supplies.short_description', 'supplies.large_description',
-          //DB::raw('GROUP_CONCAT(suppliers.trade_name) as suppliers'),
-          DB::raw('GROUP_CONCAT(files.path) as files'))
-          ->groupBy('supplies.id');
+          $supplies = DB::select(DB::raw('select `supplies`.`id`, `supplies`.`number`, `manufacturers`.`name` as `manufacturer`, `supplies`.`short_description`, `supplies`.`large_description`,
+            (
+            select group_concat(files.path)
+            FROM supplies_files 
+            JOIN files on files.id = supplies_files.files_id
+            where supplies_files.supplies_id = supplies.id
+            group by supplies_files.supplies_id
+            ) as files,
+            GROUP_CONCAT(suppliers.trade_name, "_", suppliers.id) as suppliers,
+            (select 
+            GROUP_CONCAT(suppliers.id)
+            from suppliers
+            left join quotations_requests_suppliers on quotations_requests_suppliers.suppliers_id = suppliers.id
+            left join quotations_requests on quotations_requests_suppliers.quotations_requests_id = quotations_requests.id
+            left join documents_supplies on documents_supplies.id = quotations_requests.documents_supplies_id
+            left join supplies as su on su.id = documents_supplies.supplies_id
+            where documents_supplies.supplies_id = supplies.id
+            group by documents_supplies.supplies_id) as quoted_suppliers_ids
+            from `supplies` 
+            left join `manufacturers` on `manufacturers`.`id` = `supplies`.`manufacturers_id` 
+            left join `suppliers_manufacturers` on `suppliers_manufacturers`.`manufacturers_id` = `manufacturers`.`id`
+            left join `suppliers` on `suppliers`.`id` = `suppliers_manufacturers`.`suppliers_id`
+            group by supplies.id'));
 
-          Log::notice($supplies->toSql());
+          //Log::notice($supplies->toSql());
           //Log::notice($supplies->where('supplies.id', 78617)->get());
 
           /*CASE WHEN documents_supplies.status > 1 THEN CONCAT(suppliers.trade_name, " " ,"(Cotizado)")
@@ -65,24 +75,16 @@ class SupplyController extends Controller
                     data-number="' . $supply->number . '"><i class="fa fa-list"></i></a>';
               })
               ->editColumn('suppliers', function($supply) {
-                $suppply = Supply::find($supply->id);
-       
-                //$sets = $suppply->sets->where('status', '>', 1); 
-                $suppliers = $suppply->manufacturer->suppliers;
-
-                $suppliers_arr = [];
-                foreach($suppliers as $key => $supplier) {
-                  $trade_name = $supplier->trade_name;
-                  $suppliers_arr[$key] = $supplier->trade_name;
-                  $sets = SupplySet::where('supplies_id', $suppply->id)->get();
-                  foreach($sets as $set) {
-                    foreach($set->quotation_requests as $quotation_request) {
-                      $quotation_supplier = $quotation_request->suppliers->where('id',  $supplier->id)->first();
-                      if($quotation_supplier) { $suppliers_arr[$key] = $trade_name . ' (Cotizado)'; }
-                    }
-                  }
+                $quoted_suppliers = explode(',', $supply->quoted_suppliers_ids);
+                $suppliers = explode(',', $supply->suppliers);
+                $suppliers_result = [];
+                foreach($suppliers as $supplier) {
+                  $supplier = explode('_', $supplier);
+                  if($supplier[0] == '') continue;
+                  
+                  $suppliers_result[] = in_array($supplier[1], $quoted_suppliers) ? $supplier[0] . ' (Cotizado)' : $supplier[0];
                 }
-                return implode("</br>", $suppliers_arr);
+                return implode("</br>", $suppliers_result);
               })
               ->rawColumns(['actions' => 'actions', 'suppliers' => 'suppliers'])
               ->make();

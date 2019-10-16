@@ -126,8 +126,7 @@ class SupplyController extends Controller
             ->leftJoin('documents_supplies', 'documents_supplies.documents_id', 'documents.id')
             ->leftJoin('utility_percentages', 'utility_percentages.id', 'documents_supplies.utility_percentages_id')
             ->leftJoin('suppliers', 'suppliers.id', 'documents_supplies.suppliers_id')
-            ->where('documents_supplies.supplies_id', $supply_id)
-            ->get();
+            ->where('documents_supplies.supplies_id', $supply_id);
 
             return Datatables::of($documents)
                   ->editColumn('created_at', function($document) {
@@ -140,7 +139,7 @@ class SupplyController extends Controller
                   ->addColumn('unit_total_price', function($supplies_set) {
 
                     $total_price = $supplies_set->total_cost / ((100 - $supplies_set->utility_percentage) / 100);
-                    $unit_price = $total_price / $supplies_set->products_amount;
+                    $unit_price = ($supplies_set->products_amount > 1) ? $total_price / $supplies_set->products_amount : $total_price;
 
                     return '$' . number_format($unit_price, 2, '.', ',') . ' ' . $supplies_set->currency . ' - ' .
                            '$' . number_format($total_price, 2, '.', ',') . ' ' . $supplies_set->currency;

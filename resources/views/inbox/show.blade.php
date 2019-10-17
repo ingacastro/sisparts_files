@@ -50,7 +50,6 @@
     padding-right: 5px; 
     width: 20%;
 }
-
 </style>
 @endsection
 @section('content')

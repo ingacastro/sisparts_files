@@ -82,9 +82,7 @@
                             <tr>
                                 <th width="45%"></th>
                                 <th width="45%"></th>
-                                <th width="10%">
-                                    <table><thead></thead></table>
-                                </th>
+                                <th width="10%"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -173,6 +171,7 @@
                             <th>Costo total</th>
                             <th>Precio total</th>
                             <th>Estatus</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -242,7 +241,8 @@ $(document).ready(function(){
             { data: "measurement_unit", name: "measurement_unit" },
             { data: "total_cost", name: "total_cost" },
             { data: "total_price", name: "total_price" },
-            { data: "status", name: "status" }
+            { data: "status", name: "status" },
+            { data: "actions", name: "actions", searchable: false, orderable: false}
         ],
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"

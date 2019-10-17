@@ -137,7 +137,7 @@ class InboxController extends Controller
                     $actions .= $is_admin ? '<a class="btn btn-circle btn-icon-only default blue" onClick="archiveOrLockDocument(event, ' . $document->id . ', 1)"><i class="fa fa-archive"></i></a>' : '';
                     $actions .= $is_admin ? '<a class="btn btn-circle btn-icon-only default red" onClick="archiveOrLockDocument(event, ' . $document->id . ', 2)"><i class="fa fa-lock"></i></a>' : '';
                 }
-                else {
+                else { //Archive actions
                     $actions = '<a href="' . config('app.url') . '/archive/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';
                     $actions .= $document->siavcom_ctz != 1 ? '<a class="btn btn-circle btn-icon-only default green-meadow" onClick="unlockDocument(event, ' . $document->id . ')"><i class="fa fa-unlock"></i></a>' : '';
                 }
@@ -296,35 +296,32 @@ class InboxController extends Controller
 
     public function getSetTabs(Request $request, $set_id)
     {
-        if($request->ajax()) {
+        if(!$request->ajax()) abort(403, 'Unauthorized action');
 
-            $set_pri_key = explode('_', $set_id);
-            $doc_id = $set_pri_key[0];
-            $set = SupplySet::where('documents_id', $doc_id)->where('supplies_id', $set_pri_key[1])->first();
-            
-            $suppliers = Supplier::pluck('trade_name', 'id');
-            $currencies = Currency::pluck('name', 'id');
-            $measurement = DB::table('measurements')->find($set->id);
-            $countries = DB::table('countries')->pluck('name', 'id');
-            $utility_percentages = DB::table('utility_percentages')->get()->toArray();
-            $utility_percentages[] = (object)['id' => 0, 'name' => 'Otro', 'percentage' => 'null'];
-            $checklist = DB::table('checklist')->find($set->id);
-            $set_conditions = DB::table('documents_supplies_conditions')->find($set->id);
-            $conditions = DB::table('conditions')->first();
-
-            return response()->json(
-                ['errors' => false,
-                'budget_tab' => \View::make('inbox.set_edition_modal_tabs.budget', compact('set', 'suppliers', 'currencies', 
-                    'measurement', 'countries', 'utility_percentages', 'checklist', 'doc_id'))
-                ->render(),
-                'conditions_tab' => \View::make('inbox.set_edition_modal_tabs.conditions', compact('set', 'set_conditions', 
-                    'conditions', 'checklist', 'doc_id'))
-                ->render(),
-                'files_tab' => \View::make('inbox.set_edition_modal_tabs.files', compact('set', 'checklist', 'doc_id'))
-                ->render()]);
-        }
+        $set_pri_key = explode('_', $set_id);
+        $doc_id = $set_pri_key[0];
+        $set = SupplySet::where('documents_id', $doc_id)->where('supplies_id', $set_pri_key[1])->first();
         
-        abort(403, 'Unauthorized action');
+        $suppliers = Supplier::pluck('trade_name', 'id');
+        $currencies = Currency::pluck('name', 'id');
+        $measurement = DB::table('measurements')->find($set->id);
+        $countries = DB::table('countries')->pluck('name', 'id');
+        $utility_percentages = DB::table('utility_percentages')->get()->toArray();
+        $utility_percentages[] = (object)['id' => 0, 'name' => 'Otro', 'percentage' => 'null'];
+        $checklist = DB::table('checklist')->find($set->id);
+        $set_conditions = DB::table('documents_supplies_conditions')->find($set->id);
+        $conditions = DB::table('conditions')->first();
+
+        return response()->json(
+            ['errors' => false,
+            'budget_tab' => \View::make('inbox.set_edition_modal_tabs.budget', compact('set', 'suppliers', 'currencies', 
+                'measurement', 'countries', 'utility_percentages', 'checklist', 'doc_id'))
+            ->render(),
+            'conditions_tab' => \View::make('inbox.set_edition_modal_tabs.conditions', compact('set', 'set_conditions', 
+                'conditions', 'checklist', 'doc_id'))
+            ->render(),
+            'files_tab' => \View::make('inbox.set_edition_modal_tabs.files', compact('set', 'checklist', 'doc_id'))
+            ->render()]);
     }
 
     //Now files are attached directly to supplies
@@ -522,16 +519,18 @@ class InboxController extends Controller
                 $total_profit = $total_price - $supplies_set->total_cost;
                 $currency = ' ' . $supplies_set->currency;
 
-                return ($request->route == 'inbox') 
-                ? '<a data-target="#edit_set_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default edit-set" 
+                $edit_action = '<a data-target="#edit_set_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default edit-set" 
                 data-id="' . $supplies_set->documents_id . '_' . $supplies_set->supplies_id . '"
                 data-total_cost="' . '$' . number_format($supplies_set->total_cost, 2, '.', ',') . $currency . '" 
                 data-total_price="' . '$' . number_format($total_price, 2, '.', ',') . $currency . '"
                 data-unit_price="' . '$' . number_format($unit_price, 2, '.', ',') . $currency . '"
                 data-total_profit="' . '$' . number_format($total_profit, 2, '.', ',') . $currency . '"
                 data-set_number=" ' . $supplies_set->set . '"
-                data-supply_number=" ' . $supplies_set->number . '"><i class="fa fa-edit"></i></a>
-                <a data-target="#quotation_request_modal" data-toggle="modal" class="btn btn-circle 
+                data-supply_number=" ' . $supplies_set->number . '"><i class="fa fa-edit"></i></a>';
+
+                return ($request->route == 'inbox') 
+                ? $edit_action .
+                '<a data-target="#quotation_request_modal" data-toggle="modal" class="btn btn-circle 
                 yellow-crusta btn-icon-only default quotation-request"
                 data-manufacturer="' . $supplies_set->manufacturer . '"
                 data-manufacturer_id="' . $supplies_set->manufacturers_id . '"
@@ -539,7 +538,7 @@ class InboxController extends Controller
                 data-documents_id="' . $supplies_set->documents_id . '"><i class="fa fa-envelope"></i></a>
                 <a class="btn btn-circle btn-icon-only default blue set-file-attachment" href="#set_file_attachment_modal" data-target="#set_file_attachment_modal" data-toggle="modal"
                 data-supply_id="' . $supplies_set->supplies_id . '"><i class="fa fa-paperclip"></i></a>'
-                : null;
+                : $edit_action;
               })
               ->addColumn('checkbox', function($supplies_set){
                 return '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input type="checkbox" class="checkboxes" value="' . $supplies_set->id . '"><span></span></label>';

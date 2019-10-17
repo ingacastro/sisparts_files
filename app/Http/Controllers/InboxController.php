@@ -30,11 +30,13 @@ use Mail;
 use File as LaravelFile;
 use Carbon\Carbon;
 use IParts\Http\Helper;
+use Cmixin\BusinessDay;
 
 class InboxController extends Controller
 {
     public function __construct()
     {
+        BusinessDay::enable('Carbon\Carbon');
         $this->middleware('auth');
         $this->siavcomDocumentsTable = config('siavcom_sync.siavcom_documents');
         $this->siavcomDocumentsSuppliesTable = config('siavcom_sync.siavcom_documents_supplies');
@@ -50,6 +52,7 @@ class InboxController extends Controller
         $sync_connections = DB::table('sync_connections')->where('name', '!=', 'mysql_catalogo_virtual')
         ->pluck('display_name', 'id')->prepend('TODAS', 0);
         $dealerships = User::role('Cotizador')->pluck('name', 'id')->prepend('TODOS', 0);
+
         return view('inbox.index', compact('logged_user_role', 'dealerships', 'sync_connections', 'dealerships'));
     }
 
@@ -88,17 +91,19 @@ class InboxController extends Controller
             if($route == 'inbox')
                 $query->where('documents.status', '<', 3); //No finished or archived PCTs only
             if($route == 'archive')
-                $query->where('documents.status', '>', 2); //Finished and archived
+                $query->where('documents.status', '>', 2); //Finished and archived status
         }
 
         $logged_user = Auth::user();
         //Dealership won't see customer
         if($logged_user->hasRole("Cotizador")) {
+            $fiveBusinessDaysAgoDate = Carbon::subBusinessDays(5)->format('Y-m-d');
             $query->where('documents.employees_users_id', $logged_user->id);
-            $query->orWhereRaw('DATEDIFF(documents.created_at, now()) > 5');
+            if($route == 'inbox')
+              $query->orWhereRaw("documents.created_at between '1000-01-01' and '" . $fiveBusinessDaysAgoDate . "'" .
+              "and documents.status < 3");
             unset($fields[6]); //customer removed 
         }
-
         $query->select($fields);
         return $this->buildInboxDataTable($query, $route, $logged_user);
     }

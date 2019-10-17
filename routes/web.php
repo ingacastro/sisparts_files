@@ -109,6 +109,7 @@ Route::post('inbox/binnacle-entry', 'InboxController@binnacleEntry')->name('inbo
 Route::resource('inbox', 'InboxController');
 
 //Archive
+Route::get('archive/get-list', 'ArchiveController@getList')->name('archive.get-list');
 Route::resource('archive', 'ArchiveController');
 
 //Supply set rejection

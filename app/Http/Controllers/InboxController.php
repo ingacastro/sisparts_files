@@ -36,8 +36,8 @@ class InboxController extends Controller
 {
     public function __construct()
     {
-        BusinessDay::enable('Carbon\Carbon');
         $this->middleware('auth');
+        BusinessDay::enable('Carbon\Carbon');
         $this->siavcomDocumentsTable = config('siavcom_sync.siavcom_documents');
         $this->siavcomDocumentsSuppliesTable = config('siavcom_sync.siavcom_documents_supplies');
     }
@@ -61,7 +61,6 @@ class InboxController extends Controller
     {
         if(!$request->ajax()) abort(403, 'Unauthorized action');
 
-        $route = $request->route;
         $sync_connection = $request->get('sync_connection') ?? 0;
         $status = $request->get('status') ?? 0;
         $dealer_ship = $request->get('dealer_ship') ?? 0;
@@ -81,34 +80,43 @@ class InboxController extends Controller
                      ->join('customers', 'customers.id', 'documents.customers_id')
                      ->join('sync_connections', 'documents.sync_connections_id', 'sync_connections.id');
 
+        $base_query_clone = clone $query;
+
         if($sync_connection > 0)
             $query->where('documents.sync_connections_id', $sync_connection);
         if($dealer_ship > 0)
             $query->where('documents.employees_users_id', $dealer_ship);
+        
         if($status > 0)
             $query->where('documents.status', $status);
-        else {        
-            if($route == 'inbox')
-                $query->where('documents.status', '<', 3); //No finished or archived PCTs only
-            if($route == 'archive')
-                $query->where('documents.status', '>', 2); //Finished and archived status
-        }
+        else
+            $query->where('documents.status', '<', 3); //No finished or archived PCTs only
+
 
         $logged_user = Auth::user();
         //Dealership won't see customer
         if($logged_user->hasRole("Cotizador")) {
             $fiveBusinessDaysAgoDate = Carbon::subBusinessDays(5)->format('Y-m-d');
             $query->where('documents.employees_users_id', $logged_user->id);
-            if($route == 'inbox')
-              $query->orWhereRaw("documents.created_at between '1000-01-01' and '" . $fiveBusinessDaysAgoDate . "'" .
-              "and documents.status < 3");
+            
+            $query->orWhereBetween('documents.created_at', ['1000-01-01', $fiveBusinessDaysAgoDate]);
+
+            if($status > 0)
+                $query->where('documents.status', $status);
+            else
+                $query->where('documents.status', '<', 3); //No finished or archived PCTs only
+
             unset($fields[6]); //customer removed 
         }
-        $query->select($fields);
-        return $this->buildInboxDataTable($query, $route, $logged_user);
+
+        $first_query_ids = $query->select(['documents.id'])->pluck('id');
+        $base_query_clone->whereIn('documents.id', $first_query_ids);
+        $base_query_clone->select($fields);
+
+        return $this->buildInboxDataTable($base_query_clone, $logged_user);
     }
 
-    private function buildInboxDataTable($query, $route, $logged_user)
+    private function buildInboxDataTable($query, $logged_user)
     {
         return Datatables::of($query)
               ->addColumn('semaphore', function($document) {
@@ -126,21 +134,16 @@ class InboxController extends Controller
               ->editColumn('created_at', function($document) {
                 return date_format(new \DateTime($document->created_at), 'd/m/Y');
               })
-              ->addColumn('actions', function($document) use ($route, $logged_user) { 
-                if($route == 'inbox') {
+              ->addColumn('actions', function($document) use ($logged_user) { 
 
-                    $is_admin = $logged_user->hasRole('Administrador');
-                    $actions = '<a href="' . config('app.url') . '/inbox/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';
+                $is_admin = $logged_user->hasRole('Administrador');
+                $actions = '<a href="' . config('app.url') . '/inbox/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';
 
-                    //Admin actions
-                    $actions .= $is_admin ? '<a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '"><i class="fa fa-user"></i></a>' : '';
-                    $actions .= $is_admin ? '<a class="btn btn-circle btn-icon-only default blue" onClick="archiveOrLockDocument(event, ' . $document->id . ', 1)"><i class="fa fa-archive"></i></a>' : '';
-                    $actions .= $is_admin ? '<a class="btn btn-circle btn-icon-only default red" onClick="archiveOrLockDocument(event, ' . $document->id . ', 2)"><i class="fa fa-lock"></i></a>' : '';
-                }
-                else { //Archive actions
-                    $actions = '<a href="' . config('app.url') . '/archive/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';
-                    $actions .= $document->siavcom_ctz != 1 ? '<a class="btn btn-circle btn-icon-only default green-meadow" onClick="unlockDocument(event, ' . $document->id . ')"><i class="fa fa-unlock"></i></a>' : '';
-                }
+                //Admin actions
+                $actions .= $is_admin ? '<a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '"><i class="fa fa-user"></i></a>' : '';
+                $actions .= $is_admin ? '<a class="btn btn-circle btn-icon-only default blue" onClick="archiveOrLockDocument(event, ' . $document->id . ', 1)"><i class="fa fa-archive"></i></a>' : '';
+                $actions .= $is_admin ? '<a class="btn btn-circle btn-icon-only default red" onClick="archiveOrLockDocument(event, ' . $document->id . ', 2)"><i class="fa fa-lock"></i></a>' : '';
+                
                 return $actions;
               })
               ->rawColumns(['semaphore' => 'semaphore', 'actions' => 'actions'])

@@ -165,7 +165,7 @@ function buildDataTable(ajaxData) {
         serverSide: true,
         destroy: true,
         ajax: {
-            url: root_url + '/inbox/get-list',
+            url: root_url + '/archive/get-list',
             data: ajaxData
         },
         bSort: true,

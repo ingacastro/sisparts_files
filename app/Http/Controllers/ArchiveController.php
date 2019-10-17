@@ -7,8 +7,15 @@ use Auth;
 use DB;
 use IParts\User;
 use IParts\Document;
+use Yajra\Datatables\Datatables;
+use Carbon\Carbon;
+
 class ArchiveController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -22,6 +29,54 @@ class ArchiveController extends Controller
         $dealerships = User::role('Cotizador')->pluck('name', 'id')->prepend('TODOS', 0);        
         return view('archive.index', compact('logged_user_role', 'dealerships', 'sync_connections', 'dealerships'));
     }
+
+    //Inbox list
+    public function getList(Request $request)
+    {
+        if(!$request->ajax()) abort(403, 'Unauthorized action');
+
+        $fields = ['documents.id', 'documents.is_canceled', 'documents.created_at', 
+                     'sync_connections.display_name as sync_connection',
+                     'users.name as buyer', 'documents.number', 'customers.trade_name as customer',
+                      DB::raw('(CASE documents.status 
+                              WHEN 3 THEN "Terminada"
+                              WHEN 4 THEN "Archivada"
+                              ELSE "Indefinido" END) as status'), 'documents.reference', 'documents.siavcom_ctz'];
+
+        $query = DB::table('documents')
+                     ->join('employees', 'employees.users_id', 'documents.employees_users_id')
+                     ->join('users', 'users.id', 'employees.users_id')
+                     ->join('customers', 'customers.id', 'documents.customers_id')
+                     ->join('sync_connections', 'documents.sync_connections_id', 'sync_connections.id');
+
+        $query->where('documents.status', '>', 2); //Finished and archived status
+
+        $logged_user = Auth::user();
+        //Dealership won't see customer
+        if($logged_user->hasRole("Cotizador")) {
+            $query->where('documents.employees_users_id', $logged_user->id);
+            unset($fields[6]); //customer removed 
+        }
+        $query->select($fields);
+        return $this->buildInboxDataTable($query, $logged_user);
+    }
+
+   private function buildInboxDataTable($query)
+   {
+        return Datatables::of($query)
+          ->editColumn('created_at', function($document) {
+            return date_format(new \DateTime($document->created_at), 'd/m/Y');
+          })
+          ->addColumn('actions', function($document) { 
+            
+            $actions = '<a href="' . config('app.url') . '/archive/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';
+            $actions .= $document->siavcom_ctz != 1 ? '<a class="btn btn-circle btn-icon-only default green-meadow" onClick="unlockDocument(event, ' . $document->id . ')"><i class="fa fa-unlock"></i></a>' : '';
+            
+            return $actions;
+          })
+          ->rawColumns(['actions' => 'actions'])
+          ->make(true);
+    }  
 
     /**
      * Show the form for creating a new resource.

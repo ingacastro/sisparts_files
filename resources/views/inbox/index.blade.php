@@ -49,7 +49,7 @@
                         @endrole
                         <div class="col-md-3">
                             <div class="form-group">
-                                {!! Form::select('status', [0 => 'TODOS', 1 => 'Nueva', 2 => 'En proceso', 3 => 'Terminada'], null, 
+                                {!! Form::select('status', [0 => 'TODOS', 1 => 'Nueva', 2 => 'En proceso'], null, 
                                 ['placeholder' => 'Estatus...', 'class' => 'form-control drop-down', 'id' => 'filters_status']) !!}
                             </div>
                         </div>
@@ -171,14 +171,14 @@ function buildDataTable(ajaxData) {
         bSort: true,
         destroy: true,
         columns: [
-            { data: "created_at", name: "created_at" },
+            { data: "created_at", name: "created_at", searchable: false},
             { data: "sync_connection", name: "sync_connections.display_name" },
-            { data: "number", name: "number" },
-            { data: "reference", name: "reference" },
+            { data: "number", name: "documents.number" },
+            { data: "reference", name: "documents.reference" },
             { data: "buyer", name: "users.name" },
             @if($logged_user_role == 'Administrador'){ data: "customer", name: "customers.trade_name" },@endif
-            { data: "semaphore", name: "semaphore" },
-            { data: "status", name: "status" },
+            { data: "semaphore", name: "semaphore", searchable: false, orderable: false },
+            { data: "status", name: "status", searchable: false },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }
         ],
         language: {

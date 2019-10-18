@@ -253,10 +253,8 @@ class DocumentSync extends Command
             'set' => $pivot->mov_mov,
             'product_description' => $pivot->dse_mov,
             'products_amount' => $pivot->can_mov,
-            'sale_unit_cost' => $pivot->pve_mov,
             'type' => $pivot->tdo_tdo,
             'currencies_id' => $currency->id ?? null,
-            'status' => 1,
             'ens_mov' => $pivot->ens_mov,
             'inv_tdo' => $pivot->inv_tdo,
             'dga_pro' => $pivot->dga_pro,
@@ -285,8 +283,9 @@ class DocumentSync extends Command
 
         if(isset($document_supply))
             $document->supplies()->updateExistingPivot($supply_id, $pivot_data);
-        else{
-
+        else {
+            $pivot_data['status'] = 1;
+            $pivot_data['sale_unit_cost'] = $pivot->pve_mov;
             $pivot_data['documents_id'] = $document->id;
             $pivot_data['supplies_id'] = $supply_id;
             $document_supply_id = DB::table('documents_supplies')->insertGetId($pivot_data);

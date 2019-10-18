@@ -23,6 +23,9 @@ $(document).on('click', '.edit-set', function() {
         dataType: 'json',
         success: function(response) {
             $('#tab_budget_content').html(response.budget_tab);
+            $('#budget_tab_suppliers_select').select2({
+                dropdownParent: $('#edit_set_modal')
+            });
             applyFieldsMasks();
             $('#budget_total_cost').html(total_cost);
             $('#budget_total_price').html(total_price);

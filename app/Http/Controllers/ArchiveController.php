@@ -35,6 +35,9 @@ class ArchiveController extends Controller
     {
         if(!$request->ajax()) abort(403, 'Unauthorized action');
 
+        $sync_connection = $request->get('sync_connection') ?? 0;
+        $dealer_ship = $request->get('dealer_ship') ?? 0;
+
         $fields = ['documents.id', 'documents.is_canceled', 'documents.created_at', 
                      'sync_connections.display_name as sync_connection',
                      'users.name as buyer', 'documents.number', 'customers.trade_name as customer',
@@ -48,6 +51,11 @@ class ArchiveController extends Controller
                      ->join('users', 'users.id', 'employees.users_id')
                      ->join('customers', 'customers.id', 'documents.customers_id')
                      ->join('sync_connections', 'documents.sync_connections_id', 'sync_connections.id');
+
+        if($sync_connection > 0)
+            $query->where('documents.sync_connections_id', $sync_connection);
+        if($dealer_ship > 0)
+            $query->where('documents.employees_users_id', $dealer_ship);
 
         $query->where('documents.status', '>', 2); //Finished and archived status
 

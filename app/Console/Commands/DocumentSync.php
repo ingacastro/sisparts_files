@@ -117,7 +117,6 @@ class DocumentSync extends Command
             'customer_requirement_number' => $siavcomDocument->ob1_doc,
             'buyer_name' => $siavcomDocument->ob2_doc,
             'buyer_number' => $siavcomDocument->tcd_tcd,
-            'employees_users_id' => $dealer_ship->users_id,
             'cop_nom' => $siavcomDocument->cop_nom,
             'con_con' => $siavcomDocument->con_con,
             'fel_doc' => $siavcomDocument->fel_doc,
@@ -169,12 +168,12 @@ class DocumentSync extends Command
             ->where('sync_connections_id', $conn->id)->first();
 
             $is_new_pct = true;
-            if($document) { 
+            if($document) {  //PCT update
                 $document->fill($data)->update(); 
                 $is_new_pct = false;
-            }
-            else {
+            } else { //PCT create
                 $data['status'] = 1;
+                $data['employees_users_id'] = $dealer_ship->users_id;
                 $data['sync_connections_id'] = $conn->id;
                 $document = Document::create($data);
             }

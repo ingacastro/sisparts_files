@@ -168,7 +168,11 @@ class DocumentSync extends Command
             $document = Document::where('number',$documentNumber)
             ->where('sync_connections_id', $conn->id)->first();
 
-            if(isset($document)) $document->fill($data)->update();
+            $is_new_pct = true;
+            if($document) { 
+                $document->fill($data)->update(); 
+                $is_new_pct = false;
+            }
             else {
                 $data['status'] = 1;
                 $data['sync_connections_id'] = $conn->id;
@@ -176,7 +180,7 @@ class DocumentSync extends Command
             }
 
             //Document's supplies
-            $this->insertUpdateSupplies($document, $conn);
+            $this->insertUpdateSupplies($document, $conn, $is_new_pct);
 
         } catch(\Exception $e) {
             Log::notice($e->getMessage());
@@ -187,7 +191,7 @@ class DocumentSync extends Command
         return true;
     }
 
-    private function insertUpdateSupplies(Document $document, \stdClass $conn)
+    private function insertUpdateSupplies(Document $document, \stdClass $conn, $is_new_pct)
     {
         $documentId = $document->id;
         $documentNumber = $document->number;
@@ -202,7 +206,8 @@ class DocumentSync extends Command
             $this->attachDocumentSupply($pivot, $conn,  $document);
         }
 
-        $this->sendSuppliersQuotations($document);
+        if($is_new_pct)
+            $this->sendSuppliersQuotations($document);
     }
 
     //Inserts on document_supplies table
@@ -435,7 +440,6 @@ class DocumentSync extends Command
     {
         try {        
             
-            $doc->fill(['status' => 2])->update();
 
             $binnacle_data = [
                 'entity' => 1, //Document
@@ -448,6 +452,7 @@ class DocumentSync extends Command
             ];
 
             Binnacle::create($binnacle_data);
+            $doc->fill(['status' => 2])->update();
         } catch(\Exception $e) {
             throw new \Exception("Error al registrat la bitácora.", 1);
         }

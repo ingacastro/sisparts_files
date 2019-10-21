@@ -1501,6 +1501,7 @@ $sale_conditions = $condition->description . '
                 $query_clone->update([
                     'imp_doc' => $new_subtotal,
                     'im3_doc' => $new_subtotal * $document->customer->getIVA()]);
+                return;
             }
         }
 

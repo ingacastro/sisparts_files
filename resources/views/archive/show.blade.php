@@ -236,7 +236,7 @@ $(document).ready(function(){
         destroy: true,
         columns: [
             { data: "number", name: "number" },
-            { data: "supplier", name: "supplier" },
+            { data: "supplier", name: "suppliers.trade_name" },
             { data: "products_amount", name: "products_amount" },
             { data: "measurement_unit", name: "measurement_unit" },
             { data: "total_cost", name: "total_cost" },

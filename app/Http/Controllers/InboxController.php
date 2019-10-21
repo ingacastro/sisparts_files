@@ -1494,8 +1494,8 @@ $sale_conditions = $condition->description . '
 
             if($siavcom_ctz) { //if ctz exists, update sutotal and IVA
                 $siavcom_ctz_new_subtotal = $siavcom_ctz->imp_doc + $subtotal;
-                $siavcom_ctz->update(['imp_doc' => $siavcom_ctz_new_subtotal, 
-                    'im3_doc' => ($siavcom_ctz_new_subtotal * $document->customer->getIVA())]);
+                $siavcom_ctz->fill(['imp_doc' => $siavcom_ctz_new_subtotal, 
+                    'im3_doc' => ($siavcom_ctz_new_subtotal * $document->customer->getIVA())])->update();
                 return;
             }
         }

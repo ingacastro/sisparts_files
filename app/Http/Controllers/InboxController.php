@@ -1489,7 +1489,7 @@ $sale_conditions = $condition->description . '
         }
 
         //Check if siavcom ctz exists and update, otherwise create it
-/*        if($document->siavcom_ctz == 1) {
+        if($document->siavcom_ctz == 1) {
             $query = DB::connection($conn->name)->table('comedoc')
             ->where('ndo_doc', $ctz_number)
             ->where('tdo_tdo', 'CTZ');
@@ -1504,7 +1504,7 @@ $sale_conditions = $condition->description . '
                     'im3_doc' => $new_subtotal * $document->customer->getIVA()]);
                 return;
             }
-        }*/
+        }
 
         $key_pri = $last_siavcom_ctz_key_pri->key_pri + 1;
 

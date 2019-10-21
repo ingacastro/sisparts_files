@@ -1487,7 +1487,7 @@ $sale_conditions = $condition->description . '
 
             $subtotal += $total_price;
         }
-
+        if($document->siavcom_ctz == 1) return;
         //Check if siavcom ctz exists and update, otherwise create it
 /*        if($document->siavcom_ctz == 1) {
             $query = DB::connection($conn->name)->table('comedoc')

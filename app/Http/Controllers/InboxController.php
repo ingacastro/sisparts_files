@@ -305,7 +305,7 @@ class InboxController extends Controller
         $doc_id = $set_pri_key[0];
         $set = SupplySet::where('documents_id', $doc_id)->where('supplies_id', $set_pri_key[1])->first();
         
-        $suppliers = Supplier::pluck('trade_name', 'id');
+        $suppliers = Supplier::orderBy('trade_name')->pluck('trade_name', 'id');
         $currencies = Currency::pluck('name', 'id');
         $measurement = DB::table('measurements')->find($set->id);
         $countries = DB::table('countries')->pluck('name', 'id');

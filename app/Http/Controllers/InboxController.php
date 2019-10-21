@@ -886,7 +886,7 @@ class InboxController extends Controller
 
             $result['emailed_sets_ids'] = [];
             foreach($data['emails'] as $email) {
-                $result = $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $document->dealership, $set);
+                $result = $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $set);
                 $this->registerQuotationEmailBinnacle($result['supplier_email'], $data['sets']);
             }
 
@@ -928,8 +928,11 @@ class InboxController extends Controller
         return response()->json(['errors' => false]);
     }
 
-    private function sendSupplierQuotationEmail($email, $data, $document_number, $document_reference, Employee $dealership, SupplySet $set)
+    private function sendSupplierQuotationEmail($email, $data, $document_number, $document_reference, SupplySet $set)
     {   
+
+        $dealership = Auth::user()->employee;
+
         //Spanish as default, cause we have custom emails in addition to registered suppliers
         $message = DB::table('messages_languages')
         ->join('languages', 'languages.id', 'messages_languages.languages_id')

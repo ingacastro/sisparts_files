@@ -1485,7 +1485,6 @@ $sale_conditions = $condition->description . '
                }
             }
 
-            Log::notice($subtotal);
             $subtotal += $total_price;
         }
 
@@ -1496,6 +1495,8 @@ $sale_conditions = $condition->description . '
             ->where('tdo_tdo', 'CTZ');
             $query_clone = clone $query;
             $siavcom_ctz = $query->first();
+            Log::notice($siavcom_ctz->imp_doc);
+            Log::notice($subtotal);
             $new_subtotal = $siavcom_ctz->imp_doc + $subtotal;
             if($siavcom_ctz) { //if ctz exists, update sutotal and IVA
                 $query_clone->update([

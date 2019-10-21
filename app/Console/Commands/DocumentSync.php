@@ -279,7 +279,8 @@ class DocumentSync extends Command
         ];
 
         $supply_id = $supply->id;
-        $document_supply = $document->supplies()->find($supply_id);
+        $document_supply = $document->supplies()->where('supplies_id', $supply_id)
+        ->where('set', $pivot->mov_mov)->first();
 
         if(isset($document_supply))
             $document->supplies()->updateExistingPivot($supply_id, $pivot_data);

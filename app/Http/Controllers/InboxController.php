@@ -1266,8 +1266,8 @@ class InboxController extends Controller
             }
 
             //Create CTZ on siavcom DB (zukaely, pavan or mxmro)
+            $this->createUpdateSiavcomCTZ($document, $conn, $ctz_number, $supplies_sets);
             if($document->siavcom_ctz == 0) {
-                $this->createSiavcomCTZ($document, $conn, $ctz_number, $supplies_sets);
                 $document->fill(['siavcom_ctz' => 1, 'siavcom_ctz_number' => $ctz_number])
                 ->update();
             }
@@ -1452,7 +1452,7 @@ $sale_conditions = $condition->description . '
     }
 
     /* Creates a new ctz on siavcom database and gets ctz subtotal out of user's selected supply sets */
-    private function createSiavcomCTZ(Document $document, $conn, $ctz_number, $sets) 
+    private function createUpdateSiavcomCTZ(Document $document, $conn, $ctz_number, $sets) 
     {
         $last_siavcom_ctz_key_pri = DB::connection($conn->name)->table($this->siavcomDocumentsTable)
         //->where('tdo_tdo', 'CTZ')
@@ -1460,7 +1460,7 @@ $sale_conditions = $condition->description . '
         ->first();
 
         $doc_currency = $document->currency->name;
-        $subtotal = 0;
+        $subtotal = 0; //selected sets subtotal addition
 
         foreach($sets as $set) {
 
@@ -1475,8 +1475,6 @@ $sale_conditions = $condition->description . '
 
             $total_price = $this->calculateTotalPrice($total_cost, $utility_percentage);
             
-            //Log::notice('set id ' . $set->id . 'total_cost' . $total_cost . 'total price ' . $total_price);
-
             if($set_currency != $doc_currency) {
                try {
                    $total_price = $this->currencyExchange($total_price, $set_currency, $doc_currency);
@@ -1486,6 +1484,20 @@ $sale_conditions = $condition->description . '
             }
 
             $subtotal += $total_price;
+        }
+
+        //Check if siavcom ctz exists and update, otherwise create it
+        if($document->siavcom_ctz == 1) {
+            $siavcom_ctz = DB::connection($conn->name)->table('comedoc')
+            ->where('ndo_doc', $ctz_number)
+            ->where('tdo_tdo', 'CTZ')->first();
+
+            if($siavcom_ctz) { //if ctz exists, update sutotal and IVA
+                $siavcom_ctz_new_subtotal = $siavcom_ctz->imp_doc + $subtotal;
+                $siavcom_ctz->update(['imp_doc' => $siavcom_ctz_new_subtotal, 
+                    'im3_doc' => ($siavcom_ctz_new_subtotal * $document->customer->getIVA())]);
+                return;
+            }
         }
 
         $key_pri = $last_siavcom_ctz_key_pri->key_pri + 1;

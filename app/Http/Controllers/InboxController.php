@@ -1475,6 +1475,8 @@ $sale_conditions = $condition->description . '
 
             $total_price = $this->calculateTotalPrice($total_cost, $utility_percentage);
             
+            //Log::notice('set id ' . $set->id . 'total_cost' . $total_cost . 'total price ' . $total_price);
+
             if($set_currency != $doc_currency) {
                try {
                    $total_price = $this->currencyExchange($total_price, $set_currency, $doc_currency);
@@ -1483,21 +1485,22 @@ $sale_conditions = $condition->description . '
                }
             }
 
+            Log::notice($subtotal);
             $subtotal += $total_price;
         }
 
         //Check if siavcom ctz exists and update, otherwise create it
         if($document->siavcom_ctz == 1) {
-            $siavcom_ctz_query = DB::connection($conn->name)->table('comedoc')
+            $query = DB::connection($conn->name)->table('comedoc')
             ->where('ndo_doc', $ctz_number)
             ->where('tdo_tdo', 'CTZ');
-            $siavcom_ctz = $siavcom_ctz_query->first();
-            $siavcom_ctz_query_clone = clone $siavcom_ctz_query;
-            if($siavcom_ctz_query->first()) { //if ctz exists, update sutotal and IVA
-                $siavcom_ctz_new_subtotal = $siavcom_ctz->imp_doc + $subtotal;
-                $siavcom_ctz_query_clone->update(['imp_doc' => $siavcom_ctz_new_subtotal, 
-                    'im3_doc' => ($siavcom_ctz_new_subtotal * $document->customer->getIVA())]);
-                return;
+            $query_clone = clone $query;
+            $siavcom_ctz = $query->first();
+            $new_subtotal = $siavcom_ctz->imp_doc + $subtotal;
+            if($siavcom_ctz) { //if ctz exists, update sutotal and IVA
+                $query_clone->update([
+                    'imp_doc' => $new_subtotal,
+                    'im3_doc' => $new_subtotal * $document->customer->getIVA()]);
             }
         }
 

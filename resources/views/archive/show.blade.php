@@ -239,8 +239,8 @@ $(document).ready(function(){
             { data: "supplier", name: "suppliers.trade_name" },
             { data: "products_amount", name: "documents_supplies.products_amount" },
             { data: "measurement_unit", name: "measurement", searchable: false },
-            { data: "total_cost", name: "total_cost" },
-            { data: "total_price", name: "total_price" },
+            { data: "total_cost", name: "total_cost", searchable: false },
+            { data: "total_price", name: "total_price", searchable: false },
             { data: "status", name: "status" },
             { data: "actions", name: "actions", searchable: false, orderable: false}
         ],

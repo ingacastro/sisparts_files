@@ -78,7 +78,6 @@ class ArchiveController extends Controller
           ->addColumn('actions', function($document) { 
             
             $actions = '<a href="' . config('app.url') . '/archive/' . $document->id . '" class="btn btn-circle btn-icon-only green"><i class="fa fa-eye"></i></a>';
-            $actions .= $document->siavcom_ctz != 1 ? '<a class="btn btn-circle btn-icon-only default green-meadow" onClick="unlockDocument(event, ' . $document->id . ')"><i class="fa fa-unlock"></i></a>' : '';
             
             return $actions;
           })

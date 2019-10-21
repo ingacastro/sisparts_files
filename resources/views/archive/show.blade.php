@@ -235,10 +235,10 @@ $(document).ready(function(){
         bSort: true,
         destroy: true,
         columns: [
-            { data: "number", name: "number" },
+            { data: "number", name: "supplies.number" },
             { data: "supplier", name: "suppliers.trade_name" },
-            { data: "products_amount", name: "products_amount" },
-            { data: "measurement_unit", name: "measurement_unit" },
+            { data: "products_amount", name: "documents_supplies.products_amount" },
+            { data: "measurement_unit", name: "measurement" },
             { data: "total_cost", name: "total_cost" },
             { data: "total_price", name: "total_price" },
             { data: "status", name: "status" },

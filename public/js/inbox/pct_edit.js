@@ -24,8 +24,7 @@ $(document).on('click', '.edit-set', function() {
         success: function(response) {
             $('#tab_budget_content').html(response.budget_tab);
             $('#budget_tab_suppliers_select').select2({
-                dropdownParent: $('#edit_set_modal'),
-                width: 'resolve'
+                dropdownParent: $('#edit_set_modal')
             });
             applyFieldsMasks();
             $('#budget_total_cost').html(total_cost);

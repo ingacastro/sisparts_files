@@ -10,7 +10,8 @@
                     <div class="col-md-7">
                         <div class="form-group">
                             {!! Form::select('set[suppliers_id]', $suppliers, $set->suppliers_id, ['class' => 'form-control',
-                                'id' => 'budget_tab_suppliers_select', 'placeholder' => 'Proveedor...', $set_edit_inputs_status]) !!}
+                                'style' => 'width: 100%', 'id' => 'budget_tab_suppliers_select', 
+                                'placeholder' => 'Proveedor...', $set_edit_inputs_status]) !!}
                         </div>
                     </div>
                     <div class="col-md-5">

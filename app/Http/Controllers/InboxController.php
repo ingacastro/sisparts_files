@@ -1461,10 +1461,13 @@ $sale_conditions = $condition->description . '
 
         $doc_currency = $document->currency->name;
         $subtotal = 0;
+
         foreach($document->supply_sets as $set) {
+
             $set_currency = $set->currency->name;
             $total_cost = $this->calculateTotalCost($set->sale_unit_cost, $set->products_amount, $set->importation_cost, 
             $set->warehouse_shipment_cost, $set->customer_shipment_cost, $set->extra_charges);
+
             $utility_percentage = $set->utility_percentage 
                                 ? $set->utility_percentage->percentage 
                                 : $set->custom_utility_percentage;
@@ -1479,6 +1482,7 @@ $sale_conditions = $condition->description . '
                }
             }
 
+            Log::notice($total_price);
             $subtotal += $total_price;
         }
 

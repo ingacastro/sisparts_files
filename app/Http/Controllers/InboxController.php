@@ -1474,6 +1474,7 @@ $sale_conditions = $condition->description . '
 
 
             $total_price = $this->calculateTotalPrice($total_cost, $utility_percentage);
+            Log::notice('set id ' . $set->id . 'total_cost' . $total_cost . 'total price ' . $total_price);
             if($set_currency != $doc_currency) {
                try {
                    $total_price = $this->currencyExchange($total_price, $set_currency, $doc_currency);
@@ -1482,7 +1483,6 @@ $sale_conditions = $condition->description . '
                }
             }
 
-            Log::notice('Set id  and total price, respectively' . $set . $total_price);
             $subtotal += $total_price;
         }
 

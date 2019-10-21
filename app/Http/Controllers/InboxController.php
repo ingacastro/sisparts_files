@@ -1491,6 +1491,7 @@ $sale_conditions = $condition->description . '
             $siavcom_ctz_query = DB::connection($conn->name)->table('comedoc')
             ->where('ndo_doc', $ctz_number)
             ->where('tdo_tdo', 'CTZ');
+            $siavcom_ctz = $siavcom_ctz_query->first();
             $siavcom_ctz_query_clone = clone $siavcom_ctz_query;
             if($siavcom_ctz_query->first()) { //if ctz exists, update sutotal and IVA
                 $siavcom_ctz_new_subtotal = $siavcom_ctz->imp_doc + $subtotal;

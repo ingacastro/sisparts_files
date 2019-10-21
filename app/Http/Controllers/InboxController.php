@@ -1482,7 +1482,7 @@ $sale_conditions = $condition->description . '
                }
             }
 
-            Log::notice($total_price);
+            Log::notice('Set id  and total price, respectively' . $set . $total_price);
             $subtotal += $total_price;
         }
 

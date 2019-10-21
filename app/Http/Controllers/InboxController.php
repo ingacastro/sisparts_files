@@ -1202,7 +1202,6 @@ class InboxController extends Controller
     /*Turns a supply set into CTZ*/
     public function setsTurnCTZ(Request $request)
     {
-
         if(!$request->ajax())
             return response()->json([
                 'errors' => true,
@@ -1234,6 +1233,8 @@ class InboxController extends Controller
             DB::beginTransaction();
             $conn_name = $conn->name;
             DB::connection($conn_name)->beginTransaction();
+
+            //All the supplysets selected by the user
             foreach($supplies_sets as $supply_set) {
 
                 $customer = $supply_set->document->customer;
@@ -1266,7 +1267,7 @@ class InboxController extends Controller
 
             //Create CTZ on siavcom DB (zukaely, pavan or mxmro)
             if($document->siavcom_ctz == 0) {
-                $this->createSiavcomCTZ($document, $conn, $ctz_number);
+                $this->createSiavcomCTZ($document, $conn, $ctz_number, $supplies_sets);
                 $document->fill(['siavcom_ctz' => 1, 'siavcom_ctz_number' => $ctz_number])
                 ->update();
             }
@@ -1450,19 +1451,18 @@ $sale_conditions = $condition->description . '
         return $amount;
     }
 
-    private function createSiavcomCTZ(Document $document, $conn, $ctz_number) 
+    /* Creates a new ctz on siavcom database and gets ctz subtotal out of user's selected supply sets */
+    private function createSiavcomCTZ(Document $document, $conn, $ctz_number, $sets) 
     {
         $last_siavcom_ctz_key_pri = DB::connection($conn->name)->table($this->siavcomDocumentsTable)
         //->where('tdo_tdo', 'CTZ')
         ->OrderBy('key_pri', 'desc')
         ->first();
 
-        //$subtotal = array_sum($document->supply_sets->pluck('sale_unit_cost')->toArray());
-
         $doc_currency = $document->currency->name;
         $subtotal = 0;
 
-        foreach($document->supply_sets as $set) {
+        foreach($sets as $set) {
 
             $set_currency = $set->currency->name;
             $total_cost = $this->calculateTotalCost($set->sale_unit_cost, $set->products_amount, $set->importation_cost, 
@@ -1474,7 +1474,9 @@ $sale_conditions = $condition->description . '
 
 
             $total_price = $this->calculateTotalPrice($total_cost, $utility_percentage);
-            Log::notice('set id ' . $set->id . 'total_cost' . $total_cost . 'total price ' . $total_price);
+            
+            //Log::notice('set id ' . $set->id . 'total_cost' . $total_cost . 'total price ' . $total_price);
+
             if($set_currency != $doc_currency) {
                try {
                    $total_price = $this->currencyExchange($total_price, $set_currency, $doc_currency);

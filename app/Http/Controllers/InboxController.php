@@ -1399,9 +1399,7 @@ $sale_conditions = $condition->description . '
             'EUR' => null
         ];
 
-        $sie_api_response = FALSE;
-        if(file_exists(config('sie_api.url')))
-            $sie_api_response = file_get_contents(config('sie_api.url'));
+        $sie_api_response = file_get_contents(config('sie_api.url'));
 
         if($sie_api_response === FALSE) {
             $non_mxn_currencies = Currency::where('name', '!=', 'MXN')->get();

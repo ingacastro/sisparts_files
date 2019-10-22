@@ -247,14 +247,12 @@ class DocumentSync extends Command
     //documents-supplies relationship
     private function insertDocumentSupply(\stdClass $pivot, Document $document, Supply $supply) {
 
-        $currency = DB::table('currencies')->where('id', $pivot->mon_mov)->first();
 
         $pivot_data = [
             'set' => $pivot->mov_mov,
             'product_description' => $pivot->dse_mov,
             'products_amount' => $pivot->can_mov,
             'type' => $pivot->tdo_tdo,
-            'currencies_id' => $currency->id ?? null,
             'ens_mov' => $pivot->ens_mov,
             'inv_tdo' => $pivot->inv_tdo,
             'dga_pro' => $pivot->dga_pro,
@@ -285,7 +283,10 @@ class DocumentSync extends Command
         if(isset($document_supply))
             $document->supplies()->updateExistingPivot($supply_id, $pivot_data);
         else {
+            $currency = DB::table('currencies')->where('id', $pivot->mon_mov)->first();
+            
             $pivot_data['status'] = 1;
+            $pivot['currencies_id'] = $currency->id ?? null;
             $pivot_data['sale_unit_cost'] = $pivot->pve_mov;
             $pivot_data['documents_id'] = $document->id;
             $pivot_data['supplies_id'] = $supply_id;

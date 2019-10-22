@@ -10,6 +10,7 @@ use IParts\User;
 use IParts\Manufacturer;
 use IParts\Supplier;
 use IParts\Currency;
+use IParts\Country;
 use IParts\File;
 use IParts\Message;
 use IParts\Binnacle;
@@ -616,16 +617,21 @@ class InboxController extends Controller
                 'errors' => true, 
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
                 ->withErrors('Acción no autorizada.')->render()]);
-        
-        if(!$request->ajax())
-            return response()->json([
-                'errors' => true, 
-                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
-                ->withErrors('Acción no autorizada.')->render()]);
 
         $data = $request->all();
         $utility_percent_arr = explode('_', $data['utility_percentage']);
         $data['utility_percentage'] = $utility_percent_arr[1];
+
+        $result = true;
+        if($utility_percent_arr[0] > 0)
+            $result = $this->checkCountryAllowedUtilityPercentage($data['set']['source_country_id'], $utility_percent_arr[0]);
+        
+        if(!$result) 
+            return response()->json([
+                'errors' => true, 
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('La combinación país de origen y porcentaje de utilidad no es correcta.')->render()]);
+
         $validator = $this->budgetValidations($data);
         
         if($validator->fails())
@@ -693,6 +699,16 @@ class InboxController extends Controller
             'success_fragment' => \View::make('inbox.set_edition_modal_tabs.success_message')
             ->with('success_message', 'Presupuesto correctamente actualizado.')->render()
         ]);
+    }
+
+    private function checkCountryAllowedUtilityPercentage($country_id, $utility_percentage_id)
+    {
+        $country = Country::find($country_id);
+        $utility_percentage = UtilityPercentage::find($utility_percentage_id);
+        if(($country->name == 'Mexico' && $utility_percentage->name == 'Internacional') 
+            || ($country->name != 'Mexico' && $utility_percentage->name == 'Nacional')) return false;
+
+        return true;
     }
 
     private function calculateBudget($set, $set_data, $utility_percentage)

@@ -616,6 +616,12 @@ class InboxController extends Controller
                 'errors' => true, 
                 'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
                 ->withErrors('Acción no autorizada.')->render()]);
+        
+        if(!$request->ajax())
+            return response()->json([
+                'errors' => true, 
+                'errors_fragment' => \View::make('layouts.admin.includes.error_messages')
+                ->withErrors('Acción no autorizada.')->render()]);
 
         $data = $request->all();
         $utility_percent_arr = explode('_', $data['utility_percentage']);

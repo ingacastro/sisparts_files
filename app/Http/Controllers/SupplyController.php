@@ -62,7 +62,6 @@ class SupplyController extends Controller
                 foreach($supply->manufacturer->suppliers as $k => $supplier) {
                   $trade_name = $supplier->trade_name;
                   $suppliers[$k] = $trade_name;
-                  //Log::notice($k);
                   foreach($supplier->quotation_requests as $q_request) {
                     if($q_request->document_supply->supply->id == $supply->id)
                       $suppliers[$k] = $trade_name . ' (Cotizado)';
@@ -72,7 +71,6 @@ class SupplyController extends Controller
               }) 
               ->addColumn('files', function($supply){
                 $files = '';
-                //Log::notice($supply->files->count());
                 foreach($supply->files as $k => $file) {
                   $files .= '<a href="' . config('app.url') . '/' . $file->path . '" download>Archivo ' . ($k + 1) . '</a></br>';
                 }

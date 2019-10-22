@@ -1152,7 +1152,7 @@ class InboxController extends Controller
 
         $binnacle_data = [
             'entity' => 2, //item (supply set)
-            'comments' => $request->comments,
+            'comments' => 'Partida rechazada: ' . $request->comments,
             'pct_status' => $supply_set->document->status,
             'users_id' => Auth::user()->id,
             'type' => 2, //Just a silly number tha means nothing

@@ -111,6 +111,7 @@ class InboxController extends Controller
 
         $first_query_ids = $query->select(['documents.id'])->pluck('id');
         $base_query_clone->whereIn('documents.id', $first_query_ids);
+        $base_query_clone->orderBy('documents.created_at', 'asc');
         $base_query_clone->select($fields);
 
         return $this->buildInboxDataTable($base_query_clone, $logged_user);

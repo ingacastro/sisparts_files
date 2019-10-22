@@ -99,7 +99,7 @@ return [
     |
     */
 
-    'sendmail' => '/usr/sbin/sendmail -bs',
+    'sendmail' => env('MAIL_SEND_MAIL', '/usr/sbin/sendmail -t -i'),
 
     /*
     |--------------------------------------------------------------------------

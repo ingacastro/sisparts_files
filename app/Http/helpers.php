@@ -13,9 +13,10 @@ class Helper {
         $headers = 'From: ' . $from . "\r\n" .
         'Reply-To: ' . $reply_to . "\r\n" .
 		'X-Mailer: PHP/' . phpversion() . "\r\n" . 
-		"Content-type: text/html\r\n";
+		"Content-type: text/html";
 
-		mail($recipients, $subject, $message, $headers);
+		$result = mail($recipients, $subject, $message, $headers);
+        Log::notice($result);
 
     }
     public static function diffBusinessDays($start_date)

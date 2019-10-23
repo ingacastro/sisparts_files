@@ -10,7 +10,7 @@ class SupplySet extends Model
     protected $fillable = ['documents_id', 'supplies_id', 'suppliers_id', 'currencies_id', 'sale_unit_cost',
                             'importation_cost', 'warehouse_shipment_cost', 'customer_shipment_cost', 'extra_charges', 
                             'notes', 'source_country_id', 'utility_percentages_id', 'custom_utility_percentage', 'status', 
-                            'completed_date', 'unit_price', 'quotation_request_date', 'measurement_unit_code'];
+                            'completed_date', 'unit_price', 'quotation_request_date', 'measurement_unit_code', 'rejected_date'];
 
     public function document()
     {

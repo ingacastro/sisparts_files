@@ -40,8 +40,6 @@ class DashboardController extends Controller
 
         $supplier = \IParts\Supplier::where('trade_name', 'ABSA')->first() ?? 'Creating FOO supplier';
 
-        Log::notice($supplier);
-
         return view('dashboard', compact('dashboard_stats', 'dealerships_pairs'));
     }
 

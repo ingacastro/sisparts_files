@@ -56,7 +56,7 @@ class DashboardController extends Controller
         $daily_ctz_pcts_base_query = $completed_pcts_base_query
         ->whereDate('completed_date', '=', $now->toDateString());
 
-        $daily_ctz_items_base_query = SupplySet::where('documents_supplies.status', 9)
+        $daily_ctz_items_base_query = SupplySet::where('documents_supplies.status', 8)
         ->whereDate('documents_supplies.completed_date', '=', $now->toDateString());
 
         $monthly_ctz_pcts_base_query = $completed_pcts_base_query

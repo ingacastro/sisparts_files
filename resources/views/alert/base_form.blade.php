@@ -58,7 +58,7 @@
     </div>
 </div>
 <div class="form-actions right">
-    <a href="{{ route('user.index') }}" class="btn btn-circle default">Cancelar</a>
+    <a href="{{ route('alert.index') }}" class="btn btn-circle default">Cancelar</a>
     <button type="submit" class="btn btn-circle blue">
         <i class="fa fa-check"></i> Guardar</button>
 </div>

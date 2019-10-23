@@ -130,22 +130,22 @@ class DashboardController extends Controller
         return [
             'daily_pcts' => [
                 'amount' => $stats['daily_ctz_pcts'],
-                /*'expected' => $daily_pcts,*/
+                'expected' => $daily_pcts,
                 'percentage' => $daily_pcts == 0 ? 0 : number_format(($stats['daily_ctz_pcts'] / $daily_pcts) * 100, 2),
             ],
             'daily_items' => [
                 'amount' => $stats['daily_ctz_items'],
-                /*'expected' => $daily_items,*/
+                'expected' => $daily_items,
                 'percentage' => $daily_items == 0 ? 0 : number_format(($stats['daily_ctz_items'] / $daily_items) * 100, 2),
             ],
             'monthly_pcts' => [
                 'amount' => $stats['monthly_ctz_pcts'],
-                /*'expected' => $monthly,*/
+                'expected' => $monthly,
                 'percentage' => $monthly == 0 ? 0 : number_format(($stats['monthly_ctz_pcts'] / $monthly) * 100, 2),
             ],
             'monthly_items' => [
                 'amount' => $stats['monthly_ctz_items'],
-                /*'expected' => $monthly_items,*/
+                'expected' => $monthly_items,
                 'percentage' => $monthly_items == 0 ? 0 : number_format(($stats['monthly_ctz_items'] / $monthly_items) * 100, 2),
             ],
             'pending_ppas' => $stats['pending_ppas'],

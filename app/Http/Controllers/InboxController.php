@@ -141,6 +141,8 @@ class InboxController extends Controller
                         $query->orderBy('users.name', $dir);
                     else if($column == 5)
                         $query->orderBy('customers.trade_name', $dir);
+                    else if($column == 6)
+                        $query->orderBy('documents.status', $dir);
                 }
               })
               ->addColumn('semaphore', function($document) {

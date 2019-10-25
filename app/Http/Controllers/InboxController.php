@@ -126,7 +126,6 @@ class InboxController extends Controller
                     Log::notice('sorting by created_at');
                     $query->orderBy('documents.created_at', 'desc');
                 } else { 
-                    Log::notice('sorting by column');
                     $column = request()->order[0]['column'];
                     $dir = request()->order[0]['dir'];
                     if($column == 0)
@@ -141,7 +140,7 @@ class InboxController extends Controller
                         $query->orderBy('users.name', $dir);
                     else if($column == 5)
                         $query->orderBy('customers.trade_name', $dir);
-                    else if($column == 6)
+                    else if($column == 7)
                         $query->orderBy('documents.status', $dir);
                 }
               })

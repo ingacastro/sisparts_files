@@ -169,6 +169,7 @@ function buildDataTable(ajaxData) {
             data: ajaxData
         },
         bSort: true,
+        order: [],
         destroy: true,
         columns: [
             { data: "created_at", name: "created_at", searchable: false },
@@ -178,7 +179,7 @@ function buildDataTable(ajaxData) {
             { data: "buyer", name: "users.name" },
             @if($logged_user_role == 'Administrador'){ data: "customer", name: "customers.trade_name" },@endif
             { data: "semaphore", name: "semaphore", searchable: false, orderable: false },
-            { data: "status", name: "status", searchable: false, orderable: false },
+            { data: "status", name: "status", searchable: false },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }
         ],
         language: {

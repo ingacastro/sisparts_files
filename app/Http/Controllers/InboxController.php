@@ -60,6 +60,7 @@ class InboxController extends Controller
     //Inbox list
     public function getList(Request $request)
     {
+        Log::notice($request);
         if(!$request->ajax()) abort(403, 'Unauthorized action');
 
         $sync_connection = $request->get('sync_connection') ?? 0;
@@ -112,7 +113,6 @@ class InboxController extends Controller
 
         $first_query_ids = $query->select(['documents.id'])->pluck('id');
         $base_query_clone->whereIn('documents.id', $first_query_ids);
-       // $base_query_clone->orderBy('documents.created_at', 'desc');
         $base_query_clone->select($fields);
 
         return $this->buildInboxDataTable($base_query_clone, $logged_user);
@@ -121,6 +121,28 @@ class InboxController extends Controller
     private function buildInboxDataTable($query, $logged_user)
     {
         return Datatables::of($query)
+              ->order(function($query) {
+                if(!request()->order) {
+                    Log::notice('sorting by created_at');
+                    $query->orderBy('documents.created_at', 'desc');
+                } else { 
+                    Log::notice('sorting by column');
+                    $column = request()->order[0]['column'];
+                    $dir = request()->order[0]['dir'];
+                    if($column == 0)
+                        $query->orderBy('documents.created_at', $dir);
+                    else if($column == 1)
+                        $query->orderBy('sync_connections.display_name', $dir);
+                    else if($column == 2)
+                        $query->orderBy('documents.number', $dir);
+                    else if($column == 3)
+                        $query->orderBy('documents.reference', $dir);
+                    else if($column == 4)
+                        $query->orderBy('users.name', $dir);
+                    else if($column == 5)
+                        $query->orderBy('customers.trade_name', $dir);
+                }
+              })
               ->addColumn('semaphore', function($document) {
                 $days = $this->diffBusinessDays($document->created_at);
                 $color = DB::table('color_settings')->where('days', '<=', $days)

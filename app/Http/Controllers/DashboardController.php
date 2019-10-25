@@ -67,8 +67,10 @@ class DashboardController extends Controller
 
         //PPAs
         $pending_ppas_base_query = SupplySet::where('documents_supplies.status', 6);
-        $rejected_ppas_base_query = SupplySet::where('documents_supplies.status', 7);
-        $monthly_rejected_ppas_base_query = SupplySet::where('documents_supplies.status', 7)
+        $rejected_ppas_base_query = SupplySet::where('documents_supplies.status', 7)
+        ->leftJoin('rejections', 'rejections.documents_supplies_id', 'documents_supplies.id')
+        ->orWhereNotNull('rejections.id');
+        $current_month_rejected_ppas_base_query = SupplySet::where('documents_supplies.status', 7)
         ->whereMonth('documents_supplies.rejected_date', '=', $now->month);
 
         //Quotation average time
@@ -87,7 +89,7 @@ class DashboardController extends Controller
             ->where('documents.employees_users_id', $dealership_id);
             $rejected_ppas_base_query->join('documents', 'documents.id', 'documents_supplies.documents_id')
             ->where('documents.employees_users_id', $dealership_id);
-            $monthly_rejected_ppas_base_query->join('documents', 'documents.id', 'documents_supplies.documents_id')
+            $current_month_rejected_ppas_base_query->join('documents', 'documents.id', 'documents_supplies.documents_id')
             ->where('documents.employees_users_id', $dealership_id);
             $ctz_pcts_average_time_base_query->where('documents.employees_users_id', $dealership_id);
         }
@@ -99,7 +101,7 @@ class DashboardController extends Controller
             'monthly_ctz_items' => $monthly_ctz_items_base_query->count(),
             'pending_ppas' => $pending_ppas_base_query->count(),
             'rejected_ppas' => $rejected_ppas_base_query->count(),
-            'monthly_rejected_ppas' => $monthly_rejected_ppas_base_query->count(),
+            'current_month_rejected_ppas' => $current_month_rejected_ppas_base_query->count(),
             'ctz_pcts_average_time' => number_format($ctz_pcts_average_time_base_query->first()->average_time, 2)
         ];
 
@@ -148,7 +150,7 @@ class DashboardController extends Controller
             ],
             'pending_ppas' => $stats['pending_ppas'],
             'rejected_ppas' => $stats['rejected_ppas'],
-            'monthly_rejected_ppas' => $stats['monthly_rejected_ppas'],
+            'current_month_rejected_ppas' => $stats['current_month_rejected_ppas'],
             'rejected_ppas_percentage' => number_format($rejected_ppas_percentage * 100, 2),
             'quotation_average_time' => $stats['ctz_pcts_average_time']
         ];

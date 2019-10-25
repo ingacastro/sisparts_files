@@ -171,14 +171,14 @@ function buildDataTable(ajaxData) {
         bSort: true,
         destroy: true,
         columns: [
-            { data: "created_at", name: "created_at", searchable: false},
+            { data: "created_at", name: "created_at", searchable: false },
             { data: "sync_connection", name: "sync_connections.display_name" },
             { data: "number", name: "documents.number" },
             { data: "reference", name: "documents.reference" },
             { data: "buyer", name: "users.name" },
             @if($logged_user_role == 'Administrador'){ data: "customer", name: "customers.trade_name" },@endif
             { data: "semaphore", name: "semaphore", searchable: false, orderable: false },
-            { data: "status", name: "status", searchable: false },
+            { data: "status", name: "status", searchable: false, orderable: false },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }
         ],
         language: {

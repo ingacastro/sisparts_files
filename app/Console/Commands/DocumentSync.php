@@ -476,8 +476,8 @@ class DocumentSync extends Command
 
         $data = [
                 'code' => $siavcom_customer->cod_nom,
-                'trade_name' => $siavcom_customer->cli_nom,
-                'business_name' => $siavcom_customer->nom_nom,
+                'trade_name' => trim($siavcom_customer->cli_nom),
+                'business_name' => trim($siavcom_customer->nom_nom),
                 'post_code' => $siavcom_customer->cpo_nom,
                 'state' => $siavcom_customer->edo_edo,
                 'country' => $siavcom_customer->pai_nom,

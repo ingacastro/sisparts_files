@@ -1,9 +1,9 @@
 <?php $set_edit_inputs_status = $set->document->status < 3 ? null : 'disabled' ?>
 <div class="row modal-content-row">
     <div class="col-md-8">
-        {!! Form::open(['route' => ['inbox.update-set-budget', $set->documents_id . '_' . $set->supplies_id], 
+        {!! Form::open(['route' => ['inbox.update-set-budget', $set->documents_id . '_' . $set->id], 
         'method' => 'post', 'id' => 'edit_budget_form']) !!}
-        <input type="hidden" id="set_id" value="{{ $set->documents_id . '_' . $set->supplies_id }}">
+        <input type="hidden" id="set_id" value="{{ $set->documents_id . '_' . $set->id }}">
         <div class="row modal-content-border">
             <div class="col-md-6">
                 <div class="row">

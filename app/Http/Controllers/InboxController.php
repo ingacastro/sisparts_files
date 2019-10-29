@@ -60,7 +60,6 @@ class InboxController extends Controller
     //Inbox list
     public function getList(Request $request)
     {
-        Log::notice($request);
         if(!$request->ajax()) abort(403, 'Unauthorized action');
 
         $sync_connection = $request->get('sync_connection') ?? 0;
@@ -326,9 +325,11 @@ class InboxController extends Controller
     {
         if(!$request->ajax()) abort(403, 'Unauthorized action');
 
-        $set_pri_key = explode('_', $set_id);
-        $doc_id = $set_pri_key[0];
-        $set = SupplySet::where('documents_id', $doc_id)->where('supplies_id', $set_pri_key[1])->first();
+        $set_id = explode('_', $set_id);
+        $doc_id = $set_id[0];
+/*        $set = SupplySet::where('documents_id', $doc_id)->where('supplies_id', $set_pri_key[1])
+        ->first();*/
+        $set = SupplySet::find($set_id[1]);
         
         $suppliers = Supplier::orderBy('trade_name')->pluck('trade_name', 'id');
         $currencies = Currency::pluck('name', 'id');
@@ -549,6 +550,7 @@ class InboxController extends Controller
 
                 $edit_action = '<a data-target="#edit_set_modal" data-toggle="modal" class="btn btn-circle btn-icon-only default edit-set" 
                 data-id="' . $supplies_set->documents_id . '_' . $supplies_set->supplies_id . '"
+                data-set_id="' . $supplies_set->documents_id . '_' . $supplies_set->id . '"
                 data-total_cost="' . '$' . number_format($supplies_set->total_cost, 2, '.', ',') . $currency . '" 
                 data-total_price="' . '$' . number_format($total_price, 2, '.', ',') . $currency . '"
                 data-unit_price="' . '$' . number_format($unit_price, 2, '.', ',') . $currency . '"
@@ -678,9 +680,7 @@ class InboxController extends Controller
         DB::beginTransaction();
         try {
 
-            $document_supply = SupplySet::where('documents_id', $set_id[0])
-            ->where('supplies_id', $set_id[1])
-            ->first();
+            $document_supply = SupplySet::find($set_id[1]);
 
             $budget_data = $this->calculateBudget($document_supply, $data['set'], $utility_percentage_amount);
 
@@ -1519,10 +1519,7 @@ $sale_conditions = $condition->description . '
                                 ? $set->utility_percentage->percentage 
                                 : $set->custom_utility_percentage;
 
-
             $total_price = $this->calculateTotalPrice($total_cost, $utility_percentage);
-            
-            //Log::notice('set id ' . $set->id . 'total_cost' . $total_cost . 'total price ' . $total_price);
 
             if($set_currency != $doc_currency) {
                try {

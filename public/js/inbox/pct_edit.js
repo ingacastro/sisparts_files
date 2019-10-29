@@ -4,7 +4,7 @@ $(document).on('click', '.edit-set', function() {
     $('#pct_edit_modal_error_messages').html('');
     $('#pct_edit_modal_success_message').html('');
 
-    let set_id = $(this).attr('data-id');
+    let set_id = $(this).attr('data-set_id');
     let total_cost = $(this).attr('data-total_cost');
     let total_price = $(this).attr('data-total_price');
     let unit_price = $(this).attr('data-unit_price');

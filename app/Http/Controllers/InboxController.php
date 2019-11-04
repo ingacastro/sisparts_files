@@ -122,7 +122,6 @@ class InboxController extends Controller
         return Datatables::of($query)
               ->order(function($query) {
                 if(!request()->order) {
-                    Log::notice('sorting by created_at');
                     $query->orderBy('documents.created_at', 'desc');
                 } else { 
                     $column = request()->order[0]['column'];

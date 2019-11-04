@@ -5,6 +5,7 @@ namespace IParts\Http\Controllers;
 use Illuminate\Http\Request;
 use IParts\Document;
 use IParts\SupplySet;
+use IParts\Manufacturer;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -39,6 +40,8 @@ class DashboardController extends Controller
         $dashboard_stats = $this->getUserStats($request, null, $dealerships_count);
 
         $supplier = \IParts\Supplier::where('trade_name', 'ABSA')->first() ?? 'Creating FOO supplier';
+
+        Log::notice(Manufacturer::where('name', 'ABB, SIEMENS, DANFOSS, FLUKE, RITTAL, CROUZET')->first());
 
         return view('dashboard', compact('dashboard_stats', 'dealerships_pairs'));
     }

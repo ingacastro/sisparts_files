@@ -109,12 +109,16 @@ class VirtualCatalogSync extends Command
 
       $manufacturers_ids = [];
       $supplier_brands_ids = $supplier->brands->pluck('id')->toArray();
+
       foreach ($siavcom_manufacturers as $siavcom_manufacturer) {
-        $sisparts_manufacturer = Manufacturer::where('name', trim($siavcom_manufacturer->marca))->first() ?? 
-                                 Manufacturer::create(['name' => $siavcom_manufacturer->marca]);
+
+        $brand_name = trim($siavcom_manufacturer->marca);
+        $sisparts_manufacturer = Manufacturer::where('name', trim($brand_name))->first() ?? 
+                                 Manufacturer::create(['name' => $brand_name]);
         if(!in_array($sisparts_manufacturer->id, $supplier_brands_ids)) 
           $manufacturers_ids[] = $sisparts_manufacturer->id;
       }
+      
       $supplier->brands()->attach(array_unique($manufacturers_ids));
     }
 

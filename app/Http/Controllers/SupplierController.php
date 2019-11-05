@@ -206,9 +206,9 @@ class SupplierController extends Controller
     public function destroy($id)
     {
         try {
-            $supp = Supplier::find($id);
-            $supp->brands()->detach();
-            $supp->delete();
+            $supp = Supplier::destroy($id);
+            //$supp->brands()->detach();
+            //$supp->delete();
             Session::flash('message', 'Proveedor eliminado correctamente.');
         } catch(\Exception $e) {
             back()->withErrors($e->getMessage());

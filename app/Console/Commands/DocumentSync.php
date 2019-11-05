@@ -87,9 +87,7 @@ class DocumentSync extends Command
         $quotation_acronym = config('siavcom_sync.acr_quotation');
         $siavcomDocuments = DB::connection($conn->name)->table($documentsTable)
         ->where('tdo_tdo', $quotation_acronym)
-        ->where('ndo_doc', 195)
         ->get();
-        Log::notice($siavcomDocuments);
         foreach($siavcomDocuments as $siavcomDocument) {
             if($this->createUpdateDocument($siavcomDocument, $conn) == false) continue;
         }

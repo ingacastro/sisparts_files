@@ -382,7 +382,6 @@ class DocumentSync extends Command
 
     private function sendQuotationEmail($email, $supply_sets, Document $document)
     {
-        //Log::notice("Supplier found, sending email to $email");
         //Spanish as default, cause we have custom emails in addition to registered suppliers
         $message = DB::table('messages_languages')
         ->join('languages', 'languages.id', 'messages_languages.languages_id')
@@ -426,7 +425,7 @@ class DocumentSync extends Command
                 $m->setBody($body, 'text/html');
             });*/
             
-            Helper::sendMail($email, $subject, $body, 'admin@admin.com', null);
+            Helper::sendMail($email, $subject, $body, $dealership_email, $dealership_email);
         } catch(\Exception $e) {
             throw new \Exception("Error al enviar el correo.", 1);
         }
@@ -452,7 +451,7 @@ class DocumentSync extends Command
             Binnacle::create($binnacle_data);
             $doc->fill(['status' => 2])->update();
         } catch(\Exception $e) {
-            throw new \Exception("Error al registrat la bitácora.", 1);
+            throw new \Exception("Error al registrar la bitácora.", 1);
         }
     }
 

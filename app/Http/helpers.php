@@ -10,14 +10,12 @@ class Helper {
     {
     	wordwrap($message, 70, "\r\n");
 
-        $headers = 'From: ' . $from . "\r\n" .
-        'Reply-To: ' . $reply_to . "\r\n" .
-		'X-Mailer: PHP/' . phpversion() . "\r\n" . 
-		"Content-type: text/html";
+      $headers = 'From: ' . $from . "\r\n" .
+      'Reply-To: ' . $reply_to . "\r\n" .
+  		'X-Mailer: PHP/' . phpversion() . "\r\n" . 
+  		"Content-type: text/html";
 
-		$result = mail($recipients, $subject, $message, $headers);
-        Log::notice($result);
-
+		  mail($recipients, $subject, $message, $headers);
     }
     public static function diffBusinessDays($start_date)
     {

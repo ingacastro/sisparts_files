@@ -705,7 +705,7 @@ class InboxController extends Controller
 
             $document = $document_supply->document;
             $subject = $alert->subject . ' PCT'  . $document->number . ' ' . $document->reference;
-            Helper::sendMail($alert->recipients, $subject, $alert->message, 'admin@admin.com', null);
+            Helper::sendMail($alert->recipients, $subject, $alert->message, config('siavcom.admin_email'), null);
             DB::commit();
         } catch(\Exception $e) {
             DB::rollback();
@@ -959,7 +959,7 @@ class InboxController extends Controller
             }
 
             $subject = $alert->subject . ' PCT'  . $number . ' ' . $reference;
-            Helper::sendMail($alert->recipients, $subject, $alert->message, 'admin@admin.com', null);
+            Helper::sendMail($alert->recipients, $subject, $alert->message, config('siavcom.admin_email'), null);
 
         } catch(\Exception $e) {
             DB::rollback();
@@ -975,7 +975,6 @@ class InboxController extends Controller
 
     private function sendSupplierQuotationEmail($email, $data, $document_number, $document_reference, SupplySet $set)
     {   
-
         $dealership = Auth::user()->employee;
 
         //Spanish as default, cause we have custom emails in addition to registered suppliers
@@ -1152,7 +1151,7 @@ class InboxController extends Controller
 
             $document = $supply_set->document;
             $subject = $alert->subject . ' PCT'  . $document->number . ' ' . $document->reference;
-            Helper::sendMail($alert->recipients, $subject, $alert->message, 'admin@admin.com', null);
+            Helper::sendMail($alert->recipients, $subject, $alert->message, config('siavcom.admin_email'), null);
 
         }catch(\Exception $e) {
             Log::notice($e);
@@ -1217,7 +1216,7 @@ class InboxController extends Controller
 
             $document = $supply_set->document;
             $subject = $alert->subject . ' PCT'  . $document->number . ' ' . $document->reference;
-            Helper::sendMail($alert->recipients, $subject, $alert->message, 'admin@admin.com', null);
+            Helper::sendMail($alert->recipients, $subject, $alert->message, config('siavcom.admin_email'), null);
 
         } catch(\Exception $e) {
             Log::notice($e);

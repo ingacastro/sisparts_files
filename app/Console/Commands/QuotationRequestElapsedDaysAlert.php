@@ -50,7 +50,7 @@ class QuotationRequestElapsedDaysAlert extends Command
                 $elapsed_days = Helper::diffBusinessDays($set->quotation_request_date);
                 if($elapsed_days == $alert->elapsed_days) 
                     $subject = $alert->subject . ' PCT'  . $document->number . ' ' . $document->reference;
-                    Helper::sendMail($alert->recipients, $subject, $alert->message, 'admin@admin.com', null);
+                    Helper::sendMail($alert->recipients, $subject, $alert->message, config('siavcom.admin_email'), null);
             }
         }
     }

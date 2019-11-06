@@ -592,26 +592,24 @@ class InboxController extends Controller
 
     public function getDocumentBinnacle(Request $request, $documents_id)
     {
-        if($request->ajax()):
+        if(!$request->ajax()) abort(403, 'Unauthorized action');
 
-            $binnacles = Binnacle::select('binnacles.created_at', 
-                DB::raw('(CASE binnacles.entity WHEN 1 THEN "PCT" ELSE supplies.number END) as entity'),
-                DB::raw('(CASE WHEN binnacles.type = 1 THEN "Llamada" ELSE "" END) as type'), 
-                'users.name as user', 'binnacles.comments')
-                ->leftJoin('users', 'binnacles.users_id', 'users.id')
-                ->leftJoin('documents_supplies', 'documents_supplies.id', 'binnacles.documents_supplies_id')
-                ->join('supplies', 'documents_supplies.supplies_id', 'supplies.id')
-                ->where('binnacles.documents_id', $documents_id)->get();
-               
-            return Datatables::of($binnacles)
-                  ->editColumn('created_at', function($binnacle){
-                    return date('d/m/Y h:i', strtotime($binnacle->created_at));
-                  })
-                  ->make(true);
-
-        endif;
-        abort(403, 'Unauthorized action');
-    }
+        $binnacles = Binnacle::select('binnacles.created_at', 
+            DB::raw('(CASE binnacles.entity WHEN 1 THEN "PCT" ELSE supplies.number END) as entity'),
+            DB::raw('(CASE WHEN binnacles.type = 1 THEN "Llamada" ELSE "" END) as type'), 
+            'users.name as user', 'binnacles.comments')
+            ->leftJoin('users', 'binnacles.users_id', 'users.id')
+            ->leftJoin('documents_supplies', 'documents_supplies.id', 'binnacles.documents_supplies_id')
+            ->leftJoin('supplies', 'documents_supplies.supplies_id', 'supplies.id')
+            ->where('binnacles.documents_id', $documents_id)
+            ->orderBy('binnacles.created_at');
+           
+        return Datatables::of($binnacles)
+              ->editColumn('created_at', function($binnacle){
+                return date('d/m/Y h:i', strtotime($binnacle->created_at));
+              })
+              ->make(true);        
+}
 
     private function calculateTotalPrice($total_cost, $utility_percentage)
     {

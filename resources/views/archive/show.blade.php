@@ -250,19 +250,17 @@ $(document).ready(function(){
     });
 
     $('#binnacle_table').DataTable({
-/*        serverSide: true,
-        ajax: '/inbox/get-list',
+        serverSide: true,
+        ajax: root_url + '/inbox/document-binnacle/{{ $document->id }}',
         bSort: true,
         destroy: true,
         columns: [
             { data: "created_at", name: "created_at" },
-            { data: "sync_connection", name: "sync_connection" },
-            { data: "number", name: "number" },
-            { data: "buyer", name: "buyer" },
-            { data: "semaphore", name: "semaphore" },
-            { data: "status", name: "status" },
-            { data: 'actions', name: 'actions', orderable: false, searchable: false }
-        ],*/
+            { data: "entity", name: "entity" },
+            { data: "type", name: "type" },
+            { data: "user", name: "user" },
+            { data: "comments", name: "comments" },
+        ],
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
         }, 
@@ -271,3 +269,4 @@ $(document).ready(function(){
 
 </script>
 @endpush
+

@@ -372,7 +372,7 @@ class DocumentSync extends Command
                     $man_supplies_ids = $supplies->where('manufacturers_id', $manufacturer->id)->pluck('id');
                     $supply_sets = SupplySet::whereIn('supplies_id', $man_supplies_ids)->get();
                     if($supply_sets->count() > 0)
-                        #$this->sendQuotationEmail($supplier->email, $supply_sets, $document);
+                        //$this->sendQuotationEmail($supplier->email, $supply_sets, $document);
                 }
             }
         } catch(\Exception $e) {

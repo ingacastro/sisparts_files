@@ -733,7 +733,7 @@ class InboxController extends Controller
 
     private function calculateBudget($set, $set_data, $utility_percentage)
     {
-        $currency = ' ' . Currency::find($set_data['currencies'])->name;
+        $currency = ' ' . Currency::find($set_data['currencies_id'])->name;
 /*        $total_cost = ($set_data['sale_unit_cost'] * $set->products_amount) + 
                 ($set_data['importation_cost'] + $set_data['warehouse_shipment_cost'] + 
                 $set_data['customer_shipment_cost'] + $set_data['extra_charges']);*/

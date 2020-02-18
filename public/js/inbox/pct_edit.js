@@ -1,4 +1,5 @@
- var root_url = $('#root_url').attr('content');
+var root_url = $('#root_url').attr('content');
+var rows;
 $(document).on('click', '.edit-set', function() {
 
     $('#pct_edit_modal_error_messages').html('');
@@ -11,10 +12,9 @@ $(document).on('click', '.edit-set', function() {
     let total_profit = $(this).attr('data-total_profit');
     let set_number = $(this).attr('data-set_number');
     let supply_number = $(this).attr('data-supply_number');
+    let viewRows = rows;
 
-    $('#edit_set_modal_title').html(
-        '<div style="font-size: 15px"> Editar&nbsp;&nbsp;<strong>Número de partida:</strong>' + set_number + 
-        '&nbsp;&nbsp;<strong>Número de parte:</strong> ' + supply_number + '</div>' );
+    $('#edit_set_modal_title').html('<div style="font-size: 15px">Editar&nbsp;&nbsp;<strong>Número de partida:</strong>' + set_number + '&nbsp;&nbsp;<strong>Cantidad de piezas:</strong> ' + viewRows + '&nbsp;&nbsp;<strong>Número de parte:</strong> ' + supply_number + '&nbsp;&nbsp;</div>' );
     
     //Set tabs
     $.ajax({
@@ -85,6 +85,19 @@ function initSupplySetsTable() {
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
         }, 
+    });
+
+    $.ajax({
+        url: root_url + '/inbox/document-supplies-rows',
+        data: {
+            'document_id': document_id,
+            'route': 'inbox'
+        },
+        success : function(json) {
+            rows = json;
+        },
+        error : function(xhr, status) {
+        },
     });
 }
 

@@ -84,8 +84,11 @@ $('#binnacle_entry_form').submit(function(e){
             }
             
             $('#binnacle_entry_success_message').html(response.success_fragment);
+
+            location.reload();
         }
     });
+    //let document_id = $('#document_id').attr('content');
 
 });
 

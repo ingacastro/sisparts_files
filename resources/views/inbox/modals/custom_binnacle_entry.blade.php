@@ -1,4 +1,4 @@
-<div class="modal fade bs-modal" id="custom_binnacle_entry_modal" role="dialog" aria-hidden="true">
+<div class="modal fade bs-modal" id="custom_binnacle_entry_modal" role="dialog" aria-hidden="true" style="">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -61,8 +61,9 @@
                 </div>
                 <div style="text-align: right; padding: 10px">
                     <button type="button" class="btn btn-circle default" data-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-circle blue">Enviar</button>
+                    <button id="form-submit" type="submit" class="btn btn-circle blue">Enviar</button>
                 </div>
+               
                 {!! Form::close() !!}
             </div>
         </div>

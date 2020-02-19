@@ -590,6 +590,46 @@ class InboxController extends Controller
               ->make(true);
     }
 
+    //jsanchez
+    /*Document supplies sets and only authorized sets*/
+    public function getDocumentSupplySetsRows(Request $request)
+    {
+        if(!$request->ajax()) abort(403, 'Unauthorized action');        
+
+        $query = Document::select('documents_supplies.id', 'documents_supplies.set', 'supplies.manufacturers_id', 
+        'supplies.number', 'suppliers.trade_name as supplier', 
+        DB::raw('CAST(documents_supplies.products_amount as UNSIGNED) as products_amount'),
+        'supplies.measurement_unit', 
+        DB::raw('documents_supplies.sale_unit_cost * documents_supplies.products_amount + documents_supplies.importation_cost
+        + documents_supplies.warehouse_shipment_cost + documents_supplies.customer_shipment_cost + documents_supplies.extra_charges as total_cost'),'currencies.name as currency', 'documents_supplies.unit_price',
+        DB::raw('CASE WHEN documents_supplies.status = 1 THEN "No solicitado"
+            WHEN documents_supplies.status = 2 THEN "Solicitado automáticamente"
+            WHEN documents_supplies.status = 3 THEN "Solicitado manualmente"
+            WHEN documents_supplies.status = 4 THEN "Confirmado por el proveedor"
+            WHEN documents_supplies.status = 5 THEN "Presupuesto capturado"
+            WHEN documents_supplies.status = 6 THEN "En autorización"
+            WHEN documents_supplies.status = 7 THEN "Rechazado"
+            WHEN documents_supplies.status = 8 THEN "Autorizado"
+            WHEN documents_supplies.status = 9 THEN "Convertido a CTZ"
+            ELSE "INDEFINIDO" END as status'), 
+        'documents_supplies.documents_id', 'documents_supplies.supplies_id',
+        DB::raw('CASE WHEN documents_supplies.utility_percentages_id IS NOT null THEN utility_percentages.percentage
+            ELSE documents_supplies.custom_utility_percentage END AS utility_percentage'), 'manufacturers.name as manufacturer')
+        ->leftJoin('documents_supplies', 'documents.id', 'documents_supplies.documents_id')
+        ->leftJoin('supplies', 'documents_supplies.supplies_id', 'supplies.id')
+        ->leftJoin('manufacturers', 'manufacturers.id', 'supplies.manufacturers_id')
+        ->leftjoin('suppliers', 'suppliers.id', 'documents_supplies.suppliers_id')
+        ->leftJoin('currencies', 'currencies.id', 'documents_supplies.currencies_id')
+        ->leftJoin('utility_percentages', 'utility_percentages.id', 'documents_supplies.utility_percentages_id')
+        ->where('documents_supplies.documents_id', $request->document_id);
+
+        if($request->has('status'))
+            $query->where('documents_supplies.status', $request->status);
+
+        return $query->count();
+    }
+    //jsanchez
+
     public function getDocumentBinnacle(Request $request, $documents_id)
     {
         if(!$request->ajax()) abort(403, 'Unauthorized action');
@@ -602,7 +642,7 @@ class InboxController extends Controller
             ->leftJoin('documents_supplies', 'documents_supplies.id', 'binnacles.documents_supplies_id')
             ->leftJoin('supplies', 'documents_supplies.supplies_id', 'supplies.id')
             ->where('binnacles.documents_id', $documents_id)
-            ->orderBy('binnacles.created_at');
+            ->orderBy('binnacles.created_at', 'desc');
            
         return Datatables::of($binnacles)
               ->editColumn('created_at', function($binnacle){

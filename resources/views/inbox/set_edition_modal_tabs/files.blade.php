@@ -9,6 +9,7 @@
                         <div class="col-md-6"></div>
                     </div>
                 </div>
+                <a class="btn btn-circle btn-icon-only default blue set-file-attachment" href="#set_file_attachment_modal" data-target="#set_file_attachment_modal" data-toggle="modal" data-supply_id="{{ $set->supplies_id }}" style="position: fixed;"><i class="fa fa-paperclip"></i></a>
                 <table class="table table-striped table-hover table-bordered" id="set_edit_files_table">
                     <thead>
                         <tr>

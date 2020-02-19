@@ -1,6 +1,6 @@
 <div class="modal fade bs-modal" id="set_file_attachment_modal" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
+    <div class="modal-dialog modal-xl" style="height: 415px;margin-right: 30px;">
+        <div class="modal-content" style="height: 415px;">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
                 <h4 class="modal-title">Archivos adjuntos</h4>

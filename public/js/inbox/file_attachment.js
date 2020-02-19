@@ -112,6 +112,12 @@ $('#set_file_attachment_form').submit(function(e){
 
             $('#set_file_attachment_success_message').html(response.success_fragment);
             $('#set_file_attachment_success_message').fadeIn('fast').delay(2000).fadeOut('fast');
+
+            $("#set_file_attachment_modal").delay(5000).fadeOut(1000).modal('hide');
+            initSetAttachmentsTable();
+            //$("#edit_set_modal").delay(2000).modal('hide');
+
+
         }
     });
 });

@@ -77,6 +77,7 @@
                     <thead>
                         <tr>
                             <th>Fecha</th>
+                            <th>Archivado por</th>
                             <th>Empresa</th>
                             <th>Folio</th>
                             <th>RFQ</th>
@@ -171,11 +172,14 @@ function buildDataTable(ajaxData) {
         bSort: true,
         columns: [
             { data: "created_at", name: "created_at" },
+            { data: "archive_user", name: "archive_user" },
             { data: "sync_connection", name: "sync_connections.display_name" },
             { data: "number", name: "number" },
             { data: "reference", name: "reference" },
             { data: "buyer", name: "users.name" },
-            @if($logged_user_role == 'Administrador'){ data: "customer", name: "customers.trade_name" },@endif
+            @if($logged_user_role == 'Administrador')
+                { data: "customer", name: "customers.trade_name" },
+            @endif
             { data: "status", name: "status" },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }
         ],

@@ -235,6 +235,7 @@ class InboxController extends Controller
                     $updates['is_canceled'] = 1;
                 }
 
+                $updates['archive_user'] = Auth::user()->name;
                 $document->fill($updates);
                 $document->update();
             });

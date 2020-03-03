@@ -17,7 +17,7 @@
     $set_conditions_description = isset($set_conditions) ? $set_conditions->description : '';
 ?>
 <div class="row modal-content-row">
-    <div class="col-md-8">
+    <div class="col-md-12">
         {!! Form::open(['route' => ['inbox.update-set-conditions', $set->id], 'method' => 'post', 'id' => 'edit_conditions_form']) !!}
         <input type="hidden" id="conditions_id" value="{{ $set->id }}">
         <div class="row modal-content-border">
@@ -89,10 +89,4 @@
         </div>
         {!! Form::close() !!}
     </div>
-    {{-- An admin user and set status as in authorization or set status as budget registered or rejected status --}}
-    @if((Auth::user()->hasRole('Administrador') && $set->status == 6) || (Auth::user()->hasRole('Cotizador') && ($set->status == 5 || $set->status == 7)))
-    <div class="col-md-4">
-        @include('inbox.set_edition_modal_tabs.includes.checklist')
-    </div>
-    @endif
 </div>

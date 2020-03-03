@@ -21,6 +21,7 @@ use IParts\Employee;
 use IParts\QuotationRequest;
 use IParts\UtilityPercentage;
 use IParts\Alert;
+use IParts\Checklistauth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Validator;
@@ -337,6 +338,7 @@ class InboxController extends Controller
         $utility_percentages = DB::table('utility_percentages')->get()->toArray();
         $utility_percentages[] = (object)['id' => 0, 'name' => 'Otro', 'percentage' => 'null'];
         $checklist = DB::table('checklist')->find($set->id);
+        $checklistauth = Checklistauth::All();
         $set_conditions = DB::table('documents_supplies_conditions')->find($set->id);
         $conditions = DB::table('conditions')->first();
 
@@ -349,6 +351,8 @@ class InboxController extends Controller
                 'conditions', 'checklist', 'doc_id'))
             ->render(),
             'files_tab' => \View::make('inbox.set_edition_modal_tabs.files', compact('set', 'checklist', 'doc_id'))
+            ->render(),
+            'checklist_tab' => \View::make('inbox.set_edition_modal_tabs.includes.checklist', compact('set', 'suppliers', 'currencies', 'measurement', 'countries', 'utility_percentages', 'checklist', 'doc_id','checklistauth'))
             ->render()]);
     }
 

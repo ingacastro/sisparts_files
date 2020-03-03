@@ -21,10 +21,16 @@
                             <a href="#tab_files_content" id="tab_2" data-toggle="tab"> Archivos </a>
                         </li>
                     </ul>
-                    <div class="tab-content" style="padding-top: 2px">
-                        <div class="tab-pane active" id="tab_budget_content"></div>
-                        <div class="tab-pane " id="tab_conditions_content"></div>
-                        <div class="tab-pane " id="tab_files_content"></div>
+                    <div class="row">
+                        <div class="tab-content col-md-8" style="padding-top: 2px">
+                            <div class="tab-pane active" id="tab_budget_content"></div>
+                            <div class="tab-pane " id="tab_conditions_content"></div>
+                            <div class="tab-pane " id="tab_files_content"></div>
+                        </div>
+                        
+                        <div class="col-md-4" id="tab_checklist_content" style="padding-bottom: 10px;">
+                        </div>
+                        
                     </div>
                 </div>
             </div>

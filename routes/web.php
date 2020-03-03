@@ -129,3 +129,20 @@ Route::delete('supply/replacement-observation/{id}/{type}', 'SupplyController@de
 Route::get('supply/{supply_id}/pcts', 'SupplyController@getPcts');
 Route::get('supply/{supply_id}/binnacle', 'SupplyController@getBinnacle');
 Route::get('supply', 'SupplyController@index')->name('supply.index');
+
+//jsanchez
+// checklistedit
+//Supplier
+Route::group(['middleware' => ['role:Administrador|Cotizador']], function(){
+	//Route::get('supplier/get-brands/{id}', 'SupplierController@getModelBrands');
+	Route::get('checklistauth/get-list', 'ChecklistauthController@getList');
+	//Route::post('supplier/create-brand', 'SupplierController@createBrand');
+	//Route::post('supplier/sync-brands', 'SupplierController@syncBrands')->name('supplier.sync-brands');
+	Route::resource('checklistauth', 'ChecklistauthController');
+	Route::post('checklistauth/updated', 'ChecklistauthController@updated');
+});
+
+Route::group(['middleware' => ['role:Administrador']], function(){
+	Route::delete('checklistauth/{checklistauth}', 'ChecklistauthController@destroy')->name('checklistauth.destroy');
+});
+//jsanchez

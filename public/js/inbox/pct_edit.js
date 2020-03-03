@@ -34,6 +34,9 @@ $(document).on('click', '.edit-set', function() {
             
             $('#tab_conditions_content').html(response.conditions_tab);
             $('#tab_files_content').html(response.files_tab);
+
+            $('#tab_checklist_content').html(response.checklist_tab);
+            
             $('#files_table_container').css('display', 'block');
 
             let set_supplies_id = $('#set_supplies_id').val();

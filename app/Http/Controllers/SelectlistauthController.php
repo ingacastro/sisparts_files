@@ -3,16 +3,14 @@
 namespace IParts\Http\Controllers;
 
 use Illuminate\Http\Request;
-use IParts\Checklistauth;
-//use IParts\Http\Requests\SupplierRequest;
+use IParts\Selectlistauth;
 use Illuminate\Support\Facades\Session;
-//use IParts\Manufacturer;
 use Yajra\Datatables\Datatables;
 use DB;
 use Illuminate\Support\Facades\Log;
 use Auth;
 
-class ChecklistauthController extends Controller
+class SelectlistauthController extends Controller
 {
     public function __construct()
     {
@@ -25,21 +23,21 @@ class ChecklistauthController extends Controller
      */
     public function index()
     {
-        return view('checklistauth.index');
+        return view('selectlistauth.index');
     }
 
     public function getList(Request $request)
     {
         if(!$request->ajax()) abort(403, 'Unauthorized action');
 
-        $supps = Checklistauth::All();
+        $supps = Selectlistauth::All();
 
         $i = 0;
 
         return Datatables::of($supps)
               ->addColumn('actions', function($supplier) {
 
-                $actions = '<a href="' . config('app.url') . '/checklistauth/'. $supplier->id . '/edit" class="btn btn-circle btn-icon-only default edit-checklistauth">
+                $actions = '<a href="' . config('app.url') . '/selectlistauth/'. $supplier->id . '/edit" class="btn btn-circle btn-icon-only default edit-selectlistauth">
                         <i class="fa fa-edit"></i></a>';
                         
                 $actions .= Auth::user()->hasRole('Administrador') ? '<button class="btn btn-circle btn-icon-only red"
@@ -64,9 +62,9 @@ class ChecklistauthController extends Controller
      */
     public function create()
     {
-        $model = new Checklistauth();
+        $model = new Selectlistauth();
         $states = [];
-        return view('checklistauth.create', compact(
+        return view('selectlistauth.create', compact(
             'model', 'states'));
     }
 
@@ -82,30 +80,16 @@ class ChecklistauthController extends Controller
         $supp_data = $request->all();
 
         try {
-            $model = Checklistauth::create([
+            $model = Selectlistauth::create([
                 'name'            => $request->name,
-                'help'            => $request->help,
                 'status'          => $request->status,
-                'checklis_column' => ''
             ]);
-
-            $dato=Checklistauth::All(); 
-            $checklistauth=$dato->last();
-            $i = $checklistauth->id;
-            $id = 'column_'.$checklistauth->id;
-
-            $crearcolumn = DB::unprepared(DB::raw("ALTER TABLE `checklist` ADD `$id` ENUM('','checked') CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT ''"));
-
-            $model = Checklistauth::find($i);
-            $model->fill([
-                'checklist_column' => $id
-            ])->update();
             
-            $request->session()->flash('message', 'Checklist guardado correctamente.');
+            $request->session()->flash('message', 'Item guardado correctamente.');
         } catch(\Exception $e) {
             return redirect()->back()->withErrors($e->getMessage());
         }
-        return redirect()->route('checklistauth.index');
+        return redirect()->route('selectlistauth.index');
     }
 
     /**
@@ -127,8 +111,8 @@ class ChecklistauthController extends Controller
      */
     public function edit($id)
     {
-        $model = Checklistauth::find($id);
-        return view('checklistauth.update', compact(
+        $model = Selectlistauth::find($id);
+        return view('selectlistauth.update', compact(
             'model'));
     }
 
@@ -143,38 +127,36 @@ class ChecklistauthController extends Controller
     {
         $data = [
             'name'            => $request->name,
-            'help'            => $request->help,
             'status'          => $request->status
         ];
 
         try {
-            $model = Checklistauth::find($id);
+            $model = Selectlistauth::find($id);
             $model->fill($data)->update();
-            $request->session()->flash('message', 'Checklist actualizado correctamente.');
+            $request->session()->flash('message', 'Item actualizado correctamente.');
         } catch(\Exception $e) {
             return redirect()->back()->withErrors($e->getMessage());
         }
-        return redirect()->route('checklistauth.index');
+        return redirect()->route('selectlistauth.index');
     }
 
     public function updated(Request $request)
     {
         $data = [
             'name'            => $request->name,
-            'help'            => $request->help,
             'status'          => $request->status,
         ];
 
         $id = $request->id;
 
         try {
-            $model = Checklistauth::find($id);
+            $model = Selectlistauth::find($id);
             $model->fill($data)->update();
-            $request->session()->flash('message', 'Checklist actualizado correctamente.');
+            $request->session()->flash('message', 'Item actualizado correctamente.');
         } catch(\Exception $e) {
             return redirect()->back()->withErrors($e->getMessage());
         }
-        return redirect()->route('checklistauth.index');
+        return redirect()->route('selectlistauth.index');
     }
 
     /**
@@ -186,8 +168,8 @@ class ChecklistauthController extends Controller
     public function destroy($id)
     {
         try {
-            $supp = Checklistauth::destroy($id);
-            Session::flash('message', 'Checklist eliminado correctamente.');
+            $supp = Selectlistauth::destroy($id);
+            Session::flash('message', 'Item eliminado correctamente.');
         } catch(\Exception $e) {
             back()->withErrors($e->getMessage());
         }

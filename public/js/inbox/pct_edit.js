@@ -14,7 +14,9 @@ $(document).on('click', '.edit-set', function() {
     let supply_number = $(this).attr('data-supply_number');
     let viewRows = rows;
 
-    $('#edit_set_modal_title').html('<div style="font-size: 15px">Editar&nbsp;&nbsp;<strong>Número de partida:</strong>' + set_number + '&nbsp;&nbsp;<strong>Cantidad de piezas:</strong> ' + viewRows + '&nbsp;&nbsp;<strong>Número de parte:</strong> ' + supply_number + '&nbsp;&nbsp;</div>' );
+    let ubicacion = $('#detail-title-ubicacion').text();
+
+    $('#edit_set_modal_title').html('<div style="font-size: 15px">Editar&nbsp;&nbsp;<strong>Número de partida:</strong>' + set_number + '&nbsp;&nbsp;<strong>Cantidad de piezas:</strong> ' + viewRows + '&nbsp;&nbsp;<strong>Número de parte:</strong> ' + supply_number + '&nbsp;&nbsp;<strong>Ubicación del cliente: </strong>'+ ubicacion +'</div>' );
     
     //Set tabs
     $.ajax({

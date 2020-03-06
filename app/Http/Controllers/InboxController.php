@@ -22,6 +22,8 @@ use IParts\QuotationRequest;
 use IParts\UtilityPercentage;
 use IParts\Alert;
 use IParts\Checklistauth;
+use IParts\Selectlistauth;
+
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Validator;
@@ -302,6 +304,8 @@ class InboxController extends Controller
      */
     public function show($id)
     {
+        $selectlist = Selectlistauth::where('status', 'Visible')->get();
+
         $document = Document::find($id);
 
         $document_supplies = $document->supplies->pluck('number', 'id');
@@ -318,7 +322,7 @@ class InboxController extends Controller
         $view = $document->is_canceled == 1 ? 'archive' : 'inbox';
 
         return view($view . '.show', compact('document', 'document_supplies', 'messages', 
-            'rejection_reasons'));
+            'rejection_reasons','selectlist'));
     }
 
     public function getSetTabs(Request $request, $set_id)
@@ -640,8 +644,8 @@ class InboxController extends Controller
 
         $binnacles = Binnacle::select('binnacles.created_at', 
             DB::raw('(CASE binnacles.entity WHEN 1 THEN "PCT" ELSE supplies.number END) as entity'),
-            DB::raw('(CASE WHEN binnacles.type = 1 THEN "Llamada" ELSE "" END) as type'), 
-            'users.name as user', 'binnacles.comments')
+            'users.name as user', 'binnacles.comments', 'selectlist_edit.name as type')
+            ->leftjoin('selectlist_edit','binnacles.type', 'selectlist_edit.id')
             ->leftJoin('users', 'binnacles.users_id', 'users.id')
             ->leftJoin('documents_supplies', 'documents_supplies.id', 'binnacles.documents_supplies_id')
             ->leftJoin('supplies', 'documents_supplies.supplies_id', 'supplies.id')

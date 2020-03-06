@@ -132,17 +132,24 @@ Route::get('supply', 'SupplyController@index')->name('supply.index');
 
 //jsanchez
 // checklistedit
-//Supplier
 Route::group(['middleware' => ['role:Administrador|Cotizador']], function(){
-	//Route::get('supplier/get-brands/{id}', 'SupplierController@getModelBrands');
 	Route::get('checklistauth/get-list', 'ChecklistauthController@getList');
-	//Route::post('supplier/create-brand', 'SupplierController@createBrand');
-	//Route::post('supplier/sync-brands', 'SupplierController@syncBrands')->name('supplier.sync-brands');
 	Route::resource('checklistauth', 'ChecklistauthController');
 	Route::post('checklistauth/updated', 'ChecklistauthController@updated');
 });
 
 Route::group(['middleware' => ['role:Administrador']], function(){
 	Route::delete('checklistauth/{checklistauth}', 'ChecklistauthController@destroy')->name('checklistauth.destroy');
+});
+
+// selectlistedit
+Route::group(['middleware' => ['role:Administrador|Cotizador']], function(){
+	Route::get('selectlistauth/get-list', 'SelectlistauthController@getList');
+	Route::resource('selectlistauth', 'SelectlistauthController');
+	Route::post('selectlistauth/updated', 'SelectlistauthController@updated');
+});
+
+Route::group(['middleware' => ['role:Administrador']], function(){
+	Route::delete('selectlistauth/{selectlistauth}', 'SelectlistauthController@destroy')->name('selectlistauth.destroy');
 });
 //jsanchez

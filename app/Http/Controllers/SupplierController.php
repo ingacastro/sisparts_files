@@ -212,4 +212,23 @@ class SupplierController extends Controller
             back()->withErrors($e->getMessage());
         }
     }
+
+    public function ajaxstore(SupplierRequest $request)
+    {
+        $model = null;
+        $supp_data = $request->all();
+
+        if(!$request->has('marketplace')) $supp_data['marketplace'] = 0;
+
+        try {
+            $model = Supplier::create($supp_data);
+            $message = 'Proveedor guardado correctamente.';
+            $errors  = false;
+            return response()->json(['message' => $message, 'errors' => $errors]);
+        } catch(\Exception $e) {
+            $message = 'Proveedor no pudo ser guardado.';
+            $errors  = true;
+            return response()->json(['message' => $message, 'errors' => $errors]);
+        }
+    }
 }

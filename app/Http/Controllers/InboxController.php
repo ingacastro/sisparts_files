@@ -346,8 +346,12 @@ class InboxController extends Controller
         $set_conditions = DB::table('documents_supplies_conditions')->find($set->id);
         $conditions = DB::table('conditions')->first();
 
-        return response()->json(
-            ['errors' => false,
+        $countries2  = DB::table('countries')->get();
+        $currencies2 = DB::table('currencies')->get();
+        $languages2  = DB::table('languages')->get();
+
+        return response()->json([
+            'errors' => false,
             'budget_tab' => \View::make('inbox.set_edition_modal_tabs.budget', compact('set', 'suppliers', 'currencies', 
                 'measurement', 'countries', 'utility_percentages', 'checklist', 'doc_id'))
             ->render(),
@@ -357,7 +361,10 @@ class InboxController extends Controller
             'files_tab' => \View::make('inbox.set_edition_modal_tabs.files', compact('set', 'checklist', 'doc_id'))
             ->render(),
             'checklist_tab' => \View::make('inbox.set_edition_modal_tabs.includes.checklist', compact('set', 'suppliers', 'currencies', 'measurement', 'countries', 'utility_percentages', 'checklist', 'doc_id','checklistauth'))
-            ->render()]);
+            ->render(),
+            'proveedor_tab' => \View::make('inbox.set_edition_modal_tabs.proveedor', compact('set', 'suppliers', 'currencies2', 'measurement', 'countries2', 'utility_percentages', 'checklist', 'doc_id', 'languages2'))
+            ->render()
+        ]);
     }
 
     //Now files are attached directly to supplies

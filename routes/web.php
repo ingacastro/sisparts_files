@@ -42,6 +42,7 @@ Route::group(['middleware' => ['role:Administrador|Cotizador']], function(){
 	Route::post('supplier/create-brand', 'SupplierController@createBrand');
 	Route::post('supplier/sync-brands', 'SupplierController@syncBrands')->name('supplier.sync-brands');
 	Route::post('supplier/ajaxstore', 'SupplierController@ajaxstore')->name('supplier.ajaxstore');
+	Route::get('supplier/checksupplier', 'SupplierController@checksupplier')->name('supplier.checksupplier');
 	Route::resource('supplier', 'SupplierController');
 });
 

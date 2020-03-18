@@ -217,6 +217,7 @@ class SupplierController extends Controller
     {
         $model = null;
         $supp_data = $request->all();
+        $doc = explode('_', $request['manufacturer']);
 
         if(!$request->has('marketplace')) $supp_data['marketplace'] = 0;
 
@@ -224,11 +225,52 @@ class SupplierController extends Controller
             $model = Supplier::create($supp_data);
             $message = 'Proveedor guardado correctamente.';
             $errors  = false;
+
+            $ultimoRegistro = Supplier::all()->last();
+
+            $docsup = DB::table('documents_supplies')->where('id', $doc[1])->get();
+
+            $supplies_id = $docsup[0]->supplies_id;
+            $supp = DB::table('supplies')->where('id', $supplies_id)->get();
+        
+            $manufacturers_id = $supp[0]->manufacturers_id;
+            Supplier::find($ultimoRegistro->id)->brands()->sync($manufacturers_id);
+
+
             return response()->json(['message' => $message, 'errors' => $errors]);
         } catch(\Exception $e) {
             $message = 'Proveedor no pudo ser guardado.';
             $errors  = true;
             return response()->json(['message' => $message, 'errors' => $errors]);
         }
+    }
+
+    public function checksupplier(Request $request)
+    {
+      $doc = explode('_', $request['document']);
+
+      try {
+        $docsup = DB::table('documents_supplies')->where('id', $doc[1])->get();
+
+        $supplies_id = $docsup[0]->supplies_id;
+        $supp = DB::table('supplies')->where('id', $supplies_id)->get();
+        
+        $manufacturers_id = $supp[0]->manufacturers_id;
+
+
+        $existe = DB::table('suppliers_manufacturers')
+          ->where('manufacturers_id', $manufacturers_id)
+          ->where('suppliers_id', $request['id'])
+          ->get();
+        
+        if (isset($existe[0])) {
+          return response()->json(['message' => 1]);
+        }
+
+        return response()->json(['message' => 0]);
+
+      } catch (Exception $e) {
+        return response()->json(['message' => 0]);
+      }
     }
 }

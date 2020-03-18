@@ -88,7 +88,7 @@
             <li id="sidebar_selectlistauth" class="nav-item">
                 <a href="{{ route('selectlistauth.index') }}" class="nav-link nav-toggle">
                     <i class="fa fa-navicon"></i>
-                    <span class="title">Selectlist Autorización</span>
+                    <span class="title">Tipo de Segimiento</span>
                     <span class="selected"></span>
                 </a>
             </li>

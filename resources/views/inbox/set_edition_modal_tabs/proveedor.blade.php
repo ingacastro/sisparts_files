@@ -279,6 +279,7 @@
                   <button type="button" class="btn btn-circle blue" onclick="createProveedor()" id="buttonCreate">
                     <i class="fa fa-check"></i> Guardar
                   </button>
+                  <div id="manufacturers_id" style="display: none;"></div>
                 </div>
               </form>
               <!-- END FORM-->
@@ -380,6 +381,8 @@ function createProveedor() {
   let credit_amount = $('#credit_amount').val();
   let state = $('#states_id').find('option:selected').text();
   let set_id_id = $('#set_id_id').html();
+  let manufacturer = $('#manufacturers_id').html();
+
 
   
   if (trade_name == '') {
@@ -440,6 +443,7 @@ function createProveedor() {
           'suburb'        :suburb,
           'credit_amount' :credit_amount,
           'state'         :state,
+          'manufacturer'  :manufacturer,
         },
         headers: {'X-CSRF-TOKEN': token},
         success: function(response) {

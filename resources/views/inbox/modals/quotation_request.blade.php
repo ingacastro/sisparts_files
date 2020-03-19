@@ -49,10 +49,22 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-4">
                         <div class="form-group">
-                            <label for="other_emails" class="control-label">Otros proveedores</label>
-                            <select multiple name="custom_emails[]" class="form-control input-large" data-role="tagsinput" id="other_emails"></select>
+                            <label for="other_emails_1" class="control-label">Proveedores Español</label>
+                            <select multiple name="custom_emails_1[]" class="form-control input-large" data-role="tagsinput" id="other_emails_1"></select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="other_emails_2" class="control-label">Proveedores Inglés</label>
+                            <select multiple name="custom_emails_2[]" class="form-control input-large" data-role="tagsinput" id="other_emails_2"></select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="other_emails_3" class="control-label">Proveedores Portugués</label>
+                            <select multiple name="custom_emails_3[]" class="form-control input-large" data-role="tagsinput" id="other_emails_3"></select>
                         </div>
                     </div>
                 </div>

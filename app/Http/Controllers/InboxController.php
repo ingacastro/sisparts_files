@@ -305,6 +305,7 @@ class InboxController extends Controller
     public function show($id)
     {
         $selectlist = Selectlistauth::where('status', 'Visible')->get();
+        $languageall = DB::table('languages')->get();
 
         $document = Document::find($id);
 
@@ -322,7 +323,7 @@ class InboxController extends Controller
         $view = $document->is_canceled == 1 ? 'archive' : 'inbox';
 
         return view($view . '.show', compact('document', 'document_supplies', 'messages', 
-            'rejection_reasons','selectlist'));
+            'rejection_reasons','selectlist','languageall'));
     }
 
     public function getSetTabs(Request $request, $set_id)
@@ -983,8 +984,24 @@ class InboxController extends Controller
             $reference = $document->reference;
 
             $result['emailed_sets_ids'] = [];
+            
             foreach($data['emails'] as $email) {
                 $result = $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $set);
+                $this->registerQuotationEmailBinnacle($result['supplier_email'], $data['sets']);
+            }
+
+            foreach($data['custom_emails_1'] as $email) {
+                $result = $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $set, 1);
+                $this->registerQuotationEmailBinnacle($result['supplier_email'], $data['sets']);
+            }
+
+            foreach($data['custom_emails_2'] as $email) {
+                $result = $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $set, 2);
+                $this->registerQuotationEmailBinnacle($result['supplier_email'], $data['sets']);
+            }
+
+            foreach($data['custom_emails_3'] as $email) {
+                $result = $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $set, 3);
                 $this->registerQuotationEmailBinnacle($result['supplier_email'], $data['sets']);
             }
 
@@ -1026,20 +1043,20 @@ class InboxController extends Controller
         return response()->json(['errors' => false]);
     }
 
-    private function sendSupplierQuotationEmail($email, $data, $document_number, $document_reference, SupplySet $set)
+    private function sendSupplierQuotationEmail($email, $data, $document_number, $document_reference, SupplySet $set, $lang_id = 1)
     {   
         $dealership = Auth::user()->employee;
 
         //Spanish as default, cause we have custom emails in addition to registered suppliers
         $message = DB::table('messages_languages')
-        ->join('languages', 'languages.id', 'messages_languages.languages_id')
-        ->where('languages.name', 'Español')->first();
+            ->where('messages_id', $data['message_id'])
+            ->where('languages_id', $lang_id)->first();
 
         if(is_numeric($email)) {
             $supplier = Supplier::find($email);
             $email = $supplier->email;
 
-            if(isset($supplier->$supplier->languages_id))
+            if(isset($supplier->languages_id))
                 $message = DB::table('messages_languages')->where('messages_id', $data['message_id'])
                 ->where('languages_id', $supplier->languages_id)->first();
         }

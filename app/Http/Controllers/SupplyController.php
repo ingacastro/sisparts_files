@@ -156,9 +156,9 @@ class SupplyController extends Controller
         if(!$request->ajax()) abort(403, 'Unauthorized action');
 
           $sets_ids = SupplySet::where('supplies_id', $supply_id)->pluck('id');
-          $binnacles = Binnacle::select('binnacles.*', 'users.name as user',
-          DB::raw('(CASE binnacles.entity WHEN 1 THEN "PCT" ELSE supplies.number END) as entity'),
-          DB::raw('(CASE WHEN binnacles.type = 1 THEN "Llamada" ELSE "" END) as type'))
+          $binnacles = Binnacle::select('binnacles.*', 'users.name as user', 'selectlist_edit.name as type',
+          DB::raw('(CASE binnacles.entity WHEN 1 THEN "PCT" ELSE supplies.number END) as entity'))
+          ->leftjoin('selectlist_edit','binnacles.type', 'selectlist_edit.id')
           ->leftJoin('documents_supplies', 'documents_supplies.id', 'binnacles.documents_supplies_id')
           ->join('supplies', 'documents_supplies.supplies_id', 'supplies.id')
           ->leftJoin('users', 'binnacles.users_id', 'users.id')

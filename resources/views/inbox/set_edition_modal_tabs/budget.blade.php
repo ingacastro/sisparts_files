@@ -1,6 +1,6 @@
 <?php $set_edit_inputs_status = $set->document->status < 3 ? null : 'disabled' ?>
 <div class="row modal-content-row">
-    <div class="col-md-8">
+    <div class="col-md-12">
         {!! Form::open(['route' => ['inbox.update-set-budget', $set->documents_id . '_' . $set->id], 
         'method' => 'post', 'id' => 'edit_budget_form']) !!}
         <input type="hidden" id="set_id" value="{{ $set->documents_id . '_' . $set->id }}">
@@ -238,15 +238,9 @@
         <div class="modal-footer" style="text-align: center;">
             <button type="button" class="btn btn-circle default" id="close_set_edition_modal" data-dismiss="modal">Cerrar</button>
             @if(!isset($set_edit_inputs_status) && Auth::user()->hasRole('Cotizador') || Auth::user()->hasRole('Administrador') && !$set->status == 8)
-            <button type="submit" class="btn btn-circle blue">Guardar</button>
+            <button type="submit" class="btn btn-circle blue" id="buttonBudgetSave">Guardar</button>
             @endif
         </div>
         {!! Form::close() !!}
     </div>
-    {{-- An admin user and set status as in authorization or set status as budget registered or rejected status --}}
-    @if((Auth::user()->hasRole('Administrador') && $set->status == 6) || (Auth::user()->hasRole('Cotizador') && ($set->status == 5 || $set->status == 7)))
-    <div class="col-md-4">
-        @include('inbox.set_edition_modal_tabs.includes.checklist')
-    </div>
-    @endif
 </div>

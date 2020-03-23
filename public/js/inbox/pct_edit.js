@@ -14,7 +14,9 @@ $(document).on('click', '.edit-set', function() {
     let supply_number = $(this).attr('data-supply_number');
     let viewRows = rows;
 
-    $('#edit_set_modal_title').html('<div style="font-size: 15px">Editar&nbsp;&nbsp;<strong>Número de partida:</strong>' + set_number + '&nbsp;&nbsp;<strong>Cantidad de piezas:</strong> ' + viewRows + '&nbsp;&nbsp;<strong>Número de parte:</strong> ' + supply_number + '&nbsp;&nbsp;</div>' );
+    let ubicacion = $('#detail-title-ubicacion').text();
+
+    $('#edit_set_modal_title').html('<div class="row" style="font-size: 15px"><div class="col-md-3">Editar&nbsp;&nbsp;<strong>Número de partida:</strong>' + set_number + '&nbsp;&nbsp;</div><div class="col-md-3"><strong>Cantidad de piezas:</strong> ' + viewRows + '&nbsp;&nbsp;</div><div class="col-md-3"><strong>Número de parte:</strong> ' + supply_number + '&nbsp;&nbsp;</div><div class="col-md-3"><strong>Ubi. del cliente: </strong>'+ ubicacion +'</div></div>' );
     
     //Set tabs
     $.ajax({
@@ -25,7 +27,29 @@ $(document).on('click', '.edit-set', function() {
             $('#tab_budget_content').html(response.budget_tab);
             $('#budget_tab_suppliers_select').select2({
                 dropdownParent: $('#edit_set_modal')
+            }).on('change', function() {
+                $.ajax({
+                    url: root_url + '/supplier/checksupplier',
+                    method: 'get',
+                    dataType: 'json',
+                    data: {
+                        'id': $('#budget_tab_suppliers_select').val(),
+                        'document': set_id
+                    },
+                    success: function(response) {
+                        if (response.message != 1) {
+                            $('#pct_edit_modal_error_messages').html('<div class="custom-alerts alert alert-danger fade in" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>El proveedor seleccionado no esta asociado a la marca del articulo.</div>');
+                            $('#in_authorization_btn').prop('disabled', true);
+                            $('#buttonBudgetSave').prop('disabled', true);
+                        } else{
+                            $('#pct_edit_modal_error_messages').html('');
+                            $('#in_authorization_btn').prop('disabled', false);
+                            $('#buttonBudgetSave').prop('disabled', false);
+                        }
+                    }
+                });
             });
+            
             applyFieldsMasks();
             $('#budget_total_cost').html(total_cost);
             $('#budget_total_price').html(total_price);
@@ -34,6 +58,14 @@ $(document).on('click', '.edit-set', function() {
             
             $('#tab_conditions_content').html(response.conditions_tab);
             $('#tab_files_content').html(response.files_tab);
+
+            $('#tab_checklist_content').html(response.checklist_tab);
+            $('#tab_proveedor_content').html(response.proveedor_tab);
+            $('#set_id_id').html(set_id);
+
+            $('#manufacturers_id').html(set_id);
+
+            
             $('#files_table_container').css('display', 'block');
 
             let set_supplies_id = $('#set_supplies_id').val();

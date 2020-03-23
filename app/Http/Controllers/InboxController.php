@@ -21,6 +21,9 @@ use IParts\Employee;
 use IParts\QuotationRequest;
 use IParts\UtilityPercentage;
 use IParts\Alert;
+use IParts\Checklistauth;
+use IParts\Selectlistauth;
+
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Validator;
@@ -301,6 +304,9 @@ class InboxController extends Controller
      */
     public function show($id)
     {
+        $selectlist = Selectlistauth::where('status', 'Visible')->get();
+        $languageall = DB::table('languages')->get();
+
         $document = Document::find($id);
 
         $document_supplies = $document->supplies->pluck('number', 'id');
@@ -317,7 +323,7 @@ class InboxController extends Controller
         $view = $document->is_canceled == 1 ? 'archive' : 'inbox';
 
         return view($view . '.show', compact('document', 'document_supplies', 'messages', 
-            'rejection_reasons'));
+            'rejection_reasons','selectlist','languageall'));
     }
 
     public function getSetTabs(Request $request, $set_id)
@@ -337,11 +343,16 @@ class InboxController extends Controller
         $utility_percentages = DB::table('utility_percentages')->get()->toArray();
         $utility_percentages[] = (object)['id' => 0, 'name' => 'Otro', 'percentage' => 'null'];
         $checklist = DB::table('checklist')->find($set->id);
+        $checklistauth = Checklistauth::All();
         $set_conditions = DB::table('documents_supplies_conditions')->find($set->id);
         $conditions = DB::table('conditions')->first();
 
-        return response()->json(
-            ['errors' => false,
+        $countries2  = DB::table('countries')->get();
+        $currencies2 = DB::table('currencies')->get();
+        $languages2  = DB::table('languages')->get();
+
+        return response()->json([
+            'errors' => false,
             'budget_tab' => \View::make('inbox.set_edition_modal_tabs.budget', compact('set', 'suppliers', 'currencies', 
                 'measurement', 'countries', 'utility_percentages', 'checklist', 'doc_id'))
             ->render(),
@@ -349,7 +360,12 @@ class InboxController extends Controller
                 'conditions', 'checklist', 'doc_id'))
             ->render(),
             'files_tab' => \View::make('inbox.set_edition_modal_tabs.files', compact('set', 'checklist', 'doc_id'))
-            ->render()]);
+            ->render(),
+            'checklist_tab' => \View::make('inbox.set_edition_modal_tabs.includes.checklist', compact('set', 'suppliers', 'currencies', 'measurement', 'countries', 'utility_percentages', 'checklist', 'doc_id','checklistauth'))
+            ->render(),
+            'proveedor_tab' => \View::make('inbox.set_edition_modal_tabs.proveedor', compact('set', 'suppliers', 'currencies2', 'measurement', 'countries2', 'utility_percentages', 'checklist', 'doc_id', 'languages2'))
+            ->render()
+        ]);
     }
 
     //Now files are attached directly to supplies
@@ -636,8 +652,8 @@ class InboxController extends Controller
 
         $binnacles = Binnacle::select('binnacles.created_at', 
             DB::raw('(CASE binnacles.entity WHEN 1 THEN "PCT" ELSE supplies.number END) as entity'),
-            DB::raw('(CASE WHEN binnacles.type = 1 THEN "Llamada" ELSE "" END) as type'), 
-            'users.name as user', 'binnacles.comments')
+            'users.name as user', 'binnacles.comments', 'selectlist_edit.name as type')
+            ->leftjoin('selectlist_edit','binnacles.type', 'selectlist_edit.id')
             ->leftJoin('users', 'binnacles.users_id', 'users.id')
             ->leftJoin('documents_supplies', 'documents_supplies.id', 'binnacles.documents_supplies_id')
             ->leftJoin('supplies', 'documents_supplies.supplies_id', 'supplies.id')
@@ -968,8 +984,24 @@ class InboxController extends Controller
             $reference = $document->reference;
 
             $result['emailed_sets_ids'] = [];
+            
             foreach($data['emails'] as $email) {
                 $result = $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $set);
+                $this->registerQuotationEmailBinnacle($result['supplier_email'], $data['sets']);
+            }
+
+            foreach($data['custom_emails_1'] as $email) {
+                $result = $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $set, 1);
+                $this->registerQuotationEmailBinnacle($result['supplier_email'], $data['sets']);
+            }
+
+            foreach($data['custom_emails_2'] as $email) {
+                $result = $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $set, 2);
+                $this->registerQuotationEmailBinnacle($result['supplier_email'], $data['sets']);
+            }
+
+            foreach($data['custom_emails_3'] as $email) {
+                $result = $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $set, 3);
                 $this->registerQuotationEmailBinnacle($result['supplier_email'], $data['sets']);
             }
 
@@ -1011,20 +1043,20 @@ class InboxController extends Controller
         return response()->json(['errors' => false]);
     }
 
-    private function sendSupplierQuotationEmail($email, $data, $document_number, $document_reference, SupplySet $set)
+    private function sendSupplierQuotationEmail($email, $data, $document_number, $document_reference, SupplySet $set, $lang_id = 1)
     {   
         $dealership = Auth::user()->employee;
 
         //Spanish as default, cause we have custom emails in addition to registered suppliers
         $message = DB::table('messages_languages')
-        ->join('languages', 'languages.id', 'messages_languages.languages_id')
-        ->where('languages.name', 'Español')->first();
+            ->where('messages_id', $data['message_id'])
+            ->where('languages_id', $lang_id)->first();
 
         if(is_numeric($email)) {
             $supplier = Supplier::find($email);
             $email = $supplier->email;
 
-            if(isset($supplier->$supplier->languages_id))
+            if(isset($supplier->languages_id))
                 $message = DB::table('messages_languages')->where('messages_id', $data['message_id'])
                 ->where('languages_id', $supplier->languages_id)->first();
         }

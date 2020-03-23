@@ -1,0 +1,2 @@
+php artisan migrate --path=database/migrations/2020_03_03_171033_create_checklistedit_table.php
+php artisan db:seed --class=ChecklisteditTableSeeder

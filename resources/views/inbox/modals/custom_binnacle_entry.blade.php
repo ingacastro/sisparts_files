@@ -46,8 +46,12 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            {!! Form::select('type', [1 => 'Llamada'], null, 
-                            ['placeholder' => 'Tipo...', 'class' => 'form-control']) !!}
+                            <select class="form-control" name="type" >
+                                <option value="">Tipo</option>
+                                @foreach ($selectlist as $select)                                     
+                                <option value="{{$select->id}}">{{$select->name}}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>

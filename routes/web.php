@@ -41,6 +41,8 @@ Route::group(['middleware' => ['role:Administrador|Cotizador']], function(){
 	Route::get('supplier/get-list', 'SupplierController@getList');
 	Route::post('supplier/create-brand', 'SupplierController@createBrand');
 	Route::post('supplier/sync-brands', 'SupplierController@syncBrands')->name('supplier.sync-brands');
+	Route::post('supplier/ajaxstore', 'SupplierController@ajaxstore')->name('supplier.ajaxstore');
+	Route::get('supplier/checksupplier', 'SupplierController@checksupplier')->name('supplier.checksupplier');
 	Route::resource('supplier', 'SupplierController');
 });
 
@@ -129,3 +131,27 @@ Route::delete('supply/replacement-observation/{id}/{type}', 'SupplyController@de
 Route::get('supply/{supply_id}/pcts', 'SupplyController@getPcts');
 Route::get('supply/{supply_id}/binnacle', 'SupplyController@getBinnacle');
 Route::get('supply', 'SupplyController@index')->name('supply.index');
+
+//jsanchez
+// checklistedit
+Route::group(['middleware' => ['role:Administrador|Cotizador']], function(){
+	Route::get('checklistauth/get-list', 'ChecklistauthController@getList');
+	Route::resource('checklistauth', 'ChecklistauthController');
+	Route::post('checklistauth/updated', 'ChecklistauthController@updated');
+});
+
+Route::group(['middleware' => ['role:Administrador']], function(){
+	Route::delete('checklistauth/{checklistauth}', 'ChecklistauthController@destroy')->name('checklistauth.destroy');
+});
+
+// selectlistedit
+Route::group(['middleware' => ['role:Administrador|Cotizador']], function(){
+	Route::get('selectlistauth/get-list', 'SelectlistauthController@getList');
+	Route::resource('selectlistauth', 'SelectlistauthController');
+	Route::post('selectlistauth/updated', 'SelectlistauthController@updated');
+});
+
+Route::group(['middleware' => ['role:Administrador']], function(){
+	Route::delete('selectlistauth/{selectlistauth}', 'SelectlistauthController@destroy')->name('selectlistauth.destroy');
+});
+//jsanchez

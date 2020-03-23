@@ -145,7 +145,7 @@
                                 <td>
                                     <span>
                                         <span class="detail-title">Ubicación del cliente: </span>
-                                        {{ $document->customer->country }} - {{ $document->customer->post_code }}
+                                        <b id="detail-title-ubicacion" style="font-weight: 400;">{{ $document->customer->country }} - {{ $document->customer->post_code }}</b>
                                     </span>
                                 </td>
                                 <td></td>

@@ -78,20 +78,6 @@
                     <span class="selected"></span>
                 </a>
             </li>
-            <li id="sidebar_checklistauth" class="nav-item">
-                <a href="{{ route('checklistauth.index') }}" class="nav-link nav-toggle">
-                    <i class="fa fa-file-excel-o"></i>
-                    <span class="title">Checklist Autorización</span>
-                    <span class="selected"></span>
-                </a>
-            </li>
-            <li id="sidebar_selectlistauth" class="nav-item">
-                <a href="{{ route('selectlistauth.index') }}" class="nav-link nav-toggle">
-                    <i class="fa fa-navicon"></i>
-                    <span class="title">Tipo de Segimiento</span>
-                    <span class="selected"></span>
-                </a>
-            </li>
             @endrole
             <li id="sidebar_supply" class="nav-item">
                 <a href="{{ route('supply.index') }}" class="nav-link nav-toggle">

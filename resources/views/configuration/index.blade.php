@@ -23,6 +23,8 @@
     <div class="col-md-12">
         <a href="{{ route('settings.edit') }}" class="btn btn-lg blue">Semáforo</a>
         <a href="{{ route('alert.index') }}" class="btn btn-lg blue">Alertas</a>
+        <a href="{{ route('checklistauth.index') }}" class="btn btn-lg blue">Checklist Autorización</a>
+        <a href="{{ route('selectlistauth.index') }}" class="btn btn-lg blue">Tipo de Segimiento</a>
     </div>
 </div>
 @endsection

@@ -20,7 +20,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label class="control-label" for="email"><span class="required">* </span>Estatus</label>
-                {!! Form::select('status', array('Visible' => 'Visible', 'No Visible' => 'No Visible'), 'Visible') !!}
+                {!! Form::select('status', array('Visible' => 'Visible', 'No Visible' => 'No Visible'), 'Visible', ['class' => 'form-control']) !!}
             </div>
         </div>
     </div>

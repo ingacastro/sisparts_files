@@ -1,8 +1,8 @@
 <?php $is_edit = isset($model->id); $action = $is_edit ? 'Editar' : 'Nuevo'; ?>
 @extends('layouts.admin.master')
 @section('meta-css')
-<link href="/metronic-assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
-<link href="/metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="{{ asset('metronic-assets/global/plugins/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
 @section('breadcumb')
@@ -65,8 +65,8 @@
 @endsection
 @push('scripts')
 @include('utils.form_masks')
-<script src="/metronic-assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
-<script src="/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script>
+<script src="{{ asset('metronic-assets/global/plugins/select2/js/select2.full.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('metronic-assets/pages/scripts/components-select2.min.js') }}" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function(){
     $('#sidebar_rejection_reason').addClass('active');

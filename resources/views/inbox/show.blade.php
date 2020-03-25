@@ -1,12 +1,12 @@
 @extends('layouts.admin.master')
 @section('meta-css')
-<link href="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet" type="text/css" />
-<link href="/metronic-assets/global/css/plugins.min.css" rel="stylesheet" type="text/css" />
-<link href="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.css" rel="stylesheet" type="text/css" />
-<link href="/metronic-assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css" rel="stylesheet" type="text/css" />
-<link href="/metronic-assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
-<link href="/metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
-<link href="/metronic-assets/global/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet" type="text/css" />
+<link href="{{ asset('metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('metronic-assets/global/css/plugins.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('metronic-assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('metronic-assets/global/plugins/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('metronic-assets/global/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css') }}" rel="stylesheet" type="text/css" />
 <meta id="document_id" content="{{ $document->id }}">
 <meta id="meta_token" content="{{ @csrf_token() }}">
 <style>
@@ -245,20 +245,20 @@
 @endsection
 @push('scripts')
 @include('utils.form_masks')
-<script src="/metronic-assets/global/plugins/datatables/datatables.min.js" type="text/javascript"></script>
-<script src="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
-<script src="/metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.min.js" type="text/javascript"></script>
-<script src="/metronic-assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
-<script src="/metronic-assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
-<script src="/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script>
-<script src="/metronic-assets/global/plugins/bootstrap-tagsinput/bootstrap-tagsinput.min.js" type="text/javascript"></script>
-<script src="/js/inbox/index.js" type="text/javascript"></script>
-<script src="/js/inbox/pct_edit.js" type="text/javascript"></script>
-<script src="/js/inbox/file_attachment.js" type="text/javascript"></script>
-<script src="/js/inbox/quotation_request.js" type="text/javascript"></script>
-<script src="/js/inbox/sets_turn_ctz.js" type="text/javascript"></script>
-<script src="/js/inbox/set_rejection.js" type="text/javascript"></script>
-<script src="/js/inbox/binnacle_entry.js" type="text/javascript"></script>
+<script src="{{ asset('metronic-assets/global/plugins/datatables/datatables.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js') }}" type="text/javascript"></script>
+<script src="{{ asset('metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('metronic-assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}" type="text/javascript"></script>
+<script src="{{ asset('metronic-assets/global/plugins/select2/js/select2.full.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('metronic-assets/pages/scripts/components-select2.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('metronic-assets/global/plugins/bootstrap-tagsinput/bootstrap-tagsinput.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/inbox/index.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/inbox/pct_edit.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/inbox/file_attachment.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/inbox/quotation_request.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/inbox/sets_turn_ctz.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/inbox/set_rejection.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/inbox/binnacle_entry.js') }}" type="text/javascript"></script>
 <script type="text/javascript">
 var root_url = $('#root_url').attr('content');
 $(document).ready(function(){

@@ -5,10 +5,10 @@ $cancel_btn = $is_edit ? 'Terminar' : 'Cancelar';
 ?>
 @extends('layouts.admin.master')
 @section('meta-css')
-<link href="/metronic-assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
-<link href="/metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
-<link href="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet" type="text/css" />
-<link href="/metronic-assets/global/css/plugins.min.css" rel="stylesheet" type="text/css" />
+<link href="{{ asset('metronic-assets/global/plugins/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('metronic-assets/global/css/plugins.min.css') }}" rel="stylesheet" type="text/css" />
 <meta id="auth_user_is_admin" content="{{Auth::user()->hasRole('Administrador')}}">
 @endsection
 @section('content')
@@ -69,12 +69,12 @@ $cancel_btn = $is_edit ? 'Terminar' : 'Cancelar';
 @endsection
 @push('scripts')
 @include('utils.form_masks')
-<script src="/metronic-assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
-<script src="/metronic-assets/pages/scripts/components-select2.min.js" type="text/javascript"></script>
+<script src="{{ asset('metronic-assets/global/plugins/select2/js/select2.full.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('metronic-assets/pages/scripts/components-select2.min.js') }}" type="text/javascript"></script>
 @if($is_edit)
-<script src="/metronic-assets/global/plugins/datatables/datatables.min.js" type="text/javascript"></script>
-<script src="/metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
-<script src="/js/supplier/brands.js" type="text/javascript"></script>
+<script src="{{ asset('metronic-assets/global/plugins/datatables/datatables.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/supplier/brands.js') }}" type="text/javascript"></script>
 @endif
 <script type="text/javascript">
      var root_url = $('#root_url').attr('content');

@@ -136,8 +136,13 @@ Route::get('supply', 'SupplyController@index')->name('supply.index');
 // checklistedit
 Route::group(['middleware' => ['role:Administrador|Cotizador']], function(){
 	Route::get('checklistauth/get-list', 'ChecklistauthController@getList');
-	Route::resource('checklistauth', 'ChecklistauthController');
-	Route::post('checklistauth/updated', 'ChecklistauthController@updated');
+	Route::resource('checklistauth', 'ChecklistauthController')->names([
+		'index' 	=> 'checklistauth.index',
+		'create' 	=> 'checklistauth.create',
+		'store' 	=> 'checklistauth.store',
+		'edit' 		=> 'checklistauth.edit',
+]);
+	Route::post('checklistauth/updated', 'ChecklistauthController@updated')->name('checklistauth.update');
 });
 
 Route::group(['middleware' => ['role:Administrador']], function(){
@@ -147,8 +152,13 @@ Route::group(['middleware' => ['role:Administrador']], function(){
 // selectlistedit
 Route::group(['middleware' => ['role:Administrador|Cotizador']], function(){
 	Route::get('selectlistauth/get-list', 'SelectlistauthController@getList');
-	Route::resource('selectlistauth', 'SelectlistauthController');
-	Route::post('selectlistauth/updated', 'SelectlistauthController@updated');
+	Route::resource('selectlistauth', 'SelectlistauthController')->names([
+					'index' 	=> 'selectlistauth.index',
+					'create' 	=> 'selectlistauth.create',
+					'store' 	=> 'selectlistauth.store',
+					'edit' 		=> 'selectlistauth.edit',
+	]);
+	Route::post('selectlistauth/updated', 'SelectlistauthController@updated')->name('selectlistauth.update');
 });
 
 Route::group(['middleware' => ['role:Administrador']], function(){

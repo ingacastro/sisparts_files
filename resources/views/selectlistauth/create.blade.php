@@ -53,7 +53,7 @@ $cancel_btn = $is_edit ? 'Terminar' : 'Cancelar';
                         </div>
                         <div class="portlet-body form">
                             <!-- BEGIN FORM-->
-                            <form action="/selectlistauth" method="POST" id="basic_form" class="horizontal-form">
+                            <form action="{{ route('selectlistauth.store') }}" method="POST" id="basic_form" class="horizontal-form">
                                 @include('selectlistauth.tabs.form')
                             </form>
                             <!-- END FORM-->

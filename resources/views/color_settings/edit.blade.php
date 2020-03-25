@@ -1,6 +1,6 @@
 @extends('layouts.admin.master')
 @section('meta-css')
-<link href="/metronic-assets/global/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet" type="text/css" />
+<link href="{{ asset('metronic-assets/global/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css') }}" rel="stylesheet" type="text/css" />
 <style type="text/css">
     .bootstrap-tagsinput { width: 100%; }
 </style>
@@ -45,7 +45,7 @@
 @endsection
 @push('scripts')
 @include('utils.form_masks')
-<script src="/metronic-assets/global/plugins/bootstrap-tagsinput/bootstrap-tagsinput.min.js" type="text/javascript"></script>
+<script src="{{ asset('metronic-assets/global/plugins/bootstrap-tagsinput/bootstrap-tagsinput.min.js') }}" type="text/javascript"></script>
 <script type="text/javascript">
  var root_url = $('#root_url').attr('content');
 $(document).ready(function(){

@@ -962,6 +962,9 @@ class InboxController extends Controller
         $data = $request->all();
 
         $data['emails'] = [];
+        $data['emails_1'] = [];
+        $data['emails_2'] = [];
+        $data['emails_3'] = [];
 
         if(isset($data['suppliers_ids']))
             $data['emails'] = $data['suppliers_ids'];

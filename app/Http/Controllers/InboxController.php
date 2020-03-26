@@ -968,6 +968,19 @@ class InboxController extends Controller
         if(isset($data['custom_emails']))
             $data['emails'] = array_merge($data['emails'], $data['custom_emails']);
 
+
+        if(isset($data['custom_emails_1']))
+            $data['emails_1'] = $data['custom_emails_1'];
+
+        if(isset($data['custom_emails_2']))
+            $data['emails_2'] = $data['custom_emails_2'];
+
+        if(isset($data['custom_emails_3']))
+            $data['emails_3'] = $data['custom_emails_3'];
+
+
+
+
         $validator = $this->sendSuppliersQuotationValidations($data);
 
         if($validator->fails())
@@ -990,17 +1003,17 @@ class InboxController extends Controller
                 $this->registerQuotationEmailBinnacle($result['supplier_email'], $data['sets']);
             }
 
-            foreach($data['custom_emails_1'] as $email) {
+            foreach($data['emails_1'] as $email) {
                 $result = $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $set, 1);
                 $this->registerQuotationEmailBinnacle($result['supplier_email'], $data['sets']);
             }
 
-            foreach($data['custom_emails_2'] as $email) {
+            foreach($data['emails_2'] as $email) {
                 $result = $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $set, 2);
                 $this->registerQuotationEmailBinnacle($result['supplier_email'], $data['sets']);
             }
 
-            foreach($data['custom_emails_3'] as $email) {
+            foreach($data['emails_3'] as $email) {
                 $result = $this->sendSupplierQuotationEmail($email, $data, $number, $reference, $set, 3);
                 $this->registerQuotationEmailBinnacle($result['supplier_email'], $data['sets']);
             }
@@ -1128,15 +1141,18 @@ class InboxController extends Controller
     private function sendSuppliersQuotationValidations($data)
     {
         $messages = [
-            'emails.required' => 'No se ha especificado ninguna dirección de correo de proveedor.',
-            'custom_emails.*.email' => 'El formato en una o más direcciones de correo es incorrecto.',
+            'custom_emails_1.*.email' => 'En Proveedores en Español el formato en una o más direcciones de correo es incorrecto.',
+            'custom_emails_2.*.email' => 'En Proveedores en Ingles el formato en una o más direcciones de correo es incorrecto.',
+            'custom_emails_3.*.email' => 'En Proveedores en Portugues el formato en una o más direcciones de correo es incorrecto.',
             'sets.required' => 'No se ha seleccionado ninguna de las partes.',
             'message_id.required' => 'No se ha especificado un mensaje.'
         ];
         
         $validator = Validator::make($data, [
-            'emails' => 'required',
-            'custom_emails.*' => 'nullable|email',
+            'emails.*' => 'nullable',
+            'custom_emails_1.*' => 'nullable|email',
+            'custom_emails_2.*' => 'nullable|email',
+            'custom_emails_3.*' => 'nullable|email',
             'sets' => 'required|array|min:1',
             'message_id' => 'required'
         ], $messages);

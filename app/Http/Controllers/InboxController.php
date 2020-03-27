@@ -99,7 +99,11 @@ class InboxController extends Controller
 
         $logged_user = Auth::user();
         //Dealership won't see customer
-        if($logged_user->hasRole("Cotizador")) {
+        /**
+         * para que un cotizador pueda filtrar en la bandeja de entrada 
+         * se agrego el false
+         */
+        if(false) {
             $fiveBusinessDaysAgoDate = Carbon::subBusinessDays(5)->format('Y-m-d');
             $query->where('documents.employees_users_id', $logged_user->id);
             

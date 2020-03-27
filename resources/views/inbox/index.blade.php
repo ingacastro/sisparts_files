@@ -78,7 +78,6 @@
                             <th>PCT</th>
                             <th>RFQ</th>
                             <th>Asignado</th>
-                            @if($logged_user_role == 'Administrador')<th>Cliente</th>@endif
                             <th>Edad</th>
                             <th>Estatus</th>
                             <th>Acciones</th>
@@ -173,7 +172,6 @@ function buildDataTable(ajaxData) {
             { data: "number", name: "documents.number" },
             { data: "reference", name: "documents.reference" },
             { data: "buyer", name: "users.name" },
-            @if($logged_user_role == 'Administrador'){ data: "customer", name: "customers.trade_name" },@endif
             { data: "semaphore", name: "semaphore", searchable: false, orderable: false },
             { data: "status", name: "status", searchable: false },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }

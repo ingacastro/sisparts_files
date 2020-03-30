@@ -571,6 +571,7 @@ class InboxController extends Controller
                 data-unit_price="' . '$' . number_format($unit_price, 2, '.', ',') . $currency . '"
                 data-total_profit="' . '$' . number_format($total_profit, 2, '.', ',') . $currency . '"
                 data-set_number=" ' . $supplies_set->set . '"
+                data-set_products_amount="' . $supplies_set->products_amount . '"
                 data-supply_number=" ' . $supplies_set->number . '"><i class="fa fa-edit"></i></a>';
 
                 return ($request->route == 'inbox') 

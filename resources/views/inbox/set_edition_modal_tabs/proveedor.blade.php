@@ -10,6 +10,14 @@
   </div>
 </div>
 
+<div id="pct_edit_modal_success_messages2" style="display: none;">
+  <div class="custom-alerts alert alert-success fade in" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    <ul id="espera_text_proveedor">
+    </ul>
+  </div>
+</div>
+
 <div id="pct_edit_modal_success_messages1" style="display: none;">
   <div class="custom-alerts alert alert-success fade in" role="alert">
     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -417,8 +425,6 @@ function createProveedor() {
   if (error != 1) {
     let token = $('input[name=_token]').val();
     
-    $('#tab_0').attr("href", '');
-    
     $.ajax({
         url: root_url + '/supplier/ajaxstore',
         method: 'post',
@@ -454,7 +460,14 @@ function createProveedor() {
             var html = '<li>'+response.message+'</li>';
             $('#pct_edit_modal_success_messages1').css("display", "");
             $('#success_text_proveedor').html( html );
+
+            $('#pct_edit_modal_success_messages2').css("display", "");
+            $('#espera_text_proveedor').html( '<li>Se estan actualizando los proveedores, espere un momento</li>' );
+            
             $('#buttonCreate').prop('disabled', true);
+            
+            
+            $('#tab_0').attr("href", '');
     
             //Set tabs
             $.ajax({
@@ -466,7 +479,33 @@ function createProveedor() {
                 $('#tab_budget_content').html(response.budget_tab);
                 $('#budget_tab_suppliers_select').select2({
                   dropdownParent: $('#edit_set_modal')
+                }).on('change', function() {
+                  $.ajax({
+                    url: root_url + '/supplier/checksupplier',
+                    method: 'get',
+                    dataType: 'json',
+                    data: {
+                      'id': $('#budget_tab_suppliers_select').val(),
+                      'document': set_id_id
+                    },
+                    success: function(response) {
+                      if (response.message != 1) {
+                        $('#pct_edit_modal_error_messages').html('<div class="custom-alerts alert alert-danger fade in" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>El proveedor seleccionado no esta asociado a la marca del articulo.</div>');
+                        $('#in_authorization_btn').prop('disabled', true);
+                        $('#buttonBudgetSave').prop('disabled', true);
+                      } else{
+                        $('#pct_edit_modal_error_messages').html('');
+                        $('#in_authorization_btn').prop('disabled', false);
+                        $('#buttonBudgetSave').prop('disabled', false);
+                      }
+                    }
+                  });
                 });
+
+                $('#espera_text_proveedor').html( '<li>Ya puede seguir trabajando en la parte</li>' );
+            
+                $('#tab_0').attr("href", '#tab_budget_content');
+
               }
             });
           } else {

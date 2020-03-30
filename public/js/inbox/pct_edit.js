@@ -12,11 +12,12 @@ $(document).on('click', '.edit-set', function() {
     let total_profit = $(this).attr('data-total_profit');
     let set_number = $(this).attr('data-set_number');
     let supply_number = $(this).attr('data-supply_number');
+    let set_products_amount = $(this).attr('data-set_products_amount');
     let viewRows = rows;
 
     let ubicacion = $('#detail-title-ubicacion').text();
 
-    $('#edit_set_modal_title').html('<div class="row" style="font-size: 15px"><div class="col-md-3">Editar&nbsp;&nbsp;<strong>Número de partida:</strong>' + set_number + '&nbsp;&nbsp;</div><div class="col-md-3"><strong>Cantidad de piezas:</strong> ' + viewRows + '&nbsp;&nbsp;</div><div class="col-md-3"><strong>Número de parte:</strong> ' + supply_number + '&nbsp;&nbsp;</div><div class="col-md-3"><strong>Ubi. del cliente: </strong>'+ ubicacion +'</div></div>' );
+    $('#edit_set_modal_title').html('<div class="row" style="font-size: 15px"><div class="col-md-3">Editar&nbsp;&nbsp;<strong>Número de partida:</strong>' + set_number + '&nbsp;&nbsp;</div><div class="col-md-3"><strong>Cantidad de piezas:</strong> ' + set_products_amount + '&nbsp;&nbsp;</div><div class="col-md-3"><strong>Número de parte:</strong> ' + supply_number + '&nbsp;&nbsp;</div><div class="col-md-3"><strong>Ubi. del cliente: </strong>'+ ubicacion +'</div></div>' );
     
     //Set tabs
     $.ajax({

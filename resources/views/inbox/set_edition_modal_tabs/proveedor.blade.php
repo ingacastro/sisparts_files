@@ -416,6 +416,9 @@ function createProveedor() {
 
   if (error != 1) {
     let token = $('input[name=_token]').val();
+    
+    $('#tab_0').attr("href", '');
+    
     $.ajax({
         url: root_url + '/supplier/ajaxstore',
         method: 'post',
@@ -459,11 +462,11 @@ function createProveedor() {
               method: 'get',
               dataType: 'json',
               success: function(response) {
+                
                 $('#tab_budget_content').html(response.budget_tab);
                 $('#budget_tab_suppliers_select').select2({
                   dropdownParent: $('#edit_set_modal')
                 });
-                console.log('new presu');
               }
             });
           } else {

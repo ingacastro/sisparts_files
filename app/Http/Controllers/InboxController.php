@@ -120,6 +120,51 @@ class InboxController extends Controller
         return $this->buildInboxDataTable($base_query_clone, $logged_user);
     }
 
+    //Inbox list
+    public function getListFilter(Request $request)
+    {
+        if(!$request->ajax()) abort(403, 'Unauthorized action');
+
+        $sync_connection = $request->get('sync_connection') ?? 0;
+        $status = $request->get('status') ?? 0;
+        $dealer_ship = $request->get('dealer_ship') ?? 0;
+
+        $fields = ['documents.id', 'documents.is_canceled', 'documents.created_at', 
+                     'sync_connections.display_name as sync_connection',
+                     'users.name as buyer', 'documents.number', 'customers.trade_name as customer',
+                      DB::raw('(CASE documents.status WHEN 1 THEN "Nueva"
+                              WHEN 2 THEN "En proceso"
+                              WHEN 3 THEN "Terminada"
+                              WHEN 4 THEN "Archivada"
+                              ELSE "Indefinido" END) as status'), 'documents.reference', 'documents.siavcom_ctz'];
+
+        $query = DB::table('documents')
+                     ->join('employees', 'employees.users_id', 'documents.employees_users_id')
+                     ->join('users', 'users.id', 'employees.users_id')
+                     ->join('customers', 'customers.id', 'documents.customers_id')
+                     ->join('sync_connections', 'documents.sync_connections_id', 'sync_connections.id');
+
+        $base_query_clone = clone $query;
+
+        if($sync_connection > 0)
+            $query->where('documents.sync_connections_id', $sync_connection);
+        if($dealer_ship > 0)
+            $query->where('documents.employees_users_id', $dealer_ship);
+        
+        if($status > 0)
+            $query->where('documents.status', $status);
+        else
+            $query->where('documents.status', '<', 3); //No finished or archived PCTs only
+
+        $logged_user = Auth::user();
+        
+        $first_query_ids = $query->select(['documents.id'])->pluck('id');
+        $base_query_clone->whereIn('documents.id', $first_query_ids);
+        $base_query_clone->select($fields);
+
+        return $this->buildInboxDataTable($base_query_clone, $logged_user);
+    }
+
     private function buildInboxDataTable($query, $logged_user)
     {
         return Datatables::of($query)

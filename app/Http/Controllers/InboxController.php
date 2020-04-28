@@ -169,6 +169,7 @@ class InboxController extends Controller
                 $actions .= $is_admin ? '<a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '"><i class="fa fa-user"></i></a>' : '';
                 $actions .= $is_admin ? '<a class="btn btn-circle btn-icon-only default blue" onClick="archiveOrLockDocument(event, ' . $document->id . ', 1)"><i class="fa fa-archive"></i></a>' : '';
                 
+                
                 return $actions;
               })
               ->rawColumns(['semaphore' => 'semaphore', 'actions' => 'actions'])
@@ -237,6 +238,7 @@ class InboxController extends Controller
                     $updates['is_canceled'] = 1;
                 }
 
+                $updates['archive_user'] = Auth::user()->name;
                 $document->fill($updates);
                 $document->update();
             });

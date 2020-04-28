@@ -167,7 +167,9 @@ License: You must have a valid license purchased only from themeforest(the above
         <script src="/metronic-assets/layouts/layout/scripts/demo.min.js" type="text/javascript"></script>
         <script src="/metronic-assets/layouts/global/scripts/quick-sidebar.min.js" type="text/javascript"></script>
         <script src="/metronic-assets/layouts/global/scripts/quick-nav.min.js" type="text/javascript"></script>
+        <script src="{{ asset('js/toggle-proveedores.js') }}"></script>
         <!-- END THEME LAYOUT SCRIPTS -->
         @stack('scripts')
+ 
     </body>
 </html>

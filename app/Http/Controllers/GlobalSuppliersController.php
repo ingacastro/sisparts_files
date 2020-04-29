@@ -177,18 +177,27 @@ class GlobalSuppliersController extends Controller
 
     public function getListGlobalSuppliersManufacturers($id){
         return DB::table('globals_manufacturers')
-            ->select('globals_manufacturers.manufacturer_id', 'manufacturers.id', 'manufacturers.name')
+            ->select('globals_manufacturers.manufacturer_id', 'globals_manufacturers.global_supplier_id', 'manufacturers.id', 'manufacturers.name')
             ->where('global_supplier_id', $id)
             ->leftJoin('manufacturers', 'globals_manufacturers.manufacturer_id', '=', 'manufacturers.id' )
             ->orderBy('globals_manufacturers.created_at', 'DESC')
             ->get();
     }
 
-    public function globalSuppliersManufacturersDelete($id, Request $request){
+    public function globalSuppliersManufacturersDelete($supplier_id, $manufacturer_id , Request $request){
         if ( ! $request->ajax() )
             abort(403, 'No autorizado');
 
-        DB::table('globals_manufacturers')->where('manufacturer_id', $id)->delete();
+        DB::table('globals_manufacturers')
+                        ->where('global_supplier_id', $supplier_id)
+                        ->where('manufacturer_id', $manufacturer_id)
+                        ->delete();
+
+        $global_supplier_manufacturers = $this->getListGlobalSuppliersManufacturers($supplier_id);
+
+        return response()->json([
+            'resultados' => View::make('global-suppliers.brands', compact('global_supplier_manufacturers'))->render()
+        ]);  
     }
     
     public function globalSuppliersManufacturers(Request $request){

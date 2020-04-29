@@ -253,26 +253,24 @@
 @endif
 
 <script> 
-    
-
     // borrar marca relacionada
     
     $(document).on('click','.delete-r', function(e){
         e.preventDefault()
+        const elemet = $(this)
         
-        /*
         $.ajax({
-            url:  	    '/global-suppliers-manufacturers/delete/' + $(this).attr('data-id'),
-            dataType: 	'json',
+            url:  	    `/global-suppliers-manufacturers/delete/${$(this).data('id')}/${$(this).data('manufacturer')}`,
+            dataType: 	'JSON',
             type:		'get',
-            success: function (response) {
-                $(this).parents().hide()
+            success:    function (response) {
+                $("#brands_table tbody").html(response.resultados)
             },
             error:function(x,xs,xt){
                 console.log('error: ' + JSON.stringify(x) +"\n error string: "+ xs + "\n error throwed: " + xt)
             }
         })
-        */
+        
     })
 
     // activar datos basicos

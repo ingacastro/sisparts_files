@@ -3,7 +3,7 @@
     <td>{{ $global_supplier_manufacturer->id }}</td>
     <td>{{ $global_supplier_manufacturer->name }}</td>
     <td>
-        <button type="button" class="delete-r btn btn-sm btn-danger" data-id="{{$global_supplier_manufacturer->manufacturer_id}}">Eliminar</button>
+        <button type="submit" class="btn btn-sm btn-danger delete-r" data-id="{{$global_supplier_manufacturer->global_supplier_id}}" data-manufacturer="{{$global_supplier_manufacturer->manufacturer_id}}">Eliminar</button>
     </td>
 </tr>
 @empty

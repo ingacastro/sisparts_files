@@ -171,7 +171,7 @@ Route::group(['middleware' => ['role:Administrador']], function(){
 	
 	Route::get('global-suppliers/get-list', 'GlobalSuppliersController@getList')->name('global-suppliers.get-list');
 	Route::post('/global-suppliers-manufacturers', 'GlobalSuppliersController@globalSuppliersManufacturers')->name('global-suppliers-manufacturers');
-	Route::get('/global-suppliers-manufacturers/delete/{id}', 'GlobalSuppliersController@globalSuppliersManufacturersDelete')->name('global-suppliers-manufacturers-delete');
+	Route::get('/global-suppliers-manufacturers/delete/{supplier_id}/{manufacturer_id}', 'GlobalSuppliersController@globalSuppliersManufacturersDelete')->name('global-suppliers-manufacturers-delete');
 	Route::resource('/global-suppliers', 'GlobalSuppliersController')
 						->names([
 							'index' => 'global-suppliers.index',
@@ -179,5 +179,6 @@ Route::group(['middleware' => ['role:Administrador']], function(){
 							'edit'  => 'global-suppliers.edit',
 							'update'  => 'global-suppliers.update',
 							]);
+
 });
 

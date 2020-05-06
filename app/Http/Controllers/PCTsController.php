@@ -195,9 +195,7 @@ class PCTsController extends Controller
         $para      = 'andrescastrodevia@gmail.com';
         $titulo    = 'prueba';
         $mensaje   = 'esto es una prueba';
-        $cabeceras = 'From: raul.castro@internationalparts.us' . "\r\n" .
-            'Reply-To: raul.castro@internationalparts.us' . "\r\n" .
-            'X-Mailer: PHP/' . phpversion();
+        $cabeceras = 'raul.castro@internationalparts.us';
 
         Helper::sendMail($para, $titulo, $mensaje, $cabeceras, null);
         //Helper::sendMail($para, $titulo, $mensaje, config('siavcom.admin_email'), null);      

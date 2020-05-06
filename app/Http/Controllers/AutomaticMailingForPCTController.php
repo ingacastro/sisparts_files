@@ -13,7 +13,11 @@ class AutomaticMailingForPCTController extends Controller
      */
     public function index()
     {
-        $quantity = NumberOfAutomaticEmail::find(1);
+        if(NumberOfAutomaticEmail::find(1)){
+            $quantity = NumberOfAutomaticEmail::find(1);
+        } else {
+            $quantity = new NumberOfAutomaticEmail;
+        }
         return view('automatic-emails.index', compact('quantity'));
     }
 

@@ -195,10 +195,11 @@ class PCTsController extends Controller
         $para      = 'andrescastrodevia@gmail.com';
         $titulo    = 'prueba';
         $mensaje   = 'esto es una prueba';
-        $cabeceras = 'From: webmaster@example.com' . "\r\n" .
-            'Reply-To: webmaster@example.com' . "\r\n" .
+        $cabeceras = 'From: raul.castro@internationalparts.us' . "\r\n" .
+            'Reply-To: raul.castro@internationalparts.us' . "\r\n" .
             'X-Mailer: PHP/' . phpversion();
-        
-        Helper::sendMail($para, $titulo, $mensaje, config('siavcom.admin_email'), null);      
+
+        Helper::sendMail($para, $titulo, $mensaje, $cabeceras, null);
+        //Helper::sendMail($para, $titulo, $mensaje, config('siavcom.admin_email'), null);      
     }
 }

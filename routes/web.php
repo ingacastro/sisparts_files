@@ -165,5 +165,26 @@ Route::group(['middleware' => ['role:Administrador|Cotizador']], function(){
 
 Route::group(['middleware' => ['role:Administrador']], function(){
 	Route::delete('selectlistauth/{selectlistauth}', 'SelectlistauthController@destroy')->name('selectlistauth.destroy');
+	Route::resource('/automatic-emails', 'AutomaticMailingForPCTController')
+				->names([
+					'index' => 'automatic-emails.index',
+					'update' => 'automatic-emails.update'
+					]);
+	
+	Route::get('global-suppliers/get-list', 'GlobalSuppliersController@getList')->name('global-suppliers.get-list');
+	Route::post('/global-suppliers-manufacturers', 'GlobalSuppliersController@globalSuppliersManufacturers')->name('global-suppliers-manufacturers');
+	Route::get('/global-suppliers-manufacturers/delete/{supplier_id}/{manufacturer_id}', 'GlobalSuppliersController@globalSuppliersManufacturersDelete')->name('global-suppliers-manufacturers-delete');
+	Route::resource('/global-suppliers', 'GlobalSuppliersController')
+						->names([
+							'index' => 'global-suppliers.index',
+							'store' => 'global-suppliers.store',
+							'edit'  => 'global-suppliers.edit',
+							'update'  => 'global-suppliers.update',
+							]);
+
 });
-//jsanchez
+
+//Route::get('/pct-recientes', 'PCTsController@obtenerPCTsYSusNumerosDeParte')->name('global-suppliers-manufacturers-delete');
+
+Route::get('/pct-recientes', 'PCTsController@prueba');
+

@@ -1,0 +1,4 @@
+php artisan migrate --path=database/migrations/2020_04_10_191351_create_global_suppliers_table.php
+
+php artisan migrate --path=database/migrations/2020_04_13_145515_create_number_of_automatic_emails_table.php
+php artisan db:seed --class=NumberOfAutomaticEmailsSeeder.php

@@ -18,12 +18,18 @@
                     <span class="selected"></span>
                 </a>
             </li>
-            <li id="sidebar_supplier" class="nav-item ">
-                <a href="{{ route('supplier.index') }}" class="nav-link nav-toggle">
+            <li id="sidebar_supplier" class="nav-item">
+                <a href="{{ route('supplier.index') }}" id="toggle_proveedores" class="nav-link nav-toggle">
                     <i class="icon-basket"></i>
                     <span class="title">Proveedores</span>
                     <span class="selected"></span>
                 </a>
+                {{--
+                <ul class="rc-sidebar-ul" style="display:none;">
+                    <li><a href="">Proveedores Generales</a></li>
+                    <li><a href="{{ route('global-suppliers.index') }}">Proveedores Brokers</a></li>
+                </ul>
+                --}}
             </li>
             @endif
             @if($user->hasRole('Cotizador') || $user->hasRole('Administrador'))

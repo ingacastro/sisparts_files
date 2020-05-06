@@ -1,0 +1,9 @@
+.rc-sidebar-ul{
+    list-style: none;
+}
+.rc-sidebar-ul li{
+    padding: 5px 0;
+}
+.rc-sidebar-ul a{
+    color: #ffffffc7;
+}

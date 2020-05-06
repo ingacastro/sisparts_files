@@ -25,6 +25,7 @@
         <a href="{{ route('alert.index') }}" class="btn btn-lg blue">Alertas</a>
         <a href="{{ route('checklistauth.index') }}" class="btn btn-lg blue">Checklist Autorización</a>
         <a href="{{ route('selectlistauth.index') }}" class="btn btn-lg blue">Tipo de Segimiento</a>
+        <a href="{{ route('automatic-emails.index') }}" class="btn btn-lg blue">Correos Automaticos</a>
     </div>
 </div>
 @endsection

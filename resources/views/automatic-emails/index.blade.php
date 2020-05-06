@@ -63,11 +63,12 @@
 		$(document).ready(function () {
 			let form        = document.getElementById('quantity_email_form')
 			let quantity    = document.getElementById('quantity').value
+            let ruta        = $('#root_url').attr('content')
 			
 			$(form).submit(function (e) {
 				e.preventDefault()
 				$.ajax({
-					url:  		"{{ Route('automatic-emails.update', 1) }}",
+                    url:  	    `${ruta}/automatic-emails/1`,
 					data: 		$(form).serialize(),
 					dataType: 	'json',
 					type:		'post',

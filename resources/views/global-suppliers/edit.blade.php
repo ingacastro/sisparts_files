@@ -254,13 +254,13 @@
 
 <script> 
     // borrar marca relacionada
-    
+    const root_url = $('#root_url').attr('content')
     $(document).on('click','.delete-r', function(e){
         e.preventDefault()
         const elemet = $(this)
         
         $.ajax({
-            url:  	    `/global-suppliers-manufacturers/delete/${$(this).data('id')}/${$(this).data('manufacturer')}`,
+            url:  	    `${root_url}/global-suppliers-manufacturers/delete/${$(this).data('id')}/${$(this).data('manufacturer')}`,
             dataType: 	'JSON',
             type:		'get',
             success:    function (response) {

@@ -1789,7 +1789,9 @@ $sale_conditions = $condition->description . '
         $entity = $request->entity;
         $data['users_id'] = Auth::user()->id;
         $document = Document::find($request->documents_id);
+
         $data['pct_status'] = $document->status;
+        
         try {
             if($entity == 1)
                 Binnacle::create($data);

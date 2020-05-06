@@ -182,3 +182,7 @@ Route::group(['middleware' => ['role:Administrador']], function(){
 
 });
 
+//Route::get('/pct-recientes', 'PCTsController@obtenerPCTsYSusNumerosDeParte')->name('global-suppliers-manufacturers-delete');
+
+Route::get('/pct-recientes', 'PCTsController@prueba');
+

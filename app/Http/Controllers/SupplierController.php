@@ -25,6 +25,16 @@ class SupplierController extends Controller
      */
     public function index()
     {
+       /* dd(Supplier::select('suppliers.id', 'users.name AS user', 'trade_name', 'business_name', 
+        'countries.name as country', 'suppliers.rfc', 'suppliers.email', 'suppliers.landline', 'suppliers.contact_name',
+        DB::raw("GROUP_CONCAT(manufacturers.name) as brands"))
+    ->leftJoin('countries', 'countries.id', 'suppliers.countries_id')
+    ->leftJoin('users', 'users.id', 'suppliers.user_id')
+    ->leftJoin('suppliers_manufacturers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
+    ->leftJoin('manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
+    ->orderBy('suppliers.created_at', 'DESC')
+    ->groupBy('suppliers.id')->get());
+    */
         return view('supplier.index');
     }
 
@@ -32,13 +42,15 @@ class SupplierController extends Controller
     {
         if(!$request->ajax()) abort(403, 'Unauthorized action');
 
-        $supps = Supplier::select('suppliers.id', 'trade_name', 'business_name', 
-            'countries.name as country', 'rfc', 'email', 'landline', 'contact_name',
-            DB::raw("GROUP_CONCAT(manufacturers.name) as brands"))
-        ->leftJoin('countries', 'countries.id', 'suppliers.countries_id')
-        ->leftJoin('suppliers_manufacturers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
-        ->leftJoin('manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
-        ->groupBy('suppliers.id');
+        $supps = Supplier::select('suppliers.id', 'users.name AS user', 'trade_name', 'business_name', 
+        'countries.name as country', 'suppliers.rfc', 'suppliers.email', 'suppliers.landline', 'suppliers.contact_name',
+        DB::raw("GROUP_CONCAT(manufacturers.name) as brands"))
+    ->leftJoin('countries', 'countries.id', 'suppliers.countries_id')
+    ->leftJoin('users', 'users.id', 'suppliers.user_id')
+    ->leftJoin('suppliers_manufacturers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
+    ->leftJoin('manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
+    ->orderBy('suppliers.created_at', 'DESC')
+    ->groupBy('suppliers.id');
 
         return Datatables::of($supps)
               ->addColumn('actions', function($supplier) {

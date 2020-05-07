@@ -55,6 +55,7 @@
                     <thead>
                         <tr>
                             <th>Nombre</th>
+                            <th>Usuario</th>
                             <th>Razón Social</th>
                             <th>País</th>
                             <th>RFC</th>
@@ -115,6 +116,7 @@
             bSort: true,
             columns: [
                 { data: "trade_name", name: "trade_name" },
+                { data: "user", name: "users" },
                 { data: "business_name", name: "business_name" },
                 { data: "country", name: "countries.name" },
                 { data: "rfc", name: "rfc" },

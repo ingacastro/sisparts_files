@@ -376,6 +376,7 @@ class InboxController extends Controller
 
         $files = DB::table('files')
         ->select('files.*', 'supplies_files.supplies_id', 'supplies_files.files_id')
+        ->orderBy('files.created_at', 'DESC')
         ->join('supplies_files', 'supplies_files.files_id', 'files.id')
         ->join('supplies', 'supplies.id', 'supplies_files.supplies_id')
         ->where('supplies.id', $set_supplies_id);

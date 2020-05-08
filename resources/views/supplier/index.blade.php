@@ -116,7 +116,7 @@
             bSort: true,
             columns: [
                 { data: "trade_name", name: "trade_name" },
-                { data: "user", name: "users" },
+                { data: "user", name: "users.name" },
                 { data: "business_name", name: "business_name" },
                 { data: "country", name: "countries.name" },
                 { data: "rfc", name: "rfc" },

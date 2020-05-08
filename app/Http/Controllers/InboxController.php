@@ -15,6 +15,7 @@ use IParts\File;
 use IParts\Message;
 use IParts\Binnacle;
 use IParts\SupplySet;
+use IParts\Supply;
 use IParts\Rejection;
 use IParts\Customer;
 use IParts\Employee;
@@ -305,6 +306,7 @@ class InboxController extends Controller
      */
     public function show($id)
     {
+        
         $selectlist = Selectlistauth::where('status', 'Visible')->get();
         $languageall = DB::table('languages')->get();
 
@@ -336,8 +338,19 @@ class InboxController extends Controller
 /*        $set = SupplySet::where('documents_id', $doc_id)->where('supplies_id', $set_pri_key[1])
         ->first();*/
         $set = SupplySet::find($set_id[1]);
-        
-        $suppliers = Supplier::orderBy('trade_name')->pluck('trade_name', 'id');
+
+        $product_id = SupplySet::find($set_id[1])->supplies_id;
+        $manufacturers_id = Supply::find($product_id)->manufacturers_id;
+        // $suppliers = Supplier::orderBy('trade_name')->pluck('trade_name', 'id');
+
+        $suppliers = DB::table('suppliers_manufacturers')
+                    ->where('suppliers_manufacturers.manufacturers_id', $manufacturers_id)
+                    ->leftJoin('suppliers AS s', function($join) {
+                        $join->on('suppliers_manufacturers.suppliers_id', '=', 's.id');
+                        })
+                    ->select('s.trade_name', 's.id')
+                    ->get();
+
         $currencies = Currency::pluck('name', 'id');
         $measurement = DB::table('measurements')->find($set->id);
         $countries = DB::table('countries')->pluck('name', 'id');

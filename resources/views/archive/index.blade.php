@@ -77,7 +77,6 @@
                     <thead>
                         <tr>
                             <th>Fecha</th>
-                            <th>Archivado por</th>
                             <th>Empresa</th>
                             <th>Folio</th>
                             <th>RFQ</th>
@@ -172,7 +171,6 @@ function buildDataTable(ajaxData) {
         bSort: true,
         columns: [
             { data: "created_at", name: "created_at" },
-            { data: "archive_user", name: "archive_user" },
             { data: "sync_connection", name: "sync_connections.display_name" },
             { data: "number", name: "number" },
             { data: "reference", name: "reference" },

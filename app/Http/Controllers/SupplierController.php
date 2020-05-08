@@ -227,6 +227,8 @@ class SupplierController extends Controller
 
     public function ajaxstore(SupplierRequest $request)
     {
+
+
         $model = null;
         $supp_data = $request->all();
         $doc = explode('_', $request['manufacturer']);

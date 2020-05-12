@@ -134,21 +134,7 @@ class PCTsController extends Controller
                         try {
                             
                             Helper::sendMail($proveedor->email, $this->palabra['titulo'], $this->templateEmail($numero_de_parte, $pct), $pct->email, null);
-                            /*
-                            Mail::send('automatic-emails.template-email', [
-                                        'palabras' => $this->palabras,
-                                        'nro_de_parte' => $numero_de_parte->number,
-                                        'descripcion' => $numero_de_parte->large_description,
-                                        'fabricante' => $numero_de_parte->manufacturer,
-                                        'cantidad' => intval($numero_de_parte->products_amount) . ' ' . $numero_de_parte->measurement_unit,
-                                        'cotizador' => $pct->buyer_name,
-                                        'correo_cotizador' => $pct->email,
-                                    ], 
-                            function ($mail) use ($proveedor, $pct) {
-                                $mail->from($pct->email, 'sisparts');
-                                $mail->to($proveedor->email)->subject('Test');
-                            });
-                            */
+
                             Binnacle::create([
                                 'entity'        => 1,
                                 'comments'      => "Se envío un correo automático a {$proveedor->proveedor} por el número de parte {$numero_de_parte->number} al correo {$proveedor->email}",
@@ -211,5 +197,11 @@ class PCTsController extends Controller
             <p><strong>$cotizador:</strong>$pct->buyer_name</p>
             <p><strong>$correo_cotizador:</strong>$pct->email</p>
         </div>";
+    }
+
+    public function pruebaEnviaCorreo(){
+
+        Helper::sendMail('andrescastrodevia@gmail.com', 'Solicitud de cotización', 'template', 'raul.castro@internationalparts.us', null);
+
     }
 }

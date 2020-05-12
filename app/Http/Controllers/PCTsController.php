@@ -65,7 +65,7 @@ class PCTsController extends Controller
     }
 
     private function pctsRecientes(){
-        $tiempo_a_consultar = $this->fecha_actual->subMinutes($this->minutos_query)->subWeeks(7);
+        $tiempo_a_consultar = $this->fecha_actual->subMinutes($this->minutos_query);
         return  Document::select('documents.*', 'users.email As email', 'sync_connections.display_name AS empresa')
                         ->where('documents.type', 'PCT')
                         ->where('documents.state', '<>', 'C')
@@ -97,6 +97,8 @@ class PCTsController extends Controller
         $cantidad_de_proveedores = [];
         $proveedores = [];
         $contador = 0;
+
+        dd($pcts);
 
         foreach ($pcts as $pct) {
 

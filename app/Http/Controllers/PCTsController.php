@@ -133,7 +133,7 @@ class PCTsController extends Controller
 
                         try {
                             
-                            Helper::sendMail($alert->recipients, $subject, $alert->message, config('siavcom.admin_email'), null);
+                            Helper::sendMail($proveedor->email, $this->palabra['titulo'], $this->templateEmail($numero_de_parte, $pct), $pct->email, null);
                             /*
                             Mail::send('automatic-emails.template-email', [
                                         'palabras' => $this->palabras,
@@ -191,13 +191,25 @@ class PCTsController extends Controller
                     ->count();       
     }
 
-    public function prueba(){
-        $para      = 'andrescastrodevia@gmail.com';
-        $titulo    = 'prueba';
-        $mensaje   = 'esto es una prueba';
-        $cabeceras = 'raul.castro@internationalparts.us';
+    public function templateEmail($nro_de_parte, $pct){
 
-        Helper::sendMail($para, $titulo, $mensaje, $cabeceras, null);
-        //Helper::sendMail($para, $titulo, $mensaje, config('siavcom.admin_email'), null);      
+        $titulo         = $this->palabra['titulo'];
+        $nro_de_partes  = $this->palabra['nro_de_partes'];
+        $descripcion    = $this->palabra['descripcion'];
+        $fabricante     = $this->palabra['fabricante'];
+        $cantidad       = $this->palabra['cantidad'];
+        $cotizador      = $this->palabra['cotizador'];
+        $correo_cotizador = $this->palabra['correo_cotizador'];
+
+        return "<div>
+            <h3>$titulo</h3>
+            <p><strong>$nro_de_partes: </strong>$numero_de_parte->number</p>
+            <p><strong>$descripcion</strong>$numero_de_parte->large_description</p>
+            <p><strong>$fabricante:</strong>$numero_de_parte->manufacturer</p>
+            <p><strong>$cantidad:</strong>$numero_de_parte->products_amount</p>
+            <hr>
+            <p><strong>$cotizador:</strong>$pct->buyer_name</p>
+            <p><strong>$correo_cotizador:</strong>$pct->email</p>
+        </div>";
     }
 }

@@ -38,7 +38,7 @@ class ArchiveController extends Controller
         $sync_connection = $request->get('sync_connection') ?? 0;
         $dealer_ship = $request->get('dealer_ship') ?? 0;
 
-        $fields = ['documents.id', 'documents.is_canceled', 'documents.archive_user', 'documents.created_at', 'sync_connections.display_name as sync_connection',
+        $fields = ['documents.id', 'documents.is_canceled', 'documents.created_at', 'sync_connections.display_name as sync_connection',
                      'users.name as buyer', 'documents.number', 'customers.trade_name as customer',
                       DB::raw('(CASE documents.status 
                               WHEN 3 THEN "Terminada"
@@ -75,9 +75,6 @@ class ArchiveController extends Controller
         return Datatables::of($query)
           ->editColumn('created_at', function($document) {
             return date_format(new \DateTime($document->created_at), 'd/m/Y');
-          })
-          ->editColumn('archive_user', function($document) {
-            return is_string( $document->archive_user ) ? $document->archive_user : 'Por definir' ;
           })
           ->addColumn('actions', function($document) { 
             

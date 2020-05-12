@@ -25,6 +25,16 @@ class SupplierController extends Controller
      */
     public function index()
     {
+       /* dd(Supplier::select('suppliers.id', 'users.name AS user', 'trade_name', 'business_name', 
+        'countries.name as country', 'suppliers.rfc', 'suppliers.email', 'suppliers.landline', 'suppliers.contact_name',
+        DB::raw("GROUP_CONCAT(manufacturers.name) as brands"))
+    ->leftJoin('countries', 'countries.id', 'suppliers.countries_id')
+    ->leftJoin('users', 'users.id', 'suppliers.user_id')
+    ->leftJoin('suppliers_manufacturers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
+    ->leftJoin('manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
+    ->orderBy('suppliers.created_at', 'DESC')
+    ->groupBy('suppliers.id')->get());
+    */
         return view('supplier.index');
     }
 
@@ -32,13 +42,15 @@ class SupplierController extends Controller
     {
         if(!$request->ajax()) abort(403, 'Unauthorized action');
 
-        $supps = Supplier::select('suppliers.id', 'trade_name', 'business_name', 
-            'countries.name as country', 'rfc', 'email', 'landline', 'contact_name',
-            DB::raw("GROUP_CONCAT(manufacturers.name) as brands"))
-        ->leftJoin('countries', 'countries.id', 'suppliers.countries_id')
-        ->leftJoin('suppliers_manufacturers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
-        ->leftJoin('manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
-        ->groupBy('suppliers.id');
+        $supps = Supplier::select('suppliers.id', 'users.name AS user', 'trade_name', 'business_name', 
+        'countries.name as country', 'suppliers.rfc', 'suppliers.email', 'suppliers.landline', 'suppliers.contact_name',
+        DB::raw("GROUP_CONCAT(manufacturers.name) as brands"))
+    ->leftJoin('countries', 'countries.id', 'suppliers.countries_id')
+    ->leftJoin('users', 'users.id', 'suppliers.user_id')
+    ->leftJoin('suppliers_manufacturers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
+    ->leftJoin('manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
+    ->orderBy('suppliers.created_at', 'DESC')
+    ->groupBy('suppliers.id');
 
         return Datatables::of($supps)
               ->addColumn('actions', function($supplier) {
@@ -215,6 +227,8 @@ class SupplierController extends Controller
 
     public function ajaxstore(SupplierRequest $request)
     {
+
+
         $model = null;
         $supp_data = $request->all();
         $doc = explode('_', $request['manufacturer']);
@@ -256,18 +270,19 @@ class SupplierController extends Controller
         $supp = DB::table('supplies')->where('id', $supplies_id)->get();
         
         $manufacturers_id = $supp[0]->manufacturers_id;
-
-
-        $existe = DB::table('suppliers_manufacturers')
+        
+        $proveedor = DB::table('suppliers_manufacturers')
           ->where('manufacturers_id', $manufacturers_id)
           ->where('suppliers_id', $request['id'])
-          ->get();
+          ->leftJoin('suppliers AS s', 'suppliers_manufacturers.suppliers_id', 's.id')
+          ->select('s.trade_name', 's.countries_id', 's.email', 's.languages_id', 's.landline', 's.post_code')
+          ->first();
         
-        if (isset($existe[0])) {
-          return response()->json(['message' => 1]);
+        if ( $proveedor->trade_name == null  OR $proveedor->countries_id == null OR $proveedor->email == null OR $proveedor->languages_id == null OR $proveedor->landline == null OR $proveedor->post_code == null) {
+          return response()->json(['message' => 0]);
         }
 
-        return response()->json(['message' => 0]);
+        return response()->json(['message' => 1]);
 
       } catch (Exception $e) {
         return response()->json(['message' => 0]);

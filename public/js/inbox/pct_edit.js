@@ -5,15 +5,15 @@ $(document).on('click', '.edit-set', function() {
     $('#pct_edit_modal_error_messages').html('');
     $('#pct_edit_modal_success_message').html('');
 
-    let set_id = $(this).attr('data-set_id');
-    let total_cost = $(this).attr('data-total_cost');
+    let set_id      = $(this).attr('data-set_id');
+    let total_cost  = $(this).attr('data-total_cost');
     let total_price = $(this).attr('data-total_price');
-    let unit_price = $(this).attr('data-unit_price');
-    let total_profit = $(this).attr('data-total_profit');
-    let set_number = $(this).attr('data-set_number');
+    let unit_price  = $(this).attr('data-unit_price');
+    let total_profit= $(this).attr('data-total_profit');
+    let set_number  = $(this).attr('data-set_number');
     let supply_number = $(this).attr('data-supply_number');
     let set_products_amount = $(this).attr('data-set_products_amount');
-    let viewRows = rows;
+    let viewRows    = rows;
 
     let ubicacion = $('#detail-title-ubicacion').text();
 
@@ -39,7 +39,9 @@ $(document).on('click', '.edit-set', function() {
                     },
                     success: function(response) {
                         if (response.message != 1) {
-                            $('#pct_edit_modal_error_messages').html('<div class="custom-alerts alert alert-danger fade in" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>El proveedor seleccionado no esta asociado a la marca del articulo.</div>');
+                            $('#pct_edit_modal_error_messages').html(`<div class="custom-alerts alert alert-danger fade in" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>El proveedor seleccionado le faltan datos obligatorios, por favor debe completar el registro del proveedor en
+                            <a href='${root_url}/supplier'>proveedores</a>
+                            .</div>`);
                             $('#in_authorization_btn').prop('disabled', true);
                             $('#buttonBudgetSave').prop('disabled', true);
                         } else{

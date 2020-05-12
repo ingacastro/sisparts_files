@@ -198,10 +198,4 @@ class PCTsController extends Controller
             <p><strong>$correo_cotizador:</strong>$pct->email</p>
         </div>";
     }
-
-    public function pruebaEnviaCorreo(){
-
-        Helper::sendMail('andrescastrodevia@gmail.com', 'Solicitud de cotización', 'template', 'raul.castro@internationalparts.us', null);
-
-    }
 }

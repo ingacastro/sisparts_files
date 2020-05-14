@@ -131,7 +131,7 @@ class PCTsController extends Controller
                  */
                 foreach ( $proveedores[$numero_de_parte->manufacturers_id] as $proveedor) {
                     if($proveedor->email){  
-                        /*
+                        
                         $this->traduccionDeTemplate($proveedor->languages_id);
 
                         try {
@@ -154,12 +154,11 @@ class PCTsController extends Controller
                         } catch (\Throwable $th) {
                             echo $th->getMessage() . '<br><br>';
                         }
-                        */
+                        
                     }
                 }
             }
         }
-        dd($proveedores);
     }
 
     private function obtenerProveedoresPorMarca($fabricante){

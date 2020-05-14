@@ -65,7 +65,7 @@ class PCTsController extends Controller
     }
 
     private function pctsRecientes(){
-        $tiempo_a_consultar = $this->fecha_actual->subMinutes($this->minutos_query);
+        $tiempo_a_consultar = $this->fecha_actual->subMinutes($this->minutos_query)->subMonths(2);
         return  Document::select('documents.*', 'users.email As email', 'sync_connections.display_name AS empresa')
                         ->where('documents.type', 'PCT')
                         ->where('documents.state', '<>', 'C')
@@ -73,6 +73,7 @@ class PCTsController extends Controller
                         ->where('documents.created_at', '>', $tiempo_a_consultar)
                         ->leftJoin('users', 'users.id', '=', 'documents.employees_users_id')
                         ->leftJoin('sync_connections', 'sync_connections.id', '=', 'documents.sync_connections_id')
+                        ->take(5)
                         ->get();   
     }
 
@@ -98,7 +99,7 @@ class PCTsController extends Controller
         $proveedores = [];
         $contador = 0;
 
-        dd($pcts);
+        //dd($pcts);
 
         foreach ($pcts as $pct) {
 
@@ -130,7 +131,7 @@ class PCTsController extends Controller
                  */
                 foreach ( $proveedores[$numero_de_parte->manufacturers_id] as $proveedor) {
                     if($proveedor->email){  
-                        
+                        /*
                         $this->traduccionDeTemplate($proveedor->languages_id);
 
                         try {
@@ -153,10 +154,12 @@ class PCTsController extends Controller
                         } catch (\Throwable $th) {
                             echo $th->getMessage() . '<br><br>';
                         }
+                        */
                     }
                 }
             }
         }
+        dd($proveedores);
     }
 
     private function obtenerProveedoresPorMarca($fabricante){

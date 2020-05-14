@@ -65,7 +65,7 @@ class PCTsController extends Controller
     }
 
     private function pctsRecientes(){
-        $tiempo_a_consultar = $this->fecha_actual->subMinutes($this->minutos_query)->subMonths(2);
+        $tiempo_a_consultar = $this->fecha_actual->subMinutes($this->minutos_query)->subMonths(8);
         return  Document::select('documents.*', 'users.email As email', 'sync_connections.display_name AS empresa')
                         ->where('documents.type', 'PCT')
                         ->where('documents.state', '<>', 'C')
@@ -73,7 +73,7 @@ class PCTsController extends Controller
                         ->where('documents.created_at', '>', $tiempo_a_consultar)
                         ->leftJoin('users', 'users.id', '=', 'documents.employees_users_id')
                         ->leftJoin('sync_connections', 'sync_connections.id', '=', 'documents.sync_connections_id')
-                        ->take(5)
+                        ->take(2)
                         ->get();   
     }
 
@@ -99,7 +99,7 @@ class PCTsController extends Controller
         $proveedores = [];
         $contador = 0;
 
-        //dd($pcts);
+       //dd($pcts);
 
         foreach ($pcts as $pct) {
 
@@ -129,14 +129,15 @@ class PCTsController extends Controller
                 /**
                  * Enviar correo a proveedores
                  */
+
                 foreach ( $proveedores[$numero_de_parte->manufacturers_id] as $proveedor) {
                     if($proveedor->email){  
-                        
+            
                         $this->traduccionDeTemplate($proveedor->languages_id);
 
                         try {
                             
-                            Helper::sendMail($proveedor->email, $this->palabra['titulo'], $this->templateEmail($numero_de_parte, $pct), $pct->email, null);
+                            Helper::sendMail($proveedor->email, $this->palabras['titulo'], $this->templateEmail($numero_de_parte, $pct), $pct->email, null);
 
                             Binnacle::create([
                                 'entity'        => 1,
@@ -183,20 +184,20 @@ class PCTsController extends Controller
 
     public function templateEmail($nro_de_parte, $pct){
 
-        $titulo         = $this->palabra['titulo'];
-        $nro_de_partes  = $this->palabra['nro_de_partes'];
-        $descripcion    = $this->palabra['descripcion'];
-        $fabricante     = $this->palabra['fabricante'];
-        $cantidad       = $this->palabra['cantidad'];
-        $cotizador      = $this->palabra['cotizador'];
-        $correo_cotizador = $this->palabra['correo_cotizador'];
+        $titulo         = $this->palabras['titulo'];
+        $nro_de_partes  = $this->palabras['nro_de_partes'];
+        $descripcion    = $this->palabras['descripcion'];
+        $fabricante     = $this->palabras['fabricante'];
+        $cantidad       = $this->palabras['cantidad'];
+        $cotizador      = $this->palabras['cotizador'];
+        $correo_cotizador = $this->palabras['correo_cotizador'];
 
         return "<div>
             <h3>$titulo</h3>
-            <p><strong>$nro_de_partes: </strong>$numero_de_parte->number</p>
-            <p><strong>$descripcion</strong>$numero_de_parte->large_description</p>
-            <p><strong>$fabricante:</strong>$numero_de_parte->manufacturer</p>
-            <p><strong>$cantidad:</strong>$numero_de_parte->products_amount</p>
+            <p><strong>$nro_de_partes: </strong>$nro_de_parte->number</p>
+            <p><strong>$descripcion</strong>$nro_de_parte->large_description</p>
+            <p><strong>$fabricante:</strong>$nro_de_parte->manufacturer</p>
+            <p><strong>$cantidad:</strong>$nro_de_parte->products_amount</p>
             <hr>
             <p><strong>$cotizador:</strong>$pct->buyer_name</p>
             <p><strong>$correo_cotizador:</strong>$pct->email</p>

@@ -29,6 +29,7 @@ $(document).on('click', '.edit-set', function() {
             $('#budget_tab_suppliers_select').select2({
                 dropdownParent: $('#edit_set_modal')
             }).on('change', function() {
+                let id = $('#budget_tab_suppliers_select').val()
                 $.ajax({
                     url: root_url + '/supplier/checksupplier',
                     method: 'get',
@@ -40,7 +41,7 @@ $(document).on('click', '.edit-set', function() {
                     success: function(response) {
                         if (response.message != 1) {
                             $('#pct_edit_modal_error_messages').html(`<div class="custom-alerts alert alert-danger fade in" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>El proveedor seleccionado le faltan datos obligatorios, por favor debe completar el registro del proveedor en
-                            <a href='${root_url}/supplier'>proveedores</a>
+                            <a href='${root_url}/supplier/${id}/edit'>proveedores</a>
                             .</div>`);
                             $('#in_authorization_btn').prop('disabled', true);
                             $('#buttonBudgetSave').prop('disabled', true);

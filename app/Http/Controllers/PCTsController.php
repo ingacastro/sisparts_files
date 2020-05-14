@@ -65,7 +65,7 @@ class PCTsController extends Controller
     }
 
     private function pctsRecientes(){
-        $tiempo_a_consultar = $this->fecha_actual->subMinutes($this->minutos_query)->subMonths(8);
+        $tiempo_a_consultar = $this->fecha_actual->subMinutes($this->minutos_query);
         return  Document::select('documents.*', 'users.email As email', 'sync_connections.display_name AS empresa')
                         ->where('documents.type', 'PCT')
                         ->where('documents.state', '<>', 'C')

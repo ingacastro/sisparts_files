@@ -11,7 +11,7 @@ use IParts\Http\Helper;
 
 class PCTsController extends Controller
 {
-    private $minutos_query = 30;
+    private $minutos_query = 180;
     private $fecha_actual  = NULL;
     private $nro_max_envio = NULL;
     public $palabras = [];
@@ -22,7 +22,7 @@ class PCTsController extends Controller
         $this->fecha_actual = Carbon::now();
         $this->id_tipo_de_seguimiento = DB::table('selectlist_edit')
                                             ->select('id')
-                                            ->where('name', 'email automático')
+                                            ->where('name', 'Email automático')
                                             ->first();
     }
 
@@ -98,19 +98,21 @@ class PCTsController extends Controller
         $cantidad_de_proveedores = [];
         $proveedores = [];
         $contador = 0;
+        $contador_prov = 0;
 
-       //dd($pcts);
+        //dd($pcts);
 
         foreach ($pcts as $pct) {
 
-            $numeros_de_partes[$pct->id] = $this->obtenerLosNumerosDePartesRelacionadosConUnaPCT($pct->id);
-            
+            $numeros_de_partes[$contador] = $this->obtenerLosNumerosDePartesRelacionadosConUnaPCT($pct->id);
+             
             /**
              *  Obtener los proveedores del
              *  Nro de Parte
              */
 
-            foreach ($numeros_de_partes[$pct->id] as $numero_de_parte) {
+            foreach ($numeros_de_partes[$contador] as $numero_de_parte) {
+        
 
                 /**
                  * Si la cantidad de proveedores por este Nro de Parte 
@@ -124,13 +126,14 @@ class PCTsController extends Controller
                  * Guardar los proveedores 
                  * En el array
                  */
-                $proveedores[$numero_de_parte->manufacturers_id] = $this->obtenerProveedoresPorMarca        ($numero_de_parte->manufacturers_id);
+                $proveedores[$contador_prov] = $this->obtenerProveedoresPorMarca        ($numero_de_parte->manufacturers_id);
 
                 /**
                  * Enviar correo a proveedores
                  */
-
-                foreach ( $proveedores[$numero_de_parte->manufacturers_id] as $proveedor) {
+                
+                foreach ( $proveedores[$contador_prov] as $proveedor) {
+                    
                     if($proveedor->email){  
             
                         $this->traduccionDeTemplate($proveedor->languages_id);
@@ -157,8 +160,11 @@ class PCTsController extends Controller
                         }
                         
                     }
+                
                 }
+                $contador_prov++;
             }
+            $contador++;
         }
     }
 

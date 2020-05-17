@@ -11,19 +11,21 @@ use IParts\Http\Helper;
 
 class PCTsController extends Controller
 {
-    private $minutos_query = 180;
+    private $minutos_query = 30;
     private $fecha_actual  = NULL;
     private $nro_max_envio = NULL;
     public $palabras = [];
     private $id_tipo_de_seguimiento = NULL;
     private $ref = 18885;
     public function __construct(){
-        $this->nro_max_envio = NumberOfAutomaticEmail::find(1)->quantity;
+        //  $this->nro_max_envio = NumberOfAutomaticEmail::find(1)->quantity;
         $this->fecha_actual = Carbon::now();
+
         $this->id_tipo_de_seguimiento = DB::table('selectlist_edit')
                                             ->select('id')
                                             ->where('name', 'Email automático')
                                             ->first();
+
     }
 
     public function traduccionDeTemplate($lenguaje){
@@ -155,6 +157,10 @@ class PCTsController extends Controller
                                 ->where('id', $numero_de_parte->id)
                                 ->update(['status' =>  2]);
 
+                            DB::table('documents')
+                                ->where('id', $pct->id)
+                                ->update(['status' =>  2]);
+
                         } catch (\Throwable $th) {
                             echo $th->getMessage() . '<br><br>';
                         }
@@ -197,16 +203,17 @@ class PCTsController extends Controller
         $cantidad       = $this->palabras['cantidad'];
         $cotizador      = $this->palabras['cotizador'];
         $correo_cotizador = $this->palabras['correo_cotizador'];
-
+        $products_amount = intval($nro_de_parte->products_amount);
+        
         return "<div>
             <h3>$titulo</h3>
             <p><strong>$nro_de_partes: </strong>$nro_de_parte->number</p>
-            <p><strong>$descripcion</strong>$nro_de_parte->large_description</p>
-            <p><strong>$fabricante:</strong>$nro_de_parte->manufacturer</p>
-            <p><strong>$cantidad:</strong>$nro_de_parte->products_amount</p>
+            <p><strong>$descripcion: </strong>$nro_de_parte->large_description</p>
+            <p><strong>$fabricante: </strong>$nro_de_parte->manufacturer</p>
+            <p><strong>$cantidad: </strong> $products_amount</p>
             <hr>
-            <p><strong>$cotizador:</strong>$pct->buyer_name</p>
-            <p><strong>$correo_cotizador:</strong>$pct->email</p>
+            <p><strong>$cotizador: </strong>$pct->buyer_name</p>
+            <p><strong>$correo_cotizador: </strong>$pct->email</p>
         </div>";
     }
 }

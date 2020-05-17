@@ -75,7 +75,7 @@ class PCTsController extends Controller
                         ->where('documents.created_at', '>', $tiempo_a_consultar)
                         ->leftJoin('users', 'users.id', '=', 'documents.employees_users_id')
                         ->leftJoin('sync_connections', 'sync_connections.id', '=', 'documents.sync_connections_id')
-                        ->take(2)
+                        ->orderBy('created_at', 'DESC')
                         ->get();   
     }
 
@@ -101,9 +101,7 @@ class PCTsController extends Controller
         $proveedores = [];
         $contador = 0;
         $contador_prov = 0;
-
         //dd($pcts);
-
         foreach ($pcts as $pct) {
 
             $numeros_de_partes[$contador] = $this->obtenerLosNumerosDePartesRelacionadosConUnaPCT($pct->id);
@@ -139,28 +137,39 @@ class PCTsController extends Controller
                     if($proveedor->email){  
             
                         $this->traduccionDeTemplate($proveedor->languages_id);
-
+                        
                         try {
                             
                             Helper::sendMail($proveedor->email, $this->palabras['titulo'], $this->templateEmail($numero_de_parte, $pct), $pct->email, null);
 
-                            Binnacle::create([
-                                'entity'        => 1,
-                                'comments'      => "Se envío un correo automático a {$proveedor->proveedor} por el número de parte {$numero_de_parte->number} al correo {$proveedor->email}",
-                                'type'          => $this->id_tipo_de_seguimiento->id,
-                                'documents_id'   => $pct->id,
-                                'pct_status'    => 1,
-                                'users_id'      => $pct->employees_users_id     
-                            ]);
+                            try {
+                                Binnacle::create([
+                                    'entity'        => 1,
+                                    'comments'      => "Se envío un correo automático a {$proveedor->proveedor} por el número de parte {$numero_de_parte->number} al correo {$proveedor->email}",
+                                    'type'          => $this->id_tipo_de_seguimiento->id,
+                                    'documents_id'   => $pct->id,
+                                    'pct_status'    => 1,
+                                    'users_id'      => $pct->employees_users_id     
+                                ]);
+                            } catch (\Throwable $th) {
+                                echo "Captured Throwable: " . $e->getMessage() . PHP_EOL;
+                            }
+
+                            try {
+                                DB::table('documents_supplies')
+                                    ->where('id', $numero_de_parte->id)
+                                    ->update(['status' =>  2]);
+                            } catch (\Throwable $th) {
+                                echo "Captured Throwable: " . $e->getMessage() . PHP_EOL;
+                            }
                             
-                            DB::table('documents_supplies')
-                                ->where('id', $numero_de_parte->id)
-                                ->update(['status' =>  2]);
-
-                            DB::table('documents')
-                                ->where('id', $pct->id)
-                                ->update(['status' =>  2]);
-
+                            try {
+                                DB::table('documents')
+                                    ->where('id', $pct->id)
+                                    ->update(['status' =>  2]);
+                            } catch (\Throwable $th) {
+                                echo "Captured Throwable: " . $e->getMessage() . PHP_EOL;
+                            }
                         } catch (\Throwable $th) {
                             echo $th->getMessage() . '<br><br>';
                         }

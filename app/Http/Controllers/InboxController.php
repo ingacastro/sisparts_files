@@ -15,6 +15,7 @@ use IParts\File;
 use IParts\Message;
 use IParts\Binnacle;
 use IParts\SupplySet;
+use IParts\Supply;
 use IParts\Rejection;
 use IParts\Customer;
 use IParts\Employee;
@@ -120,6 +121,51 @@ class InboxController extends Controller
         return $this->buildInboxDataTable($base_query_clone, $logged_user);
     }
 
+    //Inbox list
+    public function getListFilter(Request $request)
+    {
+        if(!$request->ajax()) abort(403, 'Unauthorized action');
+
+        $sync_connection = $request->get('sync_connection') ?? 0;
+        $status = $request->get('status') ?? 0;
+        $dealer_ship = $request->get('dealer_ship') ?? 0;
+
+        $fields = ['documents.id', 'documents.is_canceled', 'documents.created_at', 
+                     'sync_connections.display_name as sync_connection',
+                     'users.name as buyer', 'documents.number', 'customers.trade_name as customer',
+                      DB::raw('(CASE documents.status WHEN 1 THEN "Nueva"
+                              WHEN 2 THEN "En proceso"
+                              WHEN 3 THEN "Terminada"
+                              WHEN 4 THEN "Archivada"
+                              ELSE "Indefinido" END) as status'), 'documents.reference', 'documents.siavcom_ctz'];
+
+        $query = DB::table('documents')
+                     ->join('employees', 'employees.users_id', 'documents.employees_users_id')
+                     ->join('users', 'users.id', 'employees.users_id')
+                     ->join('customers', 'customers.id', 'documents.customers_id')
+                     ->join('sync_connections', 'documents.sync_connections_id', 'sync_connections.id');
+
+        $base_query_clone = clone $query;
+
+        if($sync_connection > 0)
+            $query->where('documents.sync_connections_id', $sync_connection);
+        if($dealer_ship > 0)
+            $query->where('documents.employees_users_id', $dealer_ship);
+        
+        if($status > 0)
+            $query->where('documents.status', $status);
+        else
+            $query->where('documents.status', '<', 3); //No finished or archived PCTs only
+
+        $logged_user = Auth::user();
+        
+        $first_query_ids = $query->select(['documents.id'])->pluck('id');
+        $base_query_clone->whereIn('documents.id', $first_query_ids);
+        $base_query_clone->select($fields);
+
+        return $this->buildInboxDataTable($base_query_clone, $logged_user);
+    }
+
     private function buildInboxDataTable($query, $logged_user)
     {
         return Datatables::of($query)
@@ -168,7 +214,7 @@ class InboxController extends Controller
                 //Admin actions
                 $actions .= $is_admin ? '<a data-target="#brands_modal" data-toggle="modal" href="#brands_modal" class="btn btn-circle btn-icon-only default change-dealership" data-buyer="' . $document->buyer.'" data-document_id="' . $document->id . '"><i class="fa fa-user"></i></a>' : '';
                 $actions .= $is_admin ? '<a class="btn btn-circle btn-icon-only default blue" onClick="archiveOrLockDocument(event, ' . $document->id . ', 1)"><i class="fa fa-archive"></i></a>' : '';
-                $actions .= $is_admin ? '<a class="btn btn-circle btn-icon-only default red" onClick="archiveOrLockDocument(event, ' . $document->id . ', 2)"><i class="fa fa-lock"></i></a>' : '';
+                
                 
                 return $actions;
               })
@@ -238,6 +284,7 @@ class InboxController extends Controller
                     $updates['is_canceled'] = 1;
                 }
 
+                $updates['archive_user'] = Auth::user()->name;
                 $document->fill($updates);
                 $document->update();
             });
@@ -304,6 +351,7 @@ class InboxController extends Controller
      */
     public function show($id)
     {
+        
         $selectlist = Selectlistauth::where('status', 'Visible')->get();
         $languageall = DB::table('languages')->get();
 
@@ -335,8 +383,21 @@ class InboxController extends Controller
 /*        $set = SupplySet::where('documents_id', $doc_id)->where('supplies_id', $set_pri_key[1])
         ->first();*/
         $set = SupplySet::find($set_id[1]);
-        
+
+        $product_id = SupplySet::find($set_id[1])->supplies_id;
+        $manufacturers_id = Supply::find($product_id)->manufacturers_id;
         $suppliers = Supplier::orderBy('trade_name')->pluck('trade_name', 'id');
+
+        /*
+        $suppliers = DB::table('suppliers_manufacturers')
+                    ->where('suppliers_manufacturers.manufacturers_id', $manufacturers_id)
+                    ->leftJoin('suppliers AS s', function($join) {
+                        $join->on('suppliers_manufacturers.suppliers_id', '=', 's.id');
+                        })
+                    ->select('s.trade_name', 's.id')
+                    ->get();
+        */
+
         $currencies = Currency::pluck('name', 'id');
         $measurement = DB::table('measurements')->find($set->id);
         $countries = DB::table('countries')->pluck('name', 'id');
@@ -375,6 +436,7 @@ class InboxController extends Controller
 
         $files = DB::table('files')
         ->select('files.*', 'supplies_files.supplies_id', 'supplies_files.files_id')
+        ->orderBy('files.created_at', 'DESC')
         ->join('supplies_files', 'supplies_files.files_id', 'files.id')
         ->join('supplies', 'supplies.id', 'supplies_files.supplies_id')
         ->where('supplies.id', $set_supplies_id);
@@ -1788,7 +1850,9 @@ $sale_conditions = $condition->description . '
         $entity = $request->entity;
         $data['users_id'] = Auth::user()->id;
         $document = Document::find($request->documents_id);
+
         $data['pct_status'] = $document->status;
+        
         try {
             if($entity == 1)
                 Binnacle::create($data);

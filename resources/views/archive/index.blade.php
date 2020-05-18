@@ -175,7 +175,9 @@ function buildDataTable(ajaxData) {
             { data: "number", name: "number" },
             { data: "reference", name: "reference" },
             { data: "buyer", name: "users.name" },
-            @if($logged_user_role == 'Administrador'){ data: "customer", name: "customers.trade_name" },@endif
+            @if($logged_user_role == 'Administrador')
+                { data: "customer", name: "customers.trade_name" },
+            @endif
             { data: "status", name: "status" },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }
         ],

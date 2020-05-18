@@ -9,9 +9,15 @@
                 <div class="row">
                     <div class="col-md-7">
                         <div class="form-group">
-                            {!! Form::select('set[suppliers_id]', $suppliers, $set->suppliers_id, ['class' => 'form-control',
+                            <select name="set[suppliers_id]" id="budget_tab_suppliers_select" class="form-control" style="width: 100%;">
+                                <option value="">Proveedores ...</option>
+                                @foreach ($suppliers as $supplier)
+                                    <option value="{{$supplier->id}}">{{$supplier->trade_name}}</option>
+                                @endforeach
+                            </select>
+                            {{-- {!! Form::select('set[suppliers_id]', $suppliers, $set->suppliers_id, ['class' => 'form-control',
                                 'style' => 'width: 100%', 'id' => 'budget_tab_suppliers_select', 
-                                'placeholder' => 'Proveedor...', $set_edit_inputs_status]) !!}
+                                'placeholder' => 'Proveedor...', $set_edit_inputs_status]) !!} --}}   
                         </div>
                     </div>
                     <div class="col-md-5">

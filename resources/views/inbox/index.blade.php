@@ -152,7 +152,7 @@ $('#filters_form').submit(function(e){
         'route': 'inbox'
     };
 
-    buildDataTable(ajaxData);
+    buildDataTableFilter(ajaxData);
 
 });
 
@@ -161,6 +161,32 @@ function buildDataTable(ajaxData) {
         serverSide: true,
         ajax: {
             url: root_url + '/inbox/get-list',
+            data: ajaxData
+        },
+        bSort: true,
+        order: [],
+        destroy: true,
+        columns: [
+            { data: "created_at", name: "created_at", searchable: false },
+            { data: "sync_connection", name: "sync_connections.display_name" },
+            { data: "number", name: "documents.number" },
+            { data: "reference", name: "documents.reference" },
+            { data: "buyer", name: "users.name" },
+            { data: "semaphore", name: "semaphore", searchable: false, orderable: false },
+            { data: "status", name: "status", searchable: false },
+            { data: 'actions', name: 'actions', orderable: false, searchable: false }
+        ],
+        language: {
+            url: "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json",
+        }, 
+    });
+}
+
+function buildDataTableFilter(ajaxData) {
+    $('#inbox_table').DataTable({
+        serverSide: true,
+        ajax: {
+            url: root_url + '/inbox/get-list-filter',
             data: ajaxData
         },
         bSort: true,

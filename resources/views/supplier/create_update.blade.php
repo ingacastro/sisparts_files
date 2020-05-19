@@ -75,12 +75,14 @@
                             @if(!$is_edit)
                             {!! Form::open(['route' => 'supplier.store', 'class' => 'horizontal-form', 'id' => 'fiscal_form']) !!}
                                 <input type="hidden" name="tabs_config" value="">
+                                <input type="hidden" name="user_id" value="{{auth()->user()->id}}">
                                 @include('supplier.tabs.fiscal_data')
                             {!! Form::close() !!}
                             @else
                             <!-- Update -->
                             {!! Form::model($model, ['route' => ['supplier.update', $model->id], 'class' => 'horizontal-form', 'id' => 'fiscal_form', 'method' => 'put']) !!}
                                 <input type="hidden" name="tabs_config" value="">
+                                <input type="hidden" name="user_id" value="{{auth()->user()->id}}">
                                 @include('supplier.tabs.fiscal_data')
                             {!! Form::close() !!}
                             @endif

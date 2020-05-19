@@ -24,7 +24,7 @@ class SupplierRequest extends FormRequest
     public function rules()
     {
         $rules = [
-              'trade_name' => 'required',
+              'trade_name' => 'required|unique:suppliers',
               'countries_id' => 'required',
               'languages_id' => 'required'
             ];
@@ -64,6 +64,7 @@ class SupplierRequest extends FormRequest
     {
       return [
         'trade_name.required' => 'El nombre comercial es requerido.',
+        'trade_name.unique' => 'El nombre comercial ya ha sido tomado..',
         'countries_id.required' => 'El país es requerido.',
         'email.required' => 'El correo electrónico es requerido.',
         'email.email' => 'El formato del correo electrónico es incorrecto.',

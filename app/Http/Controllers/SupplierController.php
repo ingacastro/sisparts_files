@@ -25,6 +25,16 @@ class SupplierController extends Controller
      */
     public function index()
     {
+       /* dd(Supplier::select('suppliers.id', 'users.name AS user', 'trade_name', 'business_name', 
+        'countries.name as country', 'suppliers.rfc', 'suppliers.email', 'suppliers.landline', 'suppliers.contact_name',
+        DB::raw("GROUP_CONCAT(manufacturers.name) as brands"))
+    ->leftJoin('countries', 'countries.id', 'suppliers.countries_id')
+    ->leftJoin('users', 'users.id', 'suppliers.user_id')
+    ->leftJoin('suppliers_manufacturers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
+    ->leftJoin('manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
+    ->orderBy('suppliers.created_at', 'DESC')
+    ->groupBy('suppliers.id')->get());
+    */
         return view('supplier.index');
     }
 
@@ -32,13 +42,15 @@ class SupplierController extends Controller
     {
         if(!$request->ajax()) abort(403, 'Unauthorized action');
 
-        $supps = Supplier::select('suppliers.id', 'trade_name', 'business_name', 
-            'countries.name as country', 'rfc', 'email', 'landline', 'contact_name',
-            DB::raw("GROUP_CONCAT(manufacturers.name) as brands"))
-        ->leftJoin('countries', 'countries.id', 'suppliers.countries_id')
-        ->leftJoin('suppliers_manufacturers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
-        ->leftJoin('manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
-        ->groupBy('suppliers.id');
+        $supps = Supplier::select('suppliers.id', 'users.name AS user', 'trade_name', 'business_name', 
+        'countries.name as country', 'suppliers.rfc', 'suppliers.email', 'suppliers.landline', 'suppliers.contact_name',
+        DB::raw("GROUP_CONCAT(manufacturers.name) as brands"))
+    ->leftJoin('countries', 'countries.id', 'suppliers.countries_id')
+    ->leftJoin('users', 'users.id', 'suppliers.user_id')
+    ->leftJoin('suppliers_manufacturers', 'suppliers.id', 'suppliers_manufacturers.suppliers_id')
+    ->leftJoin('manufacturers', 'suppliers_manufacturers.manufacturers_id', 'manufacturers.id')
+    ->orderBy('suppliers.created_at', 'DESC')
+    ->groupBy('suppliers.id');
 
         return Datatables::of($supps)
               ->addColumn('actions', function($supplier) {
@@ -179,8 +191,51 @@ class SupplierController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(SupplierRequest $request, $id)
-    {
+    public function update(Request $request, $id)
+    {   
+        $request->validate([
+            'trade_name' => 'required',
+            'countries_id' => 'required',
+            'languages_id' => 'required',
+            'mobile' => 'nullable|max:15',
+            'rfc' => ['nullable', 'regex:/^[a-zA-Z]{3,4}(\d{6})((\D|\d){2,3})?$/'],
+            'post_code' => 'required',
+            'credit_days' => 'nullable|numeric',
+            'credit_amount' => 'nullable|numeric',
+            'email' => 'required|email',
+            'landline' => 'required|max:15',
+            'type' => 'required'
+        ], [
+            'trade_name.required' => 'El nombre comercial es requerido.',
+            'trade_name.unique' => 'El nombre comercial ya ha sido tomado..',
+            'countries_id.required' => 'El país es requerido.',
+            'email.required' => 'El correo electrónico es requerido.',
+            'email.email' => 'El formato del correo electrónico es incorrecto.',
+            'languages_id.required' => 'El idioma es requerido.',
+            'landline.required' => 'El teléfono fijo es requerido.',
+            'landline.max' => 'El formato de teléfono debe ser de máximo 15 caracteres.',
+            'currencies_id.required' => 'La moneda es requerida.',
+            'mobile.required' => 'El teléfono móvil es requerido.',
+            'mobile.max' => 'El formato de teléfono debe ser de máximo 15 caracteres.',
+            'business_name.required' => 'La razón social es requerido.',
+            'type.required' => 'El tipo de proveedor es requerido.',
+            'states_id.required' => 'El estado es requerido.',
+            'rfc.required' => 'El RFC requerido.',
+            'rfc.unique' => 'El RFC indicado ya existe.',
+            'rfc.regex' => 'El formato de RFC es incorrecto.',
+            'city.required' => 'La ciudad es requerido.',
+            'post_code.required' => 'El código postal es requerido.',
+            'post_code.size' => 'El código postal debe ser de 5 dígitos.',
+            'street.required' => 'La calle es requerida.',
+            'contact_name.required' => 'El contacto es requerido.',
+            'street_number.required' => 'El número exterior es requerido.',
+            'unit_number.required' => 'El número interior es requerido.',
+            'credit_days.required' => 'Los días de crédito es requerido.',
+            'credit_days.required' => 'Los días de crédito debe ser númerico.',
+            'suburb.required' => 'La colonia es requerida.',
+            'credit_amount.required' => 'El monto de crédito es requerido.',
+            'credit_amount.required' => 'El monto de crédito debe ser númerico.'
+        ]);
         $data = $request->all();
         if(!$request->has('marketplace')) $data['marketplace'] = 0;
 
@@ -215,6 +270,8 @@ class SupplierController extends Controller
 
     public function ajaxstore(SupplierRequest $request)
     {
+
+
         $model = null;
         $supp_data = $request->all();
         $doc = explode('_', $request['manufacturer']);
@@ -256,18 +313,19 @@ class SupplierController extends Controller
         $supp = DB::table('supplies')->where('id', $supplies_id)->get();
         
         $manufacturers_id = $supp[0]->manufacturers_id;
-
-
-        $existe = DB::table('suppliers_manufacturers')
+        
+        $proveedor = DB::table('suppliers_manufacturers')
           ->where('manufacturers_id', $manufacturers_id)
           ->where('suppliers_id', $request['id'])
-          ->get();
+          ->leftJoin('suppliers AS s', 'suppliers_manufacturers.suppliers_id', 's.id')
+          ->select('s.trade_name', 's.countries_id', 's.email', 's.languages_id', 's.landline', 's.post_code')
+          ->first();
         
-        if (isset($existe[0])) {
-          return response()->json(['message' => 1]);
+        if ( $proveedor->trade_name == null  OR $proveedor->countries_id == null OR $proveedor->email == null OR $proveedor->languages_id == null OR $proveedor->landline == null OR $proveedor->post_code == null) {
+          return response()->json(['message' => 0]);
         }
 
-        return response()->json(['message' => 0]);
+        return response()->json(['message' => 1]);
 
       } catch (Exception $e) {
         return response()->json(['message' => 0]);

@@ -274,6 +274,7 @@ class SupplierController extends Controller
 
         $model = null;
         $supp_data = $request->all();
+        $supp_data['user_id'] = $request->user()->id;
         $doc = explode('_', $request['manufacturer']);
 
         if(!$request->has('marketplace')) $supp_data['marketplace'] = 0;

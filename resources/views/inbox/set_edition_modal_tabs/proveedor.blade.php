@@ -32,7 +32,7 @@
     <div class="tabbable-line boxless tabbable-reversed">
       <ul class="nav nav-tabs" id="supplier_tabs">
         <li class="active">
-          <a href="#tab_0_content" id="tab_0" data-toggle="tab" aria-expanded="true"> Datos Básicos </a>
+          <a href="#tab_0_content" id="tab_0" data-toggle="tab" aria-expanded="true"> Datos Básicoss </a>
         </li>
         <li>
           <a href="#tab_5_content" id="tab_5" data-toggle="tab"> Datos Fiscales </a>

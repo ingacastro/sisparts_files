@@ -122,12 +122,12 @@ class RejectionReasonController extends Controller
     {
         try {
             $reject_reason = RejectionReason::find($id);
-
+            /*
             if($reject_reason->rejections->count() > 0) {
                 back()->withErrors('El motivo de rechazo no puede ser eliminado, por que está siendo usado en algunas partidas.');
                 return;
             }
-            
+            */
             $reject_reason->delete();
             Session::flash('message', 'Motivo de rechazo eliminado correctamente.');
         } catch(\Exception $e) {

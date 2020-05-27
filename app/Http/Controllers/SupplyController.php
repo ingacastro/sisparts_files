@@ -13,6 +13,7 @@ use DB;
 use IParts\Replacement;
 use IParts\Observation;
 use IParts\Document;
+use IParts\Manufacturer;
 use Auth;
 
 class SupplyController extends Controller
@@ -37,6 +38,7 @@ class SupplyController extends Controller
         if(!$request->ajax()) abort(403, 'Unauthorized action');
           
           $supplies = Supply::query();
+          
 
           //Log::notice($supplies->toSql());
           //Log::notice($supplies->where('supplies.id', 78617)->get());
@@ -46,7 +48,9 @@ class SupplyController extends Controller
 
         return Datatables::of($supplies)
               ->addColumn('actions', function($supply) {
-                    return '<a href="#replacement_observation_modal" class="btn btn-circle btn-icon-only blue replacement-observation" data-toggle="modal" data-target="#replacement_observation_modal" 
+                    return '<a data-toggle="modal" data-id="' . $supply->id .'" href="#brand_modal" 
+                    class ="btn btn-circle btn-icon-only green show-brands"><i class="fa fa-eye"></i></a>
+                    <a href="#replacement_observation_modal" class="btn btn-circle btn-icon-only blue replacement-observation" data-toggle="modal" data-target="#replacement_observation_modal" 
                         data-supply_id="' . $supply->id . '" data-type="1" data-number="' . $supply->number . '"><i class="fa fa-refresh"></i></a>
                     <a href="#replacement_observation_modal" class="btn btn-circle btn-icon-only yellow-crusta replacement-observation" data-toggle="modal" data-target="#replacement_observation_modal" data-number="' . $supply->number . '" data-supply_id="' . $supply->id . '" data-type="2"><i class="fa fa-clipboard"></i></a>
                     <a href="#pcts_modal" class="btn btn-circle btn-icon-only default pcts" data-toggle="modal" data-target="#pcts_modal" data-number="' . $supply->number . '" data-supply_id="' . $supply->id . '"><i class="fa fa-list"></i></a>
@@ -54,6 +58,7 @@ class SupplyController extends Controller
                     data-number="' . $supply->number . '"><i class="fa fa-list"></i></a>';
               })
               ->addColumn('manufacturer', function($supply) {
+                
                 return $supply->manufacturer ? $supply->manufacturer->name : '';
               })
               ->addColumn('suppliers', function($supply){
@@ -346,5 +351,34 @@ class SupplyController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    //vincular marca a producto
+    public function syncBrand(Request $request)
+    {  
+        try {
+            $supy_id = $request->get('supply_id');
+            $brands = json_decode($request->get('supply_brands'));
+            Supplier::find($supy_id)->manufacturer()->sync($brands);
+            $request->session()->flash('message', 'Marcas actualizadas correctamente.');
+        } catch(\Exception $e) {
+            return redirect()->back()->withErrors($e->getMessage());
+        }
+
+        return redirect()->route($request->get('redirect_to'), $supp_id);
+    }
+
+    public function getBrandKeyVal(Request $request)
+    {
+        $brands = Manufacturer::select('id', 'name as text')
+        ->where('name', 'like', '%' . $request->get('term') . '%')->get();
+        return response()->json($brands);
+    }
+
+    public function createBrand(Request $request)
+    {
+        $brand = Manufacturer::find($request->get('value'));
+        if(is_null($brand)) $brand = Manufacturer::create(['name' => $request->get('value')]);
+        return response()->json($brand);
     }
 }

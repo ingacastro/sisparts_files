@@ -134,6 +134,11 @@ Route::get('supply/{supply_id}/pcts', 'SupplyController@getPcts');
 Route::get('supply/{supply_id}/binnacle', 'SupplyController@getBinnacle');
 Route::get('supply', 'SupplyController@index')->name('supply.index');
 
+//acastro
+Route::post('supply/sync-brand', 'SupplyController@syncBrand')->name('supply.sync-brand');
+Route::get('supply/brand-id-name', 'SupplyController@getBrandKeyVal');
+Route::post('supply/create-brand', 'SupplyController@createBrand');
+
 //jsanchez
 // checklistedit
 Route::group(['middleware' => ['role:Administrador|Cotizador']], function(){

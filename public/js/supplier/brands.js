@@ -39,7 +39,7 @@ $('#add_brand').click(function(){
 		success: function(brand) {
 			let row_query = $('#row_' + brand.id);
 			if(row_query.length > 0) return;
-
+			
 			$('#brands_table').DataTable().row.add({
 				'id': brand.id, 
 				'name': brand.name, 

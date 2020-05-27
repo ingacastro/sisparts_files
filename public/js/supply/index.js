@@ -1,4 +1,5 @@
  var root_url = $('#root_url').attr('content');
+ 
 $(document).on('click', '.replacement-observation', function() {
 
     replacementObservationSaveUI();
@@ -177,4 +178,70 @@ $(document).on('click', '.pcts', function() {
             "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
         }
 	});
+});
+
+//acastro
+$(document).ready(function(){
+    $('#brands_select2').select2({
+        tags: true,
+        ajax: {
+        	url: root_url + '/supply/brand-id-name',
+        	dataType: 'json',
+        	type: "get",
+        	delay: 250,
+        	data: function(params) {
+	            return {
+	                term: params.term
+	            };
+			},
+			processResults: function (data) {
+	            return {
+	                results: data
+	            };
+	        },
+	        cache: true
+        }
+    });
+});
+
+$('#add_brand').click(function(){
+
+	let select2_val = $('#brands_select2').val();
+	let token = $('#brands_form > input[name=_token]').val();
+	let model_id = $('#model_id').val();
+	let auth_user_is_admin = $('#auth_user_is_admin').attr('content');
+	if(select2_val == null) return;
+	
+	$.ajax({
+		url: root_url + '/supply/create-brand',
+		type: 'post',
+		dataType: 'json',
+		headers: {'X-CSRF-TOKEN': token},
+		data: {value: select2_val},
+		success: function(brand) {
+			let row_query = $('#row_' + brand.id);
+			if(row_query.length > 0) return;
+            console.log(brand.id);
+			console.log(brand.name);
+			$('#brands_table').DataTable().row.add({
+				'id': brand.id,
+				'name': brand.name,
+				'actions': (auth_user_is_admin == 1) ? '<a class="remove-brand" id="' + brand.id +'">Eliminar</a>' : ''
+			}).node().id = 'row_' + brand.id;
+			$('#brands_table').DataTable().draw(false);
+		}
+	});
+});
+
+$(document).on('click', 'a.remove-brand', function(){
+    $('#brand_table').DataTable()
+    .row($(this).parents('tr'))
+    .remove()
+    .draw();
+});
+
+$('#brand_form').submit(function(e){
+let rows = $('#brand_table').DataTable().rows();
+let ids = JSON.stringify($('#brand_table').DataTable().cells(rows.nodes(), 0).data().toArray());
+$('#supply_brand').val(ids);
 });

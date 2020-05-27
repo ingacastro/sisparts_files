@@ -4,6 +4,8 @@
 <link href="{{ asset('metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css') }}" rel="stylesheet" type="text/css" />
 <link href="{{ asset('metronic-assets/global/css/plugins.min.css') }}" rel="stylesheet" type="text/css" />
 <link href="{{ asset('metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('metronic-assets/global/plugins/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('metronic-assets/global/plugins/select2/css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
 <style>
     .sweet-alert {
         z-index: 99999 !important;
@@ -74,6 +76,31 @@
         <!-- END EXAMPLE TABLE PORTLET-->
     </div>
 </div>
+<!-- inicio modal marca-->
+<div class="modal fade bs-modal-lg" id="brand_modal" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Marcas</h4>
+            </div>
+            {!! Form::open(['route' => 'supply.sync-brand', 'method' => 'post', 'class' => 'horizontal-form', 'id' => 'brands_form']) !!}
+                <input type="hidden" name="supply_id" id="supply_id">
+                <input type="hidden" name="supply_brand" id="supply_brand" value="">
+                <input type="hidden" name="redirect_to" value="supply.index">
+                <div class="modal-body">
+                    @include('supply.tabs.brands')
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-circle default" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-circle blue">Guardar</button>
+                </div>
+            {!! Form::close() !!}
+        </div>
+    </div>
+</div>
+<!-- fin modal marca -->
+
 @include('supply.modals.replacement_observation')
 @include('supply.modals.pcts')
 @include('supply.modals.binnacle')
@@ -82,8 +109,10 @@
 @push('scripts')
 <script src="{{ asset('metronic-assets/global/plugins/datatables/datatables.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('metronic-assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js') }}" type="text/javascript"></script>
-<script src="{{ asset('js/supply/index.js') }}" type="text/javascript"></script>
 <script src="{{ asset('metronic-assets/global/plugins/bootstrap-sweetalert/sweetalert.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('metronic-assets/global/plugins/select2/js/select2.full.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('metronic-assets/pages/scripts/components-select2.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/supply/index.js') }}" type="text/javascript"></script>
 <script type="text/javascript">
      var root_url = $('#root_url').attr('content');
     $(document).ready(function(){
@@ -124,8 +153,9 @@
             language: {
                 "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
             }
+            
         });
-
+        
         //var abcFromUrl = Request.QueryString["number"] ?? string.Empty;
         let url = window.location.href;
         url = new URL(url);

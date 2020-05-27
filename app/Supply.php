@@ -13,6 +13,7 @@ class Supply extends Model
     	return $this->hasOne('IParts\Manufacturer', 'id', 'manufacturers_id');
     }
 
+
     public function sets()
     {
         return $this->hasMany('IParts\SupplySet', 'supplies_id');

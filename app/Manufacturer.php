@@ -17,4 +17,5 @@ class Manufacturer extends Model
     {
     	return $this->hasMany('IParts\Supply', 'manufacturers_id', 'id');
     }
+
 }
